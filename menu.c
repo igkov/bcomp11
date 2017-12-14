@@ -22,7 +22,7 @@ const menu_t menu[] = {
 	{    9, MENU_FLAG,  0, 0, "Нар.пред.",   "",    &bcomp.setup.f_ext_w,  1, 0, 1 },
 	{   10, MENU_INT,   0, 0, "Наруж.тем.",  "°C",  &bcomp.setup.t_ext,    1, -10, 10 },
 	{   12, MENU_FLAG,  0, 0, "GPS",         "",    &bcomp.setup.f_gps,    1, 0, 1 },
-	//{   13, MENU_INT,   0, 0, "GPS скор.",   "",    &bcomp.setup.i_gps,    4800, 4800, 115200 },
+	{   13, MENU_INT,   0, 0, "GPS скор.",   "",    &bcomp.setup.i_gps,    4800, 4800, 115200 },
 	{   14, MENU_FLAG,  0, 0, "ESP руль",    "",    &bcomp.setup.f_esp,    1, 0, 1 },
 	{   15, MENU_FLOAT, 2, 0, "Калиб.топ.",  "",    &bcomp.setup.fuel_cal, 1, 300, 400 },
 	{   16, MENU_FLOAT, 2, 0, "Калиб.ск.",   "",    &bcomp.setup.speed_cal,1, 80, 120 },
