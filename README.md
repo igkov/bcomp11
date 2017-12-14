@@ -1,14 +1,14 @@
 # bcomp11 - on-board computer
 
-Car on-board computer based on LPC11C14. Specified for Mitsubishi Pajero Sport 2nd gen. 
+Car on-board computer based on LPC11C14. Specified for Mitsubishi Pajero Sport 2nd gen.
 
-# Full description
+Full description
 -----------------------------------------
 
 http://igorkov.org/bcomp11 (old version)
 http://igorkov.org/bcomp11v2 (actual version)
 
-# Hardware description 
+Hardware description 
 -----------------------------------------
 
 Computer based on NXP LPC11C14 with HW CAN.
