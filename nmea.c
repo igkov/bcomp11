@@ -13,8 +13,8 @@
 #include "nmea.h"
 #include "bcomp.h"
 
-int offset;
-char nmea_string[256];
+static int nmea_offset;
+static char nmea_string[256];
 
 #define STROUT_SIZE 16
 #define NMEA_NO_CHECK 0
@@ -169,29 +169,32 @@ void nmea_parce(char *str) {
 }
 
 void nmea_proc(uint8_t ch) {
+	// Блокировка логики NMEA:
 	if (bcomp.setup.f_gps == 0) {
 		return;
 	}
+	// Счетчик принятых байт:
 	bcomp.nmea_cnt++;
-	if (offset >= sizeof(nmea_string)-1 ||
+	// Прием строк:
+	if (nmea_offset >= sizeof(nmea_string)-1 ||
 		ch == '\r' || 
 		ch == '\n') {
 		// Вставляем конец строки
-		nmea_string[offset] = 0x00;
+		nmea_string[nmea_offset] = 0x00;
 		// Обработка принятой строки:
-		if (offset > 5) { // короткие строки игнорируем.
+		if (nmea_offset > 5) { // короткие строки игнорируем.
 			nmea_parce(nmea_string);
 		}
 		// Прием новой строки:
-		offset = 0;
+		nmea_offset = 0;
 	} else {
-		nmea_string[offset] = ch;
-		offset++;
+		nmea_string[nmea_offset] = ch;
+		nmea_offset++;
 	}
 }
 
 void nmea_init(void) {
-	offset = 0;
+	nmea_offset = 0;
 	memset(nmea_string, 0x00, sizeof(nmea_string));
 }
 

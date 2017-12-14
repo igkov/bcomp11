@@ -2,8 +2,9 @@
 #include  "LPC11xx.h"
 #endif
 #include "uart0.h"
+#include "dbg.h"
 
-#if __UART0_IRQ
+#if __UART_IRQ
 void UART_IRQHandler(void) {
 	uint8_t ch;
 	uint8_t IIR_val = (LPC_UART->IIR >> 1) & 0x07;
@@ -51,7 +52,7 @@ void uart0_init(uint32_t baudrate) {
     LPC_UART->DLM = Fdiv / 256;
     LPC_UART->DLL = Fdiv % 256;
     LPC_UART->LCR = 0x03;
-#if 0
+#if 1
 	LPC_UART->FCR = 0x07; // Enable and reset TX and RX FIFO.
 #endif
 #if __UART_IRQ
