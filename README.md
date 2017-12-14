@@ -2,6 +2,17 @@
 
 Car on-board computer based on LPC11C14. Specified for Mitsubishi Pajero Sport 2nd gen.
 
+Configurations
+-----------------------------------------
+
+The Keil MDK project have some configurations:
+
+<b>bcomp11 (Debug)</b> - old interface version, debug build.<br>
+<b>bcomp11 (Release)</b> - old interface version, release build.<br>
+<b>bcomp11v2 (Debug)</b> - new (actual) interface version, debug build.<br>
+<b>bcomp11v2 (Release)</b> - new (actual) interface version, release build.<br>
+<b>bcomp11v2 (ReleaseF)</b> - new (actual) interface version, release build for SH1106 and gauge meter.<br>
+
 Full description
 -----------------------------------------
 
