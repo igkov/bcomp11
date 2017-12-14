@@ -13,6 +13,8 @@ The Keil MDK project have some configurations:
 <b>bcomp11v2 (Release)</b> - new (actual) interface version, release build.<br>
 <b>bcomp11v2 (ReleaseF)</b> - new (actual) interface version, release build for SH1106 and gauge meter.<br>
 
+The sub-folder /pc contains HAL-level and build-script for compilation in MinGW-Win32. This build use for easy interface debug.
+
 Full description
 -----------------------------------------
 
