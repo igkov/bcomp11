@@ -185,7 +185,10 @@ PIOINT3_IRQHandler
 PIOINT2_IRQHandler 
 PIOINT1_IRQHandler
 PIOINT0_IRQHandler
-                B       .
+                ;B       .
+                IMPORT  exeption_proc
+                LDR     R0, =exeption_proc
+                BX      R0
                 ENDP
 
                 ALIGN
