@@ -1073,9 +1073,12 @@ trip:
 			}
 			graph_puts16(64,0,1,"GPS");
 			if (bcomp.g_correct) {
-				graph_puts16(64,16,1,bcomp.gps_val_time);
-				graph_puts16(64,32,1,bcomp.gps_val_lon);
-				graph_puts16(64,48,1,bcomp.gps_val_lat);
+				_sprintf(str,"%s",bcomp.gps_val_time);
+				graph_puts16(64,16,1,str);
+				_sprintf(str,"%s",bcomp.gps_val_lon); str[10] = 0; // cutting
+				graph_puts16(64,32,1,str);
+				_sprintf(str,"%s",bcomp.gps_val_lat); str[10] = 0; // cutting
+				graph_puts16(64,48,1,str);
 			} else {
 				graph_puts16(64,32,1,"NO DATA");
 			}
@@ -1087,7 +1090,7 @@ trip:
 			} else {
 				bcomp.page = 1;
 			}
-			config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
+			config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
 			goto repeate;
 		}
 
