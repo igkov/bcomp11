@@ -7,8 +7,8 @@
 // Это позволяет при повреждении данных в момент записи в одной из ячеек, при последующем 
 // чтении гарантированно восстановить корректное значение из другой ячейки.
 
-// 32 * 16 * 2 = 1024Б
-#define CONFIG_MAX_PARAM 32
+// 64 * 16 * 2 = 2048Б
+#define CONFIG_MAX_PARAM 64
 #define CONFIG_MAX_SIZE  13
 #define CONFIG_OFFSET    (0x0000)
 #define CONFIG_SIZE      (2*CONFIG_MAX_PARAM*sizeof(config_unit_t))

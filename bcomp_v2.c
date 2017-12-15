@@ -571,6 +571,7 @@ int main(void)
 	if (config_read(CPAR_SETUP_I_GPS, (uint8_t*)&bcomp.setup.i_gps, CPAR_SETUP_I_GPS_SIZE)) {
 		bcomp.setup.i_gps = bconfig.uart_speed;
 	} else {
+		DBG("UART speed = %d\r\n", bcomp.setup.i_gps);
 		// Если скорости отличается от настроечной, перенастраиваем UART:
 		if (bcomp.setup.i_gps != bconfig.uart_speed) {
 			uart0_init(bcomp.setup.i_gps);
@@ -1086,6 +1087,7 @@ trip:
 			} else {
 				bcomp.page = 1;
 			}
+			config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
 			goto repeate;
 		}
 

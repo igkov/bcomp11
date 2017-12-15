@@ -185,10 +185,14 @@ PIOINT3_IRQHandler
 PIOINT2_IRQHandler 
 PIOINT1_IRQHandler
 PIOINT0_IRQHandler
-                ;B       .
+                IF      :LNOT::DEF:BCOMP_V2
+                B       .
+                ELSE
                 IMPORT  exeption_proc
                 LDR     R0, =exeption_proc
                 BX      R0
+				ENDIF
+
                 ENDP
 
                 ALIGN

@@ -116,7 +116,7 @@ obd_loopback_recv:
 }
 
 void obd_getpid(uint16_t addr, uint16_t pid) {
-	DBG("get_pid(%04x, %04x);\r\n", addr, pid);
+	//DBG("get_pid(%04x, %04x);\r\n", addr, pid);
 #if !defined( NO_FILTER )
 	// Настройка приема:
 	CAN_wrFilter(addr+0x08, STANDARD_FORMAT);
