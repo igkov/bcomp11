@@ -1123,6 +1123,15 @@ trip:
 // Точка входа для отладочной WIN-версии:
 int main(int argc, char **argv) {
 	uint32_t addr;
+	
+	printf("-----------------------------------------------------------\r\n");
+	printf("BCOMP11 Win32 PC build\r\n");
+	printf("-----------------------------------------------------------\r\n");
+	printf("A (or mouse click) - next, S - previous\r\n");
+	printf("A long press - Enter, S long press - Cancel\r\n");
+	printf("-----------------------------------------------------------\r\n");
+	printf("\r\n");
+
 	return lcd_init(ProcMain, "OLED", SIZE_X, SIZE_Y);
 }
 #endif
