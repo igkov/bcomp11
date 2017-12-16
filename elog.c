@@ -125,7 +125,7 @@ void elog_proc(void) {
 	} else {
 		_sprintf(&elog_str[offset], "%d.%d;", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
 	}
-	//  5 - dfuel  - Израсходованное за сеанс топливо (л).
+	//  5 - fuel  - Израсходованное за сеанс топливо (л).
 	offset = strlen(elog_str);
 	_sprintf(&elog_str[offset], "%d.%02d;", (int)bcomp.fuel_level, (int)(bcomp.fuel_level*100)%100);
 	//  6 - dfuel  - Израсходованное за сеанс топливо (л).
