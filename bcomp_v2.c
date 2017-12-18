@@ -148,11 +148,11 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 			//bcomp.mil = 1;
 			// FIX: флаг ставится только после чтения кода ошибки
 			obd_act_set(FREEZE_DTC, 1);
-			DBG("MIL ON!!!\r\n");
+			DBG("MIL ON (DTCs = %d)!\r\n", data[3]&0x7F);
 		} else {
 			// MIL Light off
 			bcomp.mil = 0;
-			DBG("MIL OFF!!!\r\n");
+			DBG("MIL OFF (DTCs = %d)!\r\n", data[3]&0x7F);
 		}
 		break;
 	case FREEZE_DTC: {
