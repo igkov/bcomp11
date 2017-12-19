@@ -27,7 +27,7 @@ Hardware description
 Computer based on NXP LPC11C14 with HW CAN.
 
 Scheme:
-<img src="http://igorkov.org/images/bcomp11-scheme-v2.png">
+<img src="http://igorkov.org/images/bcomp11v2-scheme.png">
 
 Device view*:
 <img src="http://igorkov.org/images/bcomp11-tests.jpg">
