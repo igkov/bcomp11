@@ -132,14 +132,38 @@ void graph_pic(const ico_t *p, int ox, int oy) {
 	}
 }
 
-#if 1//defined( WIN32 )
 // ---------------------------------------------
 // EXT FONT SUPPORT
 // ---------------------------------------------
 
+//#include "./fonts/arial_30_pk.c"
+//#include "./fonts/arial_30b_pk.c"
+//#include "./fonts/courier_30_pk.c"
+//#include "./fonts/courier_30b_pk.c"
+//#include "./fonts/helv_30_pk.c"
+//#include "./fonts/helv_30b_pk.c"
+//#include "./fonts/sans_30_pk.c"
 #include "./fonts/sans_30b_pk.c"
-#define FONT32 font30gs
-#if !defined( FONT_NO_RECODE )
+//#include "./fonts/times_30_pk.c"
+//#include "./fonts/times_30b_pk.c"
+//#include "./fonts/arial_48_pk.c"
+//#include "./fonts/arial_48b_pk.c"
+//#include "./fonts/courier_48_pk.c"
+//#include "./fonts/courier_48b_pk.c"
+//#include "./fonts/helv_48_pk.c"
+//#include "./fonts/helv_48b_pk.c"
+//#include "./fonts/sans_48_pk.c"
+//#include "./fonts/sans_48b_pk.c"
+//#include "./fonts/times_48_pk.c"
+//#include "./fonts/times_48b_pk.c"
+
+#define FONT_ARRAY font_array
+
+//
+// FONT_RECODE - определение, говорящее о том, что таблица символов 
+//
+
+#if defined( FONT_RECODE )
 const uint8_t map_font32[256] = { 
 //         0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0A 0x0B 0x0C 0x0D 0x0E 0x0F
 /* 0x00 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
@@ -168,32 +192,36 @@ void graph_puts32c(int ox, int oy, char *str) {
 	int wide = 0;
 	// Рассчет выравнивания:
 	while ((ch = str[i]) != 0) {
-#if !defined( FONT_NO_RECODE )
+#if defined( FONT_RECODE )
 		ch = map_font32[ch];
+#else
+		ch -= 0x20;
 #endif
-		wide += FONT32[ch].sizex;
+		wide += FONT_ARRAY[ch].sizex;
 		i++;
 	}
 	ox -= wide/2; if (ox < 0) ox = 0;
 	// Вывод строки:
 	i = 0;
 	while ((ch = str[i]) != 0) {
-#if !defined( FONT_NO_RECODE )
+#if defined( FONT_RECODE )
 		ch = map_font32[ch];
+#else
+		ch -= 0x20;
 #endif
-		if (FONT32[ch].data == NULL) {
+		if (FONT_ARRAY[ch].data == NULL) {
 			//nop
 		} else {
-			graph_pic(&FONT32[ch], ox+offset, oy);
+			graph_pic(&FONT_ARRAY[ch], ox+offset, oy);
 		}
-		offset += FONT32[ch].sizex;
+		offset += FONT_ARRAY[ch].sizex;
 		i++;
 	}
 }
 // ---------------------------------------------
 // EXT FONT SUPPORT END
 // ---------------------------------------------
-#endif
+
 
 // ---------------------------------------------
 // LINE DRAW SUPPORT
