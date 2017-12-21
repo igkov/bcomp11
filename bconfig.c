@@ -30,7 +30,10 @@ const bcomp_config_t bconfig = {
 #endif
 	1,                     // uart logging on/off
 	0,0,                   // res1,2
+#if defined(INSIDE_VERSION)
+	{ 3700.0f, 313.15f, 1000.0f },  // Mitsubishi NMPS termistor
+#else
 	{ 4300.0f, 298.15f, 10000.0f }, // EPCOS termistor
-	//{ 3700.0f, 313.15f, 1000.0f },  // Mitsubishi NMPS termistor
+#endif
 	0xAEAEAEAE,            // end label
 };
