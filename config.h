@@ -78,10 +78,10 @@ typedef struct {
 #define CPAR_SETUP_T_AT_SIZE     4
 #define CPAR_SETUP_T_ENG         23
 #define CPAR_SETUP_T_ENG_SIZE    4
-//#define CPAR_SETUP_F_FUEL        24
-//#define CPAR_SETUP_F_FUEL_SIZE   1
-//#define CPAR_SETUP_L_FUEL        25
-//#define CPAR_SETUP_L_FUEL_SIZE   4
+#define CPAR_SETUP_F_FUEL        24
+#define CPAR_SETUP_F_FUEL_SIZE   1
+#define CPAR_SETUP_L_FUEL        25
+#define CPAR_SETUP_L_FUEL_SIZE   4
 //#define CPAR_SETUP_TIME          26
 //#define CPAR_SETUP_TIME_SIZE     1
 #define CPAR_SETUP_W_DELAY       27

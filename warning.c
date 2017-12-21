@@ -171,6 +171,27 @@ void bcomp_warning(void) {
 			errors_list[WARNING_ID_SERVICE].time = 0;
 		}
 	}
+	// FUEL
+	if (bcomp.setup.f_fuel) {
+		if (bcomp.fuel_level < bcomp.setup.l_fuel) {
+			if (errors_list[WARNING_ID_FUEL].flags & WARN_FLAG_ACT) {
+				errors_list[WARNING_ID_FUEL].time += 5;
+				if (errors_list[WARNING_ID_FUEL].time > bcomp.setup.w_delay*60) {
+					errors_list[WARNING_ID_FUEL].flags &= ~WARN_FLAG_HIDE;
+					errors_list[WARNING_ID_FUEL].time = 0;
+				}
+			} else {
+				errors_list[WARNING_ID_FUEL].time++;
+				// Ошибка по FUEL появляется с задержкой в 1 минуту,
+				// фильтрует мгновенные уменьшения уровня ниже минимума 
+				// во время движения:
+				if (errors_list[WARNING_ID_FUEL].time > 12) {
+					errors_list[WARNING_ID_FUEL].flags |= WARN_FLAG_ACT;
+					errors_list[WARNING_ID_FUEL].time = 0;
+				}
+			}
+		}
+	}
 bcomp_warning_end:
 	// Раз в 5 секунд:
 	event_set(7, bcomp_warning, 5000);

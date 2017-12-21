@@ -10,8 +10,9 @@
 #define WARNING_ID_T_EXT     5
 #define WARNING_ID_GPS       6
 #define WARNING_ID_SERVICE   7
+#define WARNING_ID_FUEL      8
 
-#define WARN_MAX_NUM    8
+#define WARN_MAX_NUM    9
 #define WARN_FLAG_ACT   0x01
 #define WARN_FLAG_HIDE  0x02
 
