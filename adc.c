@@ -8,6 +8,8 @@ void adc_init(void) {
 	// Configure PIN GPIO0.11 for AD3/AD5:
 	LPC_IOCON->R_PIO1_2 = (2UL <<  0);
 	LPC_IOCON->PIO1_4   = (1UL <<  0);
+	//
+	// TODO!!!
 	LPC_GPIO1->DIR &= ~((1UL<<2)|(1UL<<4));
 	// configure ADC:
 	LPC_SYSCON->PDRUNCFG      &= ~(1UL <<  4);  /* Enable power to ADC block  */
@@ -29,9 +31,17 @@ int adc_get(int ch) {
 							  (23UL <<  8) |      /* ADC clock is 24MHz/24    */
 							  ( 1UL << 21);       /* enable ADC               */
 		break;
-	// ...
+	// -   - P0.11 - AD0
 	case ADC_CH3: 
-		DBG("adc_get(): CH3 no realise!\r\n");
+		LPC_ADC->CR        =  ( 1UL <<  0) |      /* select AD5 pin           */
+							  (23UL <<  8) |      /* ADC clock is 24MHz/24    */
+							  ( 1UL << 21);       /* enable ADC               */
+		break;
+	// -   - P1.0 - AD1
+	case ADC_CH4: 
+		LPC_ADC->CR        =  ( 1UL <<  1) |      /* select AD5 pin           */
+							  (23UL <<  8) |      /* ADC clock is 24MHz/24    */
+							  ( 1UL << 21);       /* enable ADC               */
 		break;
 	default:
 		DBG("adc_get(): unknown channel!\r\n");
