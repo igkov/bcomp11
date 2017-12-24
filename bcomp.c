@@ -1,5 +1,6 @@
 /*
-	BCOMP11 firmware
+	BCOMP11 firmware, old version.
+	Use it for debug experimental functions.
 
 	Events:
 	0 - button
