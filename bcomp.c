@@ -20,6 +20,7 @@
 #include "leds.h"
 #include "event.h"
 #include "can.h"
+#include "timer.h"
 #include "uart0.h"
 #include <stdint.h>
 #include <string.h>
@@ -29,6 +30,7 @@
 #include "beep.h"
 #include "obd_pids.h"
 #include "obd.h"
+#include "mbus.h"
 #include "bcomp.h"
 
 #include "adc.h"
@@ -43,11 +45,38 @@
 
 bcomp_t bcomp;
 
+#define SNIFFER_MODE 1
+
+void ProtectDelay(void) {
+	int n;
+	for (n = 0; n < 100000; n++) { __NOP(); } 
+}
+
+#if (SNIFFER_MODE == 1)
+
+int main(void) {
+	uart0_init(115200);
+	leds_init();
+	led_red(1);
+	// Тестовый сниффинг протокола:
+	timer0_init();
+	// Основная функция сниффера,
+	// Кроме инициализации процедуры ничего не требуется.
+	mbus_init();
+
+	while (1) {
+		__WFI();
+	}
+}
+
+#else // Остальная часть bccomp:
+
 /*
 	bcomp_proc()
 	Вызывается из OBD.C
 	Парсит PID-s ответы, заносит параметры в структуру bcomp.
  */
+
 void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 	data = data-1;
 	/*  Details from: http://en.wikipedia.org/wiki/OBD-II_PIDs */
@@ -255,11 +284,6 @@ extern int melody_warning[];
 extern int melody_wrep[];
 extern int melody_start[];
 
-void ProtectDelay(void) {
-	int n;
-	for (n = 0; n < 100000; n++) { __NOP(); } 
-}
-
 volatile uint8_t val_Tx = 0, val_Rx = 0;
 
 void set_warning(int num) {
@@ -279,6 +303,20 @@ int main(void) {
 	int state;
 	uint8_t reset_counter = 0;
 
+#if 1
+	uart0_init(115200);
+	leds_init();
+	led_red(1);
+	// Тестовый сниффинг протокола:
+	timer0_init();
+	// Основная функция сниффера,
+	// Кроме инициализации процедуры ничего не требуется.
+	mbus_init();
+
+	while (1) {
+		__WFI();
+	}
+#endif
 	event_init();
 	leds_init();
 #if defined( _DBGOUT )
@@ -777,3 +815,4 @@ int main(void) {
 		}
 	}
 }
+#endif
