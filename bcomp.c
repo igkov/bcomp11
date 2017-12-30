@@ -58,6 +58,7 @@ int main(void) {
 	uart0_init(115200);
 	leds_init();
 	led_red(1);
+	DBG("main()\r\n");
 	// Тестовый сниффинг протокола:
 	timer0_init();
 	// Основная функция сниффера,
@@ -65,7 +66,9 @@ int main(void) {
 	mbus_init();
 
 	while (1) {
-		__WFI();
+		//__WFI();
+		delay_mks(1000000);
+		uart0_putchar('.');
 	}
 }
 
@@ -303,20 +306,6 @@ int main(void) {
 	int state;
 	uint8_t reset_counter = 0;
 
-#if 1
-	uart0_init(115200);
-	leds_init();
-	led_red(1);
-	// Тестовый сниффинг протокола:
-	timer0_init();
-	// Основная функция сниффера,
-	// Кроме инициализации процедуры ничего не требуется.
-	mbus_init();
-
-	while (1) {
-		__WFI();
-	}
-#endif
 	event_init();
 	leds_init();
 #if defined( _DBGOUT )

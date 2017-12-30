@@ -16,8 +16,6 @@ uint32_t timer0_get(void) {
 void delay_mks(uint32_t mks) {
 	uint32_t mksStart = LPC_TMR32B0->TC;
 	while ((LPC_TMR32B0->TC-mksStart) < mks);
-
-	LPC_TMR32B0->TC;
 }
 
 void timer1_init(void) {
