@@ -11,6 +11,7 @@ extern void nmea_proc(uint8_t ch);
 void    uart0_init(uint32_t baudrate);
 void    uart0_putchar(uint8_t ch);
 uint8_t uart0_getchar(void);
+int     uart0_isdata(void);
 void    uart0_puts(const uint8_t *str);
 
 #endif

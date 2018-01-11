@@ -54,7 +54,79 @@ void ProtectDelay(void) {
 
 #if (SNIFFER_MODE == 1)
 
+int cmd_convert(uint8_t *cmd, uint8_t *scmd, int len) {
+	int ret_len = 0;
+	int offset = 0;
+	char b;
+	memset(scmd, 0, len/2);
+	while (offset < len) {
+		switch (scmd[offset]) {
+		case '0':
+			b = 0;
+			goto byte_conv;
+		case '1':
+			b = 1;
+			goto byte_conv;
+		case '2':
+			b = 2;
+			goto byte_conv;
+		case '3':
+			b = 3;
+			goto byte_conv;
+		case '4':
+			b = 4;
+			goto byte_conv;
+		case '5':
+			b = 5;
+			goto byte_conv;
+		case '6':
+			b = 6;
+			goto byte_conv;
+		case '7':
+			b = 7;
+			goto byte_conv;
+		case '8':
+			b = 8;
+			goto byte_conv;
+		case '9':
+			b = 9;
+			goto byte_conv;
+		case 'A':
+			b = 10;
+			goto byte_conv;
+		case 'B':
+			b = 11;
+			goto byte_conv;
+		case 'C':
+			b = 12;
+			goto byte_conv;
+		case 'D':
+			b = 13;
+			goto byte_conv;
+		case 'E':
+			b = 14;
+			goto byte_conv;
+		case 'F':
+			b = 15;
+byte_conv:
+			if (ret_len&1) {
+				cmd[ret_len/2] |= (b);
+			} else {
+				cmd[ret_len/2] |= (b<<4);
+			}
+			break;
+		default:
+			return -1;
+		}
+	}
+	return ret_len/2;
+}
+
 int main(void) {
+	uint8_t scmd[128];
+	uint8_t cmd[64];
+	int offset = -1;
+
 	uart0_init(115200);
 	leds_init();
 	led_red(1);
@@ -67,9 +139,27 @@ int main(void) {
 
 	while (1) {
 		//__WFI();
-		delay_mks(1000000);
-		uart0_putchar('.');
+		char b = uart0_getchar();
+		if (b == 'S') {
+			offset = 0;
+		} else
+		if (b == 'U') {
+			if (offset >= 0) {
+				int size = cmd_convert(cmd, scmd, offset);
+				if (size >= 0) {
+					mbus_msend(cmd, size);
+				}
+			}
+			offset = -1;
+		} else
+		if (offset >= 0 && offset < sizeof(cmd)) { 
+			if (strchr("0123456789ABCDEF", b) != NULL) {
+				scmd[offset] = b;
+				offset++;
+			}
+		}
 	}
+	return 0;
 }
 
 #else // Остальная часть bccomp:

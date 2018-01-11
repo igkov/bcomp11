@@ -71,6 +71,10 @@ uint8_t uart0_getchar (void) {
   return (LPC_UART->RBR);
 }
 
+int uart0_isdata(void) {
+	return (LPC_UART->LSR & 0x01);
+}
+
 void uart0_puts(const uint8_t * str) {
 	while ((*str) != 0) {
 		uart0_putchar(*str++);
