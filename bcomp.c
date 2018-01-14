@@ -58,7 +58,7 @@ int cmd_convert(uint8_t *cmd, uint8_t *scmd, int len) {
 	int ret_len = 0;
 	int offset = 0;
 	char b;
-	memset(scmd, 0, len/2);
+	memset(cmd, 0, len/2);
 	while (offset < len) {
 		switch (scmd[offset]) {
 		case '0':
@@ -109,17 +109,19 @@ int cmd_convert(uint8_t *cmd, uint8_t *scmd, int len) {
 		case 'F':
 			b = 15;
 byte_conv:
-			if (ret_len&1) {
-				cmd[ret_len/2] |= (b);
+			if (offset&1) {
+				cmd[ret_len] |= (b);
+				ret_len++;
 			} else {
-				cmd[ret_len/2] |= (b<<4);
+				cmd[ret_len] |= (b<<4);
 			}
+			offset++;
 			break;
 		default:
 			return -1;
 		}
 	}
-	return ret_len/2;
+	return ret_len;
 }
 
 int main(void) {
@@ -145,9 +147,14 @@ int main(void) {
 		} else
 		if (b == 'U') {
 			if (offset >= 0) {
-				int size = cmd_convert(cmd, scmd, offset);
+				int size;
+				memset(cmd, 0, sizeof(cmd));
+				size = cmd_convert(cmd, scmd, offset);
+				//DBG("cmd_convert() return %d\r\n", size);
 				if (size >= 0) {
 					mbus_msend(cmd, size);
+					//DBG("mbus_msend(%d): %02x %02x %02x %02x %02x %02x ...\r\n",
+					//	size, cmd[0], cmd[1], cmd[2], cmd[3], cmd[4], cmd[5]);
 				}
 			}
 			offset = -1;

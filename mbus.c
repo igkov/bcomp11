@@ -9,7 +9,7 @@
 	Sniffer mode = 1
 
 	Режим сниффера, в данном режиме логика работает на приём байт с шины.
-	Требуется для анализа протокола и съема кодов.
+	Требуется для анализа протокола и съёма кодов.
 
 	X4 - SSEL1 - P2.0
 	X5 - SCK1  - P2.1
@@ -17,7 +17,7 @@
 	X7 - MOSI1 - P2.3
 
 	Посылает следующие кодовые байты на шину:
-	1. FF - принятый байтю
+	1. FF - принятый байт
 	2. S - активный BUSY (=0).
 	3. U - неактивный BUSY (=1).
  */
@@ -87,8 +87,8 @@ void mbus_init(void) {
 	NVIC_EnableIRQ(EINT2_IRQn);
 }
 
-uint8_t bdata = 0;
-uint8_t boff = 0;
+static uint8_t bdata = 0;
+static uint8_t boff = 0;
 
 //This is a function that sends a byte to the HU - (not using interrupts)
 void mbus_sendb(uint8_t b){
@@ -113,16 +113,16 @@ void mbus_sendb(uint8_t b){
 void mbus_msend(uint8_t *data, int len) {
 	int offset = 0;
 	uint8_t b;
-	NVIC_DisableIRQ(EINT2_IRQn); 
 	while (PIN_MBUSY_GET == 0);
-	delay_ms(15);
+	NVIC_DisableIRQ(EINT2_IRQn); 
+	delay_mks(15*1000);
 	PIN_MDATA_OUT;
 	PIN_MDATA_SET1;
 	PIN_MCLOCK_OUT;
 	PIN_MCLOCK_SET1;
 	PIN_MBUSY_OUT;
 	PIN_MBUSY_SET0;
-	delay_ms(10);
+	delay_mks(10*1000);
 	while (offset < len) {
 		int n;
 		b = data[offset];
@@ -141,7 +141,7 @@ void mbus_msend(uint8_t *data, int len) {
 		delay_mks(200);
 		offset++;
 	}
-	delay_ms(10);
+	delay_mks(10*1000);
   	PIN_MBUSY_SET1;
 	delay_mks(100);
   	PIN_MDATA_IN;
