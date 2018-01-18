@@ -820,10 +820,10 @@ repeate:
 				if (buttons & (BUTT_SW1|BUTT_SW1_LONG)) {
 					menu_back();
 				}
-				graph_puts16(64,  0, 1, "NMPS");
-				graph_puts16(64, 16, 1, "COMP v2.0");
-				graph_puts16(64, 32, 1, "igorkov");
-				graph_puts16(64, 48, 1, "2017");
+				graph_puts16(64,  0, 1, INFO_DEVICE);
+				graph_puts16(64, 16, 1, INFO_VERSION);
+				graph_puts16(64, 32, 1, INFO_AUTHOR);
+				graph_puts16(64, 48, 1, INFO_YEAR);
 				break;
 			case 0xF1:
 				DBG("Screen 0xF1, buttons: %02x\r\n", buttons);

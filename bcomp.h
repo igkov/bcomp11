@@ -15,6 +15,13 @@ extern int melody_wrep[];
 extern int melody_wrep2[];
 #endif
 
+// Определения для экрана информации:
+#define INFO_DEVICE   "NMPS COMP"
+#define INFO_VERSION  "v2.0alpha"
+#define INFO_AUTHOR   "igorkov"
+#define INFO_YEAR     "2018"
+// Максимальная длина строки на отображение: 10 символов!
+
 typedef struct {
 	uint32_t time;   // Время маршрута (сек).
 	double dist;     // Дистанция маршрута (м).
