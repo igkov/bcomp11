@@ -377,8 +377,10 @@ int main(void) {
 	graph_clear();
 
 	// Стартовый экран (заставка):
+#if !defined( __GCC__ )
 	//graph_ico64(0,0,ico64_mitsu_data,65);
 	graph_pic(&ico64_mitsu, 0,0);
+#endif
 	_sprintf(str, "BCOMP");
 	graph_puts16(64,1*8,0,str); 
 	_sprintf(str, "igorkov.org");
@@ -673,7 +675,7 @@ int main(void) {
 			break;
 		case 5:
 			// Тестовый вывод данных ESC (датчик положения рулевого колеса):
-			graph_puts16(0,0*8,0,"WHEEL");
+			graph_puts16(0,0*8,0,"WHEELS");
 			_sprintf(str, "ID=%d, DATA:", bcomp.esc_id);
 			graph_puts8(0,3*8,0,str);
 			_sprintf(str, "%02x %02x %02x %02x",
@@ -706,9 +708,13 @@ int main(void) {
 		case 8:
 			// Угол колес:
 			graph_puts16(64,0,1,"WHEELS");
+#if !defined( __GCC__ )
 			graph_line(40+4,40,88-4,40);
 			draw_rect(40,40,bcomp.angle);
 			draw_rect(88,40,bcomp.angle);
+#else
+			graph_puts16(64,16,1,"UNSUPPORT");
+#endif
 			break;
 		case 9:	{
 			float value;
@@ -718,6 +724,7 @@ int main(void) {
 			graph_puts16(0,16,0,str);
 			_sprintf(str, "2:%03x", adc_get(ADC_CH2));
 			graph_puts16(0,32,0,str);
+#if !defined( __GCC__ )
 			value = analog_temp(&bconfig.termistor);
 			if (value == NAN) {
 				_sprintf(str, "T:NAN");
@@ -725,6 +732,7 @@ int main(void) {
 				_sprintf(str, "T:%2d.%d°C", (int)value, (int)(value*10)%10);
 			}
 			graph_puts16(0,48,0,str);
+#endif
 			break; }
 		default:
 			bcomp.page = 0;

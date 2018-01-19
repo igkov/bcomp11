@@ -101,6 +101,7 @@ void graph_ico16(int x, int y, const uint8_t *ico, int size) {
 }
 #endif
 
+#if !defined( __GCC__ )
 // Вывод графической иконки по дескриптору.
 // Поддерживает сжатие тела иконки.
 static uint8_t uncompress[64*64/8];
@@ -131,7 +132,9 @@ void graph_pic(const ico_t *p, int ox, int oy) {
 		}
 	}
 }
+#endif
 
+#if !defined( __GCC__ )
 // ---------------------------------------------
 // EXT FONT SUPPORT
 // ---------------------------------------------
@@ -221,8 +224,9 @@ void graph_puts32c(int ox, int oy, char *str) {
 // ---------------------------------------------
 // EXT FONT SUPPORT END
 // ---------------------------------------------
+#endif // __GCC__
 
-
+#if !defined( __GCC__ )
 // ---------------------------------------------
 // LINE DRAW SUPPORT
 // ---------------------------------------------
@@ -270,6 +274,7 @@ void graph_line(int x1, int y1, int x2, int y2) {
 // ---------------------------------------------
 // LINE DRAW SUPPORT END 
 // ---------------------------------------------
+#endif // __GCC__
 
 void graph_clear(void) {
 	memset(frame, 0x00, sizeof(frame));

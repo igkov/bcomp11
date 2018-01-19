@@ -2,6 +2,10 @@
 .out_rel
 .out_v2
 .out_v2_rel
+.dep
+.lst
+.obj
+.out_gcc
 pc/bcomp11v2.exe
 pc/eeprom.bin
 *uvgui*
