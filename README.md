@@ -24,7 +24,7 @@ http://igorkov.org/bcomp11v2 (actual version)
 Hardware description 
 -----------------------------------------
 
-Computer based on NXP LPC11C14 with HW CAN.
+Computer based on NXP LPC11C14 with HW CAN. Full hardware project here: https://github.com/igkov/bcomp11hw
 
 Scheme:
 <img src="http://igorkov.org/images/bcomp11v2-scheme.png">
