@@ -32,3 +32,13 @@ Scheme:
 Device view*:
 <img src="http://igorkov.org/images/bcomp11-tests.jpg">
 *on photo 2 board with LPC11C14: this computer, and test device for automotive CAN-NET: http://github.com/igkov/ecu-emulator
+
+Compilation
+---------
+
+Use <a href="http://www.keil.com">Keil MDK</a> or <a href="https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads">GCC ARM</a>.
+
+Program MCU
+---------
+
+For program MCU, please use USB-UART converter with DTR/RST control and programming utility as <a href="http://www.flashmagictool.com/">Flash Magic</a> or <a href="https://sourceforge.net/projects/lpc21isp/">lpc21isp</a>.
