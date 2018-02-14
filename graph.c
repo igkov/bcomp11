@@ -49,6 +49,12 @@ void graph_puts8(int x, int y, int w, const char *str) {
 		x += fx;
 	}
 }
+
+// Font 8x12
+void graph_puts12(int x, int y, int w, const char *str) {
+	int i = 0;
+	int fx = 0;
+}
 #endif
 
 // Font 12x16
