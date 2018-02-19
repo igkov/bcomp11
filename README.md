@@ -31,7 +31,7 @@ Computer based on NXP LPC11C14 with HW CAN. Full hardware project here: https://
 Scheme:
 <img src="http://igorkov.org/images/bcomp11v2-scheme.png">
 
-Device view*:
+Device view (this is first hardware version)*:
 <img src="http://igorkov.org/images/bcomp11-tests.jpg">
 *on photo 2 board with LPC11C14: this computer, and test device for automotive CAN-NET: http://github.com/igkov/ecu-emulator
 
