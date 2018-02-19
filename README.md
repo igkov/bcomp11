@@ -38,7 +38,7 @@ Device view*:
 Compilation
 ---------
 
-Use <a href="http://www.keil.com">Keil MDK</a> or <a href="https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads">GCC ARM</a>.
+Use <a href="http://www.keil.com">Keil MDK</a> or <a href="https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads">GCC ARM</a>. Recommended version of Keil MDK - 4.23 or 4.24, newer versions have other editor kernel and cann't show Cyrillic in CP-1251 (only in Unicode/UTF-8), thats problem for show/edit Cyrillic text constants.
 
 Program MCU
 ---------
