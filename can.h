@@ -36,6 +36,7 @@ typedef struct  {
 void CAN_setup         (uint32_t baudrate);
 void CAN_init          (void);
 void CAN_start         (void);
+void CAN_stop          (void);
 void CAN_waitReady     (void);
 int  CAN_isboff        (void);
 void CAN_wrMsg         (CAN_msg *msg);

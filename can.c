@@ -100,53 +100,82 @@ unsigned int  CAN_RxRdy = 0;                     /* CAN HW received a message */
 /*----------------------------------------------------------------------------
   configure the requested baudrate
  *----------------------------------------------------------------------------*/
-static int CAN_cfgBaudrate (uint32_t baudrate) {
-#if 0
-	LPC_CAN->BT   = 0x2301;        /* 500kBit/s @ 8MHz CAN clk */
-#else
-	// CANBT: address 0x4005 000C) bit description:
+static int CAN_cfgBaudrate (uint32_t baudrate)  {
+	#define CAN_CLK_16MHZ 16000000UL
+	#define CAN_CLK_8MHZ 8000000UL
+	#define CAN_CLK_4MHZ 4000000UL
+	#define CAN_CLK_2MHZ 2000000UL
+	#define CAN_CLK_1MHZ 1000000UL
+	uint32_t can_clk = CAN_CLK_8MHZ;
+	uint32_t can_bt = 0x0000;
+	
+	// CANBT: address 0x4005000C
+	// Bit description:
 	// Bit 5:0   - BRP Baud rate prescaler
 	// Bit 7:6   - SJW (Re)synchronization jump width
 	// Bit 11:8  - TSEG1 Time segment before the sample point including
 	// Bit 14:12 - TSEG2 Time segment after the sample point
 	// Bit 31:15 - Reserved
-	// Bit Rate = CAN_CLK / ((BRP + 1) x (TSEG1 + 2 + TSEG2 + 1));
+	// Bit Rate = CAN_CLK / ((BRP + 1) x ((TSEG1 + 1) + (TSEG2 + 1) + (SJW + 1)));
 	// CAN_CLK = 8MHz.
+
+	// MAPLE
+	// CAN_CLK := 8000000.;
+	// BRP := 29;
+	// TSEG1 := 3;
+	// TSEG2 := 2;
+	// SJW := 0;
+	// CAN_CLK / ((BRP + 1) * ((TSEG1 + 1) + (TSEG2 + 1) + (SJW + 1)));
+
 	if (baudrate == 1000000) {
-		return 1;
+		can_bt        = 0x2300;        /* 1000kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 800000) {
-		return 1;
+		can_bt        = 0x3401;        /* 800kBit/s @ 16MHz CAN clk */
+		can_clk = CAN_CLK_16MHZ;
 	} else if (baudrate == 500000) {
-		LPC_CAN->BT   = 0x2301;        /* 500kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x2301;        /* 500kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 250000) {
-		LPC_CAN->BT   = 0x2302;        /* 250kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x2303;        /* 250kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 125000) {
-		LPC_CAN->BT   = 0x2304;        /* 125kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x2307;        /* 125kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 100000) {
-		LPC_CAN->BT   = 0x2305;        /* 100kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x2309;        /* 100kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 50000) {
-		LPC_CAN->BT   = 0x230A;        /* 50kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x2313;        /* 50kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 20000) {
-		LPC_CAN->BT   = 0x2319;        /* 20kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x2331;        /* 20kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 10000) {
-		LPC_CAN->BT   = 0x2332;        /* 10kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x2331;        /* 10kBit/s @ 4MHz CAN clk */
+		can_clk = CAN_CLK_4MHZ;
 	} else if (baudrate == 95238) {
-		return 1;
+		can_bt        = 0x220B;        /* 95.238kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 83333) {
-		LPC_CAN->BT   = 0x2306;        /* 83.3kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x230B;        /* 83.3kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 47619) {
-		return 1;
+		can_bt        = 0x2314;        /* 47.619kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 33333) {
-		LPC_CAN->BT   = 0x230F;        /* 33.3kBit/s @ 8MHz CAN clk */
+		can_bt        = 0x231D;        /* 33.3kBit/s @ 8MHz CAN clk */
 	} else if (baudrate == 5000) {
-		return 1;
+		can_bt        = 0x2331;        /* 5.0kBit/s @ 2MHz CAN clk */
+		can_clk = CAN_CLK_2MHZ;
 	} else {
 		return 1;
 	}
-#endif
+	
+	/* Configure CAN */
+	LPC_CAN->CLKDIV = (SystemCoreClock / can_clk) - 1; /* set CAN clk to 8MHz */
+	LPC_CAN->CNTL  =  _CNTL_INIT;                 /* set initialization mode by default */
+	LPC_CAN->CNTL |=  _CNTL_CCE;                  /* Start configuring bit timing */
+
+	/* Configure timings: */
+	LPC_CAN->BT   = can_bt;
 	LPC_CAN->BRPE = 0x0000;
+
+	LPC_CAN->CNTL &= ~_CNTL_CCE;                  /* Stop configuring bit timing */
+	
 	return 0;
 }
+
 
 /*----------------------------------------------------------------------------
   set the testmode
@@ -165,14 +194,12 @@ void CAN_setup (uint32_t baudrate)  {
 	/* configure CAN */
 	LPC_SYSCON->PRESETCTRL    |=  (1UL <<  3);    /* de-asserts the reset signal */
 	LPC_SYSCON->SYSAHBCLKCTRL |=  (1UL << 17);    /* enable power to CAN  block */
-	LPC_CAN->CLKDIV = (SystemCoreClock / 8000000UL) - 1; /* set CAN clk to 8MHz */
-	LPC_CAN->CNTL  =  _CNTL_INIT;                 /* set initialization mode by default */
-	LPC_CAN->CNTL |=  _CNTL_CCE;                  /* Sart configuring bit timing */
+
 	if (CAN_cfgBaudrate(baudrate)) {              /* Set bit timing */
 		DBG("Incorrect CAN speed!\r\n");
 		while (1);
 	}
-	LPC_CAN->CNTL &= ~_CNTL_CCE;                  /* Stop configuring bit timing */
+
 	NVIC_EnableIRQ(CAN_IRQn);                     /* enable CAN interrupt */
 	/* pre-initialize CAN message objects */ 
 	for ( i = 0; i < _MSG_OBJ_MAX; i++ ) {
@@ -203,6 +230,13 @@ void CAN_setup (uint32_t baudrate)  {
  *----------------------------------------------------------------------------*/
 void CAN_start (void)  {
 	LPC_CAN->CNTL &= ~_CNTL_INIT;                     /* Enter normal operating mode */
+}
+
+/*----------------------------------------------------------------------------
+  leave initialisation mode.
+ *----------------------------------------------------------------------------*/
+void CAN_stop (void)  {
+	LPC_CAN->CNTL |=  _CNTL_TEST; /* enable Test mode */
 }
 
 /*----------------------------------------------------------------------------
