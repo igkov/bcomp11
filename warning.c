@@ -194,7 +194,7 @@ void bcomp_warning(void) {
 	}
 bcomp_warning_end:
 	// Раз в 5 секунд:
-	event_set(7, bcomp_warning, 5000);
+	event_set(bcomp_warning, 5000);
 }
 
 // -----------------------------------------------------------------------------

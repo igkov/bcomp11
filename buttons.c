@@ -59,7 +59,7 @@ static void button_proc(void) {
 			last_state[n]--;
 		}
 	}
-	event_set(0, button_proc, 10);
+	event_set(button_proc, 10);
 }
 #else
 static void button_proc(void) {
@@ -90,14 +90,14 @@ static void button_proc(void) {
 			last_state[n]--;
 		}
 	}
-	event_set(0, button_proc, 10);
+	event_set(button_proc, 10);
 }
 #endif
 
 void button_init(void) {
 	state = 0;
 	memset(last_state, 0x00, sizeof(last_state));
-	event_set(0, button_proc, 10);
+	event_set(button_proc, 10);
 }
 
 int button_read(void) {

@@ -50,6 +50,7 @@ void event_init(void) {
 	}
 }
 
+#if 0
 int event_set(uint32_t slot, timer_event_f pfunc, uint32_t delay) {
 	if (slot >= MAX_EVENT) {
 		return 1;
@@ -69,6 +70,33 @@ int event_unset(uint32_t slot) {
 	timer_events[slot].pfunc = NULL;
 	return 0;
 }
+#else
+int event_set(timer_event_f pfunc, uint32_t delay) {
+	int slot;
+	for (slot=0; slot<MAX_EVENT; slot++) {
+		if (timer_events[slot].pfunc == NULL) {
+			if (delay < 1) {
+				delay = 1;
+			}
+			timer_events[slot].cmp_val = (msTicks + delay);
+			timer_events[slot].pfunc = (timer_event_f)pfunc;
+			return 0;
+		}
+	}
+	return 1;
+}
+
+int event_unset(timer_event_f pfunc) {
+	int slot;
+	for (slot=0; slot<MAX_EVENT; slot++) {
+		if (timer_events[slot].pfunc == pfunc) {
+			timer_events[slot].pfunc = NULL;
+			return 0;
+		}
+	}
+	return 1;
+}
+#endif
 
 void delay_ms(uint32_t msDelay) {
 	uint32_t msStart = GetTickCount();

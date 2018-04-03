@@ -1,19 +1,19 @@
 /*
 	BCOMP11 v2 firmware
 	
-	Events:
-	0 - button
-	1 - calc
-	2 - beep
-	3 - save
-	4 - obd
-	5 - analog
-	6 - elog
-	7 - warn
-
+	Асинхронные события:
+	1) button
+	2) calc
+	3) beep
+	4) save
+	5) obd
+	6) analog
+	7) elog
+	8) warn
+	
 	Вторая итерация прошивки мини-бортового компьютера.
 	Обточка функционала для реализации полноценного устройства.
-
+	
 	igorkov / 2017 / igorkov.org/bcomp11v2
  */
 #if defined( WIN32 )
@@ -288,12 +288,12 @@ void bcomp_calc(void) {
 		}
 	}
 
-	event_set(1, bcomp_calc, 1000);
+	event_set(bcomp_calc, 1000);
 }
 
 /*
 	bcomp_analog()
-
+	
 	Чтение аналоговых значний (АЦП-входы).
  */
 #define ABS(a) ((a)>0?(a):-(a))
@@ -327,7 +327,7 @@ void bcomp_analog(void) {
 		fuel_protect_cnt = 0;
 	}
 	bcomp.fuel_level = new_fuel_level;
-	event_set(5, bcomp_analog, 3000);
+	event_set(bcomp_analog, 3000);
 }
 
 /*
@@ -337,7 +337,7 @@ void bcomp_analog(void) {
  */
 void bcomp_save(void) {
 	save_flag |= 0x01;
-	event_set(3, bcomp_save, 30000);
+	event_set(bcomp_save, 30000);
 }
 
 /*
@@ -347,7 +347,7 @@ void bcomp_save(void) {
  */
 void bcomp_elog(void) {
 	save_flag |= 0x08;
-	event_set(6, bcomp_elog, 1000);
+	event_set(bcomp_elog, 1000);
 }
 
 // -----------------------------------------------------------------------------
@@ -609,17 +609,17 @@ int main(void)
 	// -----------------------------------------------------------------------------
 
 	// Процедура 
-	event_set(1, bcomp_calc, 1000); delay_ms(10);
+	event_set(bcomp_calc, 1000); delay_ms(10);
 	// Получение аналоговых данных:
-	event_set(5, bcomp_analog, 500); delay_ms(10);
+	event_set(bcomp_analog, 500); delay_ms(10);
 	// Если установлен флаг логгирования, инициализируем соотв. событие:
 	if (bcomp.setup.f_log) {
-		event_set(6, bcomp_elog, 10000); delay_ms(10);
+		event_set(bcomp_elog, 10000); delay_ms(10);
 	}
 	// Асинхронный обработчик с проверками на предупреждения:
-	event_set(7, bcomp_warning, 5000); delay_ms(10);
+	event_set(bcomp_warning, 5000); delay_ms(10);
 	// Сохраняем данные в EEPROM, только если задана её конфигурация:
-	event_set(3, bcomp_save, 30000); delay_ms(10);
+	event_set(bcomp_save, 30000); delay_ms(10);
 
 	// -----------------------------------------------------------------------------
 	// Инициализируем экран:

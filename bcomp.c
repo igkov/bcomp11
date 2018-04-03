@@ -1,14 +1,7 @@
 /*
 	BCOMP11 firmware, old version.
 	Use it for debug experimental functions.
-
-	Events:
-	0 - button
-	1 - calc
-	2 - beep
-	3 - save
-	4 - obd
-
+	
 	igorkov / fsp@igorkov.org / 2016-2017
 	
 	Site: igorkov.org/bcomp11
@@ -221,7 +214,7 @@ void bcomp_calc(void) {
 	// Обнуляем параметры:
 	bcomp.rpm = 0;
 
-	event_set(1, bcomp_calc, 1000);
+	event_set(bcomp_calc, 1000);
 }
 
 volatile uint8_t save_flag = 0;
@@ -247,7 +240,7 @@ void save_settings(void) {
 
 void bcomp_save(void) {
 	save_flag |= 1;
-	event_set(3, bcomp_save, 30000);
+	event_set(bcomp_save, 30000);
 }
 
 extern int melody1[];
@@ -366,10 +359,10 @@ int main(void) {
 	}
 
 	// Инициализируем асинхронные события:
-	event_set(1, bcomp_calc, 1000); delay_ms(10);
+	event_set(bcomp_calc, 1000); delay_ms(10);
 	if (bconfig.ee_size) {
 		// Только, если есть EEEPROM, настраиваем обработчик сохранения:
-		event_set(3, bcomp_save, 30000); delay_ms(10);
+		event_set(bcomp_save, 30000); delay_ms(10);
 	}
 
 	// Инициализируем экран:

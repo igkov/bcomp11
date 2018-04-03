@@ -149,7 +149,7 @@ static void obd_manage(void) {
 		//Свободны, обработка след. запроса:
 		can_pid = can_id = can_done = 0;
 		//Задержка перед следующей обработкой:
-		event_set(4, obd_manage, 200);
+		event_set(obd_manage, 200);
 	} else 
 	if (can_pid == 0) {
 		// В случае установленного сервисного флага, запросы в ЭБУ не отправляются.
@@ -163,12 +163,12 @@ static void obd_manage(void) {
 			count++;
 		} while (pids_list[count%PIDS_SIZE].act == 0); 
 		// Запрос отправлен, ожидаем до 100мс:
-		event_set(4, obd_manage, 100);
+		event_set(obd_manage, 100);
 		return;
 	} else {
 		// Таймаут!
 		can_pid = 0;
-		event_set(4, obd_manage, 10);
+		event_set(obd_manage, 10);
 	}
 }
 
@@ -189,7 +189,7 @@ void obd_init(void) {
 	CAN_noFilter(STANDARD_FORMAT);
 #endif
 	// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
-	event_set(4, obd_manage, 5000);
+	event_set(obd_manage, 5000);
 }
 
 int obd_act_set(uint16_t pid, int flag) {
