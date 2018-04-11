@@ -26,7 +26,6 @@ const static virtuino_unit_t units[] = {
 	{   3, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.rpm },
 	{   4, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_engine },
 	{   5, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_akpp },
-	{   6, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_engine },
 	//{ 7, VIRTUINO_TYPE_STRING, 0, 0, &bcomp.vin },
 };
 
@@ -54,16 +53,16 @@ static void virtuino_unit_get(const virtuino_unit_t *punit, char *strout) {
 				(int)(*(double*)punit->value * 100) % 100);
 		}
 		break;
-#if 0
 	case VIRTUINO_TYPE_STRING:
-		_sprintf(strout, "!%c%02d=%s$", punit->id, *(char*)punit->value);
+		_sprintf(strout, "!%c%02d=%s$", punit->vtype, punit->id, *(char**)punit->value);
 		break;
-#endif
 	default:
 		DBG("virtuino_unit_get(): unknown value type (%d)!\r\n", punit->type);
 	}
 }
 
+// Не используется реализация atof, т.к. она подключает достаточно много
+// паразитного кода (порядка 2кб). Эта автономная реализация намного легче.
 static double stof(const char* s){
 	double rez = 0;
 	double fact = 1;
@@ -102,6 +101,12 @@ static void virtuino_unit_set(const virtuino_unit_t *punit, const char *str) {
 		break;
 	case VIRTUINO_TYPE_DOUBLE:
 		*(double*)punit->value = (double)stof(str);
+		break;
+	case VIRTUINO_TYPE_STRING:		
+		memset(*(char**)punit->value, 0, VIRTUINO_STRING_MAX_SIZE);
+		if ((int)(strstr(str, "$") - str) < VIRTUINO_STRING_MAX_SIZE-1) {
+			memcpy(*(char**)punit->value, str, (int)(strstr(str, "$") - str));
+		}
 	default:
 		DBG("virtuino_unit_set(): unknown value type (%d)!\r\n", punit->type);
 	}
@@ -149,17 +154,13 @@ void virtuino_proc(uint8_t data) {
 		goto end;
 	}
 
-	if (offset < sizeof(cmd)) {
+	if (offset < sizeof(cmd)-1) {
 		cmd[offset] = data;
 		offset++;
 	}
 		  
 	if (data == '$') {
-		if (offset < sizeof(cmd)) {
-			cmd[offset] = '0';
-			offset++;
-		}
-	 
+		cmd[offset] = '0';
 		ch = atoi(&cmd[2]);
 		unit_n = virtuino_unit_find(ch, cmd[1]);
 		if (unit_n == -1) {
@@ -169,12 +170,17 @@ void virtuino_proc(uint8_t data) {
 		// !!! PROC !!!
 		switch (cmd[1]) {
 		case 'C': // Команда инициализации
-			//nop
+			strcpy(cmd, VIRTUINO_VERSION_ANSWER);
+			break;
+		case 'O':
+		case 'I':
+			DBG("WARNING: cmd = '%s'\r\n", cmd);
 			break;
 		case 'A': // Аналоговый вход
 		case 'D': // Виртуальный вывод VD
 		case 'V': // Виртуальный вывод V
 		case 'Q': // Цифровой вывод
+		case 'T': // Строка на выход
 			if (tmp[1] == '?') {
 				virtuino_unit_get(&units[unit_n], cmd);
 			} else {

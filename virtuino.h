@@ -7,6 +7,10 @@
 #define VIRTUINO_TYPE_DOUBLE  (3)
 #define VIRTUINO_TYPE_STRING  (4)
 
+#define VIRTUINO_STRING_MAX_SIZE (32)
+
+#define VIRTUINO_VERSION_ANSWER "!C00=1.62$"
+
 #include <stdint.h>
 
 typedef struct {
