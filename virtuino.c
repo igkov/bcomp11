@@ -8,7 +8,6 @@
 	
 	igorkov.org / Igor Kovalenko / 2018
  */
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -17,64 +16,47 @@
 #include "uart0.h"
 #include "dbg.h"
 
-typedef struct {
-	uint8_t id;    // Номер канала
-	uint8_t type;  // Тип переменной в микропрограмме
-	uint8_t vtype; // Тип переменной в протоколе
-	uint8_t res;
-	void *value;
-} virtuino_unit_t, *pvirtuino_unit_t;
-
-#define VIRTUINO_TYPE_INT     (0)
-#define VIRTUINO_TYPE_BYTE    (1)
-#define VIRTUINO_TYPE_FLOAT   (2)
-#define VIRTUINO_TYPE_DOUBLE  (3)
-#define VIRTUINO_TYPE_STRING  (4)
-
-#define VIRTUINO_PTYPE_D      (0)
-#define VIRTUINO_PTYPE_V      (1)
-#define VIRTUINO_PTYPE_Q      (2)
-
 //
 // Структура-описание данных на отправку:
 //
 const static virtuino_unit_t units[] = {
-	{ 1, VIRTUINO_TYPE_INT, 'V', 0, &bcomp.time },
-	{ 2, VIRTUINO_TYPE_INT, 'V', 0, &bcomp.speed },
-	{ 3, VIRTUINO_TYPE_INT, 'V', 0, &bcomp.rpm },
-	{ 4, VIRTUINO_TYPE_INT, 'V', 0, &bcomp.t_engine },
-	{ 5, VIRTUINO_TYPE_INT, 'V', 0, &bcomp.t_akpp },
-	{ 6, VIRTUINO_TYPE_INT, 'V', 0, &bcomp.t_engine },
+	// id,       type       , vtype,res, value
+	{   1, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.time },
+	{   2, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.speed },
+	{   3, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.rpm },
+	{   4, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_engine },
+	{   5, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_akpp },
+	{   6, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_engine },
 	//{ 7, VIRTUINO_TYPE_STRING, 0, 0, &bcomp.vin },
 };
 
 static void virtuino_unit_get(const virtuino_unit_t *punit, char *strout) {
 	switch (punit->type) {
 	case VIRTUINO_TYPE_INT:
-		_sprintf(strout, "!DV%02d=%d$", punit->id, *(int*)punit->value);
+		_sprintf(strout, "!%c%02d=%d$", punit->vtype, punit->id, *(int*)punit->value);
 		break;
 	case VIRTUINO_TYPE_BYTE:
-		_sprintf(strout, "!DV%02d=%d$", punit->id, *(char*)punit->value);
+		_sprintf(strout, "!%c%02d=%d$", punit->vtype, punit->id, *(char*)punit->value);
 		break;
 	case VIRTUINO_TYPE_FLOAT:
 		if (isnan(*(float*)punit->value)) {
-			_sprintf(strout, "!V%02d=NAN$", punit->id);
+			_sprintf(strout, "!%c%02d=NAN$", punit->vtype, punit->id);
 		} else {
-			_sprintf(strout, "!V%02d=%d.%02d$", punit->id, (int)*(float*)punit->value, 
+			_sprintf(strout, "!%c%02d=%d.%02d$", punit->vtype, punit->id, (int)*(float*)punit->value, 
 				(int)(*(float*)punit->value * 100) % 100);
 		}
 		break;
 	case VIRTUINO_TYPE_DOUBLE:
 		if (isnan(*(double*)punit->value)) {
-			_sprintf(strout, "!V%02d=NAN$", punit->id);
+			_sprintf(strout, "!%c%02d=NAN$", punit->id);
 		} else {
-			_sprintf(strout, "!V%02d=%d.%02d$", punit->id, (int)*(double*)punit->value, 
+			_sprintf(strout, "!%c%02d=%d.%02d$", punit->vtype, punit->id, (int)*(double*)punit->value, 
 				(int)(*(double*)punit->value * 100) % 100);
 		}
 		break;
 #if 0
 	case VIRTUINO_TYPE_STRING:
-		_sprintf(strout, "!V%02d=%s$", punit->id, *(char*)punit->value);
+		_sprintf(strout, "!%c%02d=%s$", punit->id, *(char*)punit->value);
 		break;
 #endif
 	default:
@@ -82,8 +64,47 @@ static void virtuino_unit_get(const virtuino_unit_t *punit, char *strout) {
 	}
 }
 
-static void virtuino_unit_set(const virtuino_unit_t *punit, char *strout) {
-	// TODO
+static double stof(const char* s){
+	double rez = 0;
+	double fact = 1;
+	int p = 0; // point seen flag
+	if (*s == '-') {
+		s++;
+		fact = -1;
+	}
+	for ( ; *s; s++) {
+		int d;
+		if (*s == '.' || *s == ',') {
+			p = 1; 
+			continue;
+		}
+		d = *s - '0';
+		if (d >= 0 && d <= 9) {
+			if (p) {
+				fact /= 10.0f;
+			}
+			rez = rez * 10.0f + (float)d;
+		}
+	}
+	return rez * fact;
+};
+
+static void virtuino_unit_set(const virtuino_unit_t *punit, const char *str) {
+	switch (punit->type) {
+	case VIRTUINO_TYPE_INT:
+		*(int*)punit->value = (int)atoi(str);
+		break;
+	case VIRTUINO_TYPE_BYTE:
+		*(char*)punit->value = (int)atoi(str);
+		break;
+	case VIRTUINO_TYPE_FLOAT:
+		*(float*)punit->value = (float)stof(str);
+		break;
+	case VIRTUINO_TYPE_DOUBLE:
+		*(double*)punit->value = (double)stof(str);
+	default:
+		DBG("virtuino_unit_set(): unknown value type (%d)!\r\n", punit->type);
+	}
 }
 
 int virtuino_unit_find(int ch, int type) {
@@ -123,49 +144,48 @@ void virtuino_proc(uint8_t data) {
 	char *tmp;
 	int unit_n;
 
+	if (data == '!') {
+		offset = 0;
+		goto end;
+	}
+
 	if (offset < sizeof(cmd)) {
 		cmd[offset] = data;
 		offset++;
 	}
 		  
-	if (data == '!') {
-		offset = 0;
-	} else if (data == '$') {
+	if (data == '$') {
 		if (offset < sizeof(cmd)) {
 			cmd[offset] = '0';
 			offset++;
 		}
 	 
-		ch = atoi(&cmd[1]);
-		tmp = strstr(cmd, "=");
-		unit_n = virtuino_unit_find(ch, cmd[0]);
+		ch = atoi(&cmd[2]);
+		unit_n = virtuino_unit_find(ch, cmd[1]);
 		if (unit_n == -1) {
 			goto end;
 		}
+		tmp = strstr(cmd, "=");
 		// !!! PROC !!!
-		switch (cmd[0]) {
+		switch (cmd[1]) {
 		case 'C': // Команда инициализации
-			//???
+			//nop
 			break;
 		case 'A': // Аналоговый вход
-			
-			break;
 		case 'D': // Виртуальный вывод VD
+		case 'V': // Виртуальный вывод V
+		case 'Q': // Цифровой вывод
 			if (tmp[1] == '?') {
 				virtuino_unit_get(&units[unit_n], cmd);
 			} else {
 				virtuino_unit_set(&units[unit_n], &tmp[1]);
 			}
 			break;
-		case 'V': // Виртуальный вывод V
-			
-			break;
-		case 'Q': // Цифровой вывод
-			
-			break;
+		default:
+			DBG("virtuino_proc(): unknown command '%c'\r\n", cmd[1]);
 		}
 		// Выставляем данные на асинхронную отправку:
-		uart0_puts(cmd);	
+		uart0_puts((const uint8_t *)cmd);	
 	}
 end:
 	return;

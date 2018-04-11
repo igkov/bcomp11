@@ -1114,7 +1114,7 @@ trip:
 		}
 		if (save_flag & 0x08) {
 #if ( VIRTUINO_SUPPORT == 1)
-			virtuino_proc();
+			// nop
 #else
 			elog_proc();
 #endif
