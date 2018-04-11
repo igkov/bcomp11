@@ -17,7 +17,7 @@ static void event_beep(void) {
 		timer1_pwm_freq(*pmelody);
 	}
 	pmelody++;
-	event_set(2, event_beep, *pmelody);
+	event_set(event_beep, *pmelody);
 	pmelody++;
 }
 
@@ -36,7 +36,7 @@ void beep(int time, int freq) {
 void beep_play(int *melody) {
 	timer1_pwm_on();
 	pmelody = melody;
-	event_set(2, event_beep, 5);
+	event_set(event_beep, 5);
 }
 
 int beep_is_play(void) {

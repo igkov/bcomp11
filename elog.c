@@ -18,8 +18,8 @@
 	 5 - fuel     - Уровень топлива в баке (л).
 	 6 - dfuel    - Израсходованное за сеанс топливо (л).
 	 7 - lon      - Широта.
-	 8 - lat	  - Долгота.
-	 9 - gtime	  - Время GPS в формате HH-MM-SS.
+	 8 - lat      - Долгота.
+	 9 - gtime    - Время GPS в формате HH-MM-SS.
 	10 - gdate    - Дата GPS в формате DD-MM-YYYY.
 	11 - t_eng    - Температура двигателя (°C).
 	12 - t_akpp   - Температура коробки передач (°C).
@@ -54,7 +54,7 @@ static char elog_str[128];
 
 // Стартовая строка, используется для дальнейшей привязки строк к значениям в софте обработки:
 // COLUMN:                0    1     2   3     4    5     6     7   8   9     10    11    12     13    14     15    16   17    18  
-const char elog_info[] = "time;speed;rpm;trans;batt;fuel; dfuel;lon;lat;gtime;gdate;t_eng;t_akpp;t_ext;p_fuel;p_air;dist;gdist;mil;\r\n";
+const char elog_info[] = "time;speed;rpm;trans;batt;fuel;dfuel;lon;lat;gtime;gdate;t_eng;t_akpp;t_ext;p_fuel;p_air;dist;gdist;mil;\r\n";
 
 void elog_proc(void) {
 	int offset;

@@ -15,6 +15,8 @@ extern int melody_wrep[];
 extern int melody_wrep2[];
 #endif
 
+#define VIRTUINO_SUPPORT 1
+
 // Определения для экрана информации:
 #define INFO_DEVICE   "NMPS COMP"
 #define INFO_VERSION  "v2.0alpha"

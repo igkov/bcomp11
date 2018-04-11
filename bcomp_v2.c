@@ -54,6 +54,7 @@
 #include "config.h"
 #include "errors.h"
 #include "elog.h"
+#include "virtuino.h"
 #include "warning.h"
 #include "nmea.h"
 
@@ -1112,7 +1113,11 @@ trip:
 			save_flag &= ~0x82;
 		}
 		if (save_flag & 0x08) {
+#if ( VIRTUINO_SUPPORT == 1)
+			virtuino_proc();
+#else
 			elog_proc();
+#endif
 			save_flag &= ~0x08;
 		}
 	}

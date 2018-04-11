@@ -1,5 +1,4 @@
-#include <LPC17xx.h>
-#include <core_cm3.h>
+#include <LPC11xx.h>
 #include <string.h>
 #include "event.h"
 
