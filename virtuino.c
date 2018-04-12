@@ -112,7 +112,7 @@ static void virtuino_unit_set(const virtuino_unit_t *punit, const char *str) {
 	}
 }
 
-int virtuino_unit_find(int ch, int type) {
+int virtuino_unit_find(uint8_t ch, uint8_t type) {
 	int i;
 	for (i=0; i<sizeof(units)/sizeof(virtuino_unit_t); i++) {
 		if (units[i].id == ch && units[i].vtype == type) {
@@ -145,13 +145,17 @@ void virtuino_proc(uint8_t data) {
 	static int offset = 0;
 	static char cmd[64];
 
-	int ch;
+	uint8_t ch;
 	char *tmp;
 	int unit_n;
 
+#if defined( _DBGOUT )
+	uart0_putchar(data);
+#endif
+
 	if (data == '!') {
+		memset(cmd, 0, sizeof(cmd));
 		offset = 0;
-		goto end;
 	}
 
 	if (offset < sizeof(cmd)-1) {
@@ -160,10 +164,10 @@ void virtuino_proc(uint8_t data) {
 	}
 		  
 	if (data == '$') {
-		cmd[offset] = '0';
 		ch = atoi(&cmd[2]);
+		DBG("virtuino_unit_find(%d, '%c')\r\n", ch, cmd[1]);
 		unit_n = virtuino_unit_find(ch, cmd[1]);
-		if (unit_n == -1) {
+		if (cmd[1] != 'C' && unit_n == -1) {
 			goto end;
 		}
 		tmp = strstr(cmd, "=");
