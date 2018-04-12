@@ -11,7 +11,6 @@ The Keil MDK project have some configurations:
 <b>bcomp11 (Release)</b> - old interface version, release build.<br>
 <b>bcomp11v2 (Debug)</b> - new (actual) interface version, debug build.<br>
 <b>bcomp11v2 (Release)</b> - new (actual) interface version, release build.<br>
-<b>bcomp11v2 (ReleaseF)</b> - new (actual) interface version, release build for SH1106 and gauge meter.<br>
 
 For build in GCC-ARM use Makefile. GCC build didn't full functionality, because GCC generate more code. 
 
