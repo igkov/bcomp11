@@ -15,11 +15,14 @@ extern int melody_wrep[];
 extern int melody_wrep2[];
 #endif
 
+// Поддержка протокола Virtuino:
 #define VIRTUINO_SUPPORT 1
+// Флаг сборки для встраиваемой версии (другой тип экрана):
+#define INSIDE_VERSION 0
 
 // Определения для экрана информации:
 #define INFO_DEVICE   "NMPS COMP"
-#define INFO_VERSION  "v2.0alpha"
+#define INFO_VERSION  "v2.1a"
 #define INFO_AUTHOR   "igorkov"
 #define INFO_YEAR     "2018"
 // Максимальная длина строки на отображение: 10 символов!

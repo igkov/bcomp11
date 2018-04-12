@@ -1113,11 +1113,7 @@ trip:
 			save_flag &= ~0x82;
 		}
 		if (save_flag & 0x08) {
-#if ( VIRTUINO_SUPPORT == 1)
-			// nop
-#else
 			elog_proc();
-#endif
 			save_flag &= ~0x08;
 		}
 	}
