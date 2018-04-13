@@ -28,18 +28,16 @@ const static virtuino_unit_t units[] = {
 	{   5,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.t_akpp },
 	{   6,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.t_ext },
 	{   7,  VIRTUINO_TYPE_FLOAT | VIRTUINO_ACCESS_READ,  'V', 0, &bcomp.v_ecu },
-
+	{   8,  VIRTUINO_TYPE_BYTE | VIRTUINO_ACCESS_READ,   'V', 0, &bcomp.at_drive },
 	{   9,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.p_intake },
 	{  10,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.p_fuel },
 	{  11,  VIRTUINO_TYPE_FLOAT | VIRTUINO_ACCESS_READ,  'V', 0, &bcomp.fuel_level },
 	{  12,  VIRTUINO_TYPE_DOUBLE | VIRTUINO_ACCESS_READ, 'V', 0, &bcomp.fuel },
 	{  13,  VIRTUINO_TYPE_DOUBLE | VIRTUINO_ACCESS_READ, 'V', 0, &bcomp.dist },
 
-	{   1,  VIRTUINO_TYPE_BYTE | VIRTUINO_ACCESS_READ,                          'D', 0, &bcomp.at_drive },
-	{   2,  VIRTUINO_TYPE_BYTE | VIRTUINO_ACCESS_READ | VIRTUINO_ACCESS_WRITE,  'D', 0, &bcomp.service },
+	{   1,  VIRTUINO_TYPE_BYTE | VIRTUINO_ACCESS_READ | VIRTUINO_ACCESS_WRITE,  'Q', 0, &bcomp.service },
 
 	{   1,  VIRTUINO_TYPE_STRING | VIRTUINO_ACCESS_READ,'T', 0, &bcomp.vin },
-	
 };
 
 static void virtuino_unit_get(const virtuino_unit_t *punit, char *strout) {
