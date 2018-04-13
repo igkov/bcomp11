@@ -20,17 +20,30 @@
 // Структура-описание данных на отправку:
 //
 const static virtuino_unit_t units[] = {
-	// id,       type       , vtype,res, value
-	{   1, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.time },
-	{   2, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.speed },
-	{   3, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.rpm },
-	{   4, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_engine },
-	{   5, VIRTUINO_TYPE_INT,   'V', 0, &bcomp.t_akpp },
-	//{ 7, VIRTUINO_TYPE_STRING, 0, 0, &bcomp.vin },
+	// id,       type,                                 vtype,res, value pointer
+	{   1,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.time },
+	{   2,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.speed },
+	{   3,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.rpm },
+	{   4,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.t_engine },
+	{   5,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.t_akpp },
+	{   6,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.t_ext },
+	{   7,  VIRTUINO_TYPE_FLOAT | VIRTUINO_ACCESS_READ,  'V', 0, &bcomp.v_ecu },
+
+	{   9,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.p_intake },
+	{  10,  VIRTUINO_TYPE_INT | VIRTUINO_ACCESS_READ,    'V', 0, &bcomp.p_fuel },
+	{  11,  VIRTUINO_TYPE_FLOAT | VIRTUINO_ACCESS_READ,  'V', 0, &bcomp.fuel_level },
+	{  12,  VIRTUINO_TYPE_DOUBLE | VIRTUINO_ACCESS_READ, 'V', 0, &bcomp.fuel },
+	{  13,  VIRTUINO_TYPE_DOUBLE | VIRTUINO_ACCESS_READ, 'V', 0, &bcomp.dist },
+
+	{   1,  VIRTUINO_TYPE_BYTE | VIRTUINO_ACCESS_READ,                          'D', 0, &bcomp.at_drive },
+	{   2,  VIRTUINO_TYPE_BYTE | VIRTUINO_ACCESS_READ | VIRTUINO_ACCESS_WRITE,  'D', 0, &bcomp.service },
+
+	{   1,  VIRTUINO_TYPE_STRING | VIRTUINO_ACCESS_READ,'T', 0, &bcomp.vin },
+	
 };
 
 static void virtuino_unit_get(const virtuino_unit_t *punit, char *strout) {
-	switch (punit->type) {
+	switch (punit->type & VIRTUINO_TYPE_MASK) {
 	case VIRTUINO_TYPE_INT:
 		_sprintf(strout, "!%c%02d=%d$", punit->vtype, punit->id, *(int*)punit->value);
 		break;
@@ -57,7 +70,7 @@ static void virtuino_unit_get(const virtuino_unit_t *punit, char *strout) {
 		_sprintf(strout, "!%c%02d=%s$", punit->vtype, punit->id, *(char**)punit->value);
 		break;
 	default:
-		DBG("virtuino_unit_get(): unknown value type (%d)!\r\n", punit->type);
+		DBG("virtuino_unit_get(): unknown value type (%d)!\r\n", punit->type & VIRTUINO_TYPE_MASK);
 	}
 }
 
@@ -89,7 +102,7 @@ static double stof(const char* s){
 };
 
 static void virtuino_unit_set(const virtuino_unit_t *punit, const char *str) {
-	switch (punit->type) {
+	switch (punit->type & VIRTUINO_TYPE_MASK) {
 	case VIRTUINO_TYPE_INT:
 		*(int*)punit->value = (int)atoi(str);
 		break;
@@ -103,12 +116,12 @@ static void virtuino_unit_set(const virtuino_unit_t *punit, const char *str) {
 		*(double*)punit->value = (double)stof(str);
 		break;
 	case VIRTUINO_TYPE_STRING:		
-		memset(*(char**)punit->value, 0, VIRTUINO_STRING_MAX_SIZE);
-		if ((int)(strstr(str, "$") - str) < VIRTUINO_STRING_MAX_SIZE-1) {
+		memset(*(char**)punit->value, 0, punit->len);
+		if ((int)(strstr(str, "$") - str) < punit->len-1) {
 			memcpy(*(char**)punit->value, str, (int)(strstr(str, "$") - str));
 		}
 	default:
-		DBG("virtuino_unit_set(): unknown value type (%d)!\r\n", punit->type);
+		DBG("virtuino_unit_set(): unknown value type (%d)!\r\n", punit->type & VIRTUINO_TYPE_MASK);
 	}
 }
 
@@ -168,6 +181,7 @@ void virtuino_proc(uint8_t data) {
 		DBG("virtuino_unit_find(%d, '%c')\r\n", ch, cmd[1]);
 		unit_n = virtuino_unit_find(ch, cmd[1]);
 		if (cmd[1] != 'C' && unit_n == -1) {
+			// TODO: set error
 			goto end;
 		}
 		tmp = strstr(cmd, "=");
@@ -186,14 +200,23 @@ void virtuino_proc(uint8_t data) {
 		case 'Q': // Цифровой вывод
 		case 'T': // Строка на выход
 			if (tmp[1] == '?') {
-				virtuino_unit_get(&units[unit_n], cmd);
+				if (units[unit_n].type & VIRTUINO_ACCESS_READ) {
+					virtuino_unit_get(&units[unit_n], cmd);
+				} else {
+					// TODO: set error
+				}
 			} else {
-				virtuino_unit_set(&units[unit_n], &tmp[1]);
+				if (units[unit_n].type & VIRTUINO_ACCESS_WRITE) {
+					virtuino_unit_set(&units[unit_n], &tmp[1]);
+				} else {
+					// TODO: set error
+				}
 			}
 			break;
 		default:
 			DBG("virtuino_proc(): unknown command '%c'\r\n", cmd[1]);
 		}
+end_send:
 		// Выставляем данные на асинхронную отправку:
 		uart0_puts((const uint8_t *)cmd);	
 	}

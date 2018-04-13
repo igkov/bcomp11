@@ -4,8 +4,11 @@
 #define ADC_VALUE_MAX 0x3FF
 #define ADC_LIMIT     0x20
 
+//
 // TODO: Перейти на новую нумерацию каналов.
+//
 
+// Старая нумерация каналов:
 // X12 - P1.2 - AD3
 #define ADC_CH1 0
 // X11 - P1.4 - AD5
