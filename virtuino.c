@@ -52,16 +52,16 @@ static void virtuino_unit_get(const virtuino_unit_t *punit, char *strout) {
 		if (isnan(*(float*)punit->value)) {
 			_sprintf(strout, "!%c%02d=NAN$", punit->vtype, punit->id);
 		} else {
-			_sprintf(strout, "!%c%02d=%d.%02d$", punit->vtype, punit->id, (int)*(float*)punit->value, 
-				(int)(*(float*)punit->value * 100) % 100);
+			_sprintf(strout, "!%c%02d=%d.%03d$", punit->vtype, punit->id, (int)*(float*)punit->value, 
+				(int)(*(float*)punit->value * 1000) % 1000);
 		}
 		break;
 	case VIRTUINO_TYPE_DOUBLE:
 		if (isnan(*(double*)punit->value)) {
 			_sprintf(strout, "!%c%02d=NAN$", punit->id);
 		} else {
-			_sprintf(strout, "!%c%02d=%d.%02d$", punit->vtype, punit->id, (int)*(double*)punit->value, 
-				(int)(*(double*)punit->value * 100) % 100);
+			_sprintf(strout, "!%c%02d=%d.%03d$", punit->vtype, punit->id, (int)*(double*)punit->value, 
+				(int)(*(double*)punit->value * 1000) % 1000);
 		}
 		break;
 	case VIRTUINO_TYPE_STRING:
