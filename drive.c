@@ -4,6 +4,8 @@
 
 #define AT_DRIVE_ICO 0
 
+#if ( PAJERO_SPECIFIC == 1 ) && ( GRAPH_SUPPORT == 1 )
+
 /* 
 	show_drive()
 	
@@ -67,3 +69,5 @@ void show_drive(int x, int y) {
 #endif
 	}
 }
+
+#endif

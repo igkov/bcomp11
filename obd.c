@@ -24,9 +24,11 @@ static int count;
 /* Список PID-ов для получения. */
 pid_obd_t pids_list[] = {
 	// CAN ADDR          | PID              | ACT |  RES1  RES2  RES3     
-	//{ PID_REQUEST_ENGINE,  ENGINE_RPM,           0, {0xFF, 0xFF, 0xFF} }, // 1. Обороты (получаем сырыми данными).
-	//{ PID_REQUEST_ENGINE,  VEHICLE_SPEED,        0, {0xFF, 0xFF, 0xFF} }, // 2. Спидометр (получаем сырыми данными).
-	//{ PID_REQUEST_ENGINE,  ENGINE_COOLANT_TEMP,  0, {0xFF, 0xFF, 0xFF} }, // 3. Темп. двигателя (получаем сырыми данными).
+#if ( PAJERO_SPECIFIC == 1 )
+	{ PID_REQUEST_ENGINE,  ENGINE_RPM,           1, {0xFF, 0xFF, 0xFF} }, // 1. Обороты (получаем сырыми данными).
+	{ PID_REQUEST_ENGINE,  VEHICLE_SPEED,        1, {0xFF, 0xFF, 0xFF} }, // 2. Спидометр (получаем сырыми данными).
+	{ PID_REQUEST_ENGINE,  ENGINE_COOLANT_TEMP,  1, {0xFF, 0xFF, 0xFF} }, // 3. Темп. двигателя (получаем сырыми данными).
+#endif
 	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 4. Напряжение бортовой сети.
 	{ PID_REQUEST_AT,      PAJERO_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки.
 	{ PID_REQUEST_ENGINE,  GET_VIN,              1, {0xFF, 0xFF, 0xFF} }, // 6. Получение VIN-автомобиля.

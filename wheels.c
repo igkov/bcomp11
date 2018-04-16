@@ -1,7 +1,10 @@
 #include <stdint.h>
 #include <math.h>
+#include "bcomp.h"
 #include "graph.h"
 #include "wheels.h"
+
+#if ( PAJERO_SPECIFIC == 1 ) && ( GRAPH_SUPPORT == 1 )
 
 // Вращение точки, для отрисовки колес:
 static void point_rot(int *x, int *y, int angle) {
@@ -40,3 +43,5 @@ void draw_rect(int x, int y, int angle) {
 	graph_line(point_2_x,point_2_y,point_3_x,point_3_y);
 	graph_line(point_3_x,point_3_y,point_0_x,point_0_y);
 }
+
+#endif

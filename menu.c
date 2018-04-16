@@ -9,6 +9,8 @@
 
 #include "menu.h"
 
+#if ( GRAPH_SUPPORT == 1 )
+
 const menu_t menu[] = {
 	{    0, MENU_FLOAT, 1, 0, "Акк.макс",    "В",   &bcomp.setup.v_max,    1, 130, 160 },
 	{    1, MENU_FLOAT, 1, 0, "Акк.мин",     "В",   &bcomp.setup.v_min,    1, 105, 130 },
@@ -168,3 +170,5 @@ int menu_work(int *act) {
 void menu_back(void) {
 	menu_inside = 0;
 }
+
+#endif

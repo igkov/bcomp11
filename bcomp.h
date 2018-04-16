@@ -19,6 +19,16 @@ extern int melody_wrep2[];
 #define VIRTUINO_SUPPORT 1
 // Флаг сборки для встраиваемой версии (другой тип экрана):
 #define INSIDE_VERSION 0
+// Поддержка графического интерфейса:
+#define GRAPH_SUPPORT 0
+// Поддержка вывода во внешний лог-файл:
+#define ELOG_SUPPORT 0
+// Специфичные возможности шины Mitsubishi Pajero Sport II:
+#define PAJERO_SPECIFIC 1
+
+#if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
+#error Unsupport 
+#endif
 
 // Определения для экрана информации:
 #define INFO_DEVICE   "NMPS COMP"

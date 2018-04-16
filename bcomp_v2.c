@@ -193,6 +193,7 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 	bcomp.connect = 1;
 	switch (pid) {
+#if ( PAJERO_SPECIFIC == 1 )
 	case 0x0215:
 		bcomp.speed = ((uint32_t)data[0] * 256 + data[1]) / 128;
 		break;
@@ -230,6 +231,11 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.t_engine = (int32_t)data[0] - 40;
 		// ТЕСТОВЫЙ ВАРИАНТ ПОТРЕБЛЕНИЯ ТОПЛИВА
 		bcomp.raw_fuel = (int32_t)data[5]*256 + data[6];
+		break;
+#endif
+#if 0 // OTHER VENDOR SPECIFIC CAN PAKCETS PROCESS:
+#endif
+	default:
 		break;
 	}	
 }
@@ -582,11 +588,13 @@ int main(void)
 	if (config_read(CPAR_SETUP_F_ESP, (uint8_t*)&bcomp.setup.f_esp, CPAR_SETUP_F_ESP_SIZE)) {
 		bcomp.setup.f_esp = 0;
 	}
+#if ( ELOG_SUPPORT == 1 )
 	// Флаг отправки лог-данных в UART-порт. Можно подключать устройство логгирования UART-данных.
 	// Данные отправляются на той же скорости, что работает GPS-модуль.
 	if (config_read(CPAR_SETUP_F_LOG, (uint8_t*)&bcomp.setup.f_log, CPAR_SETUP_F_LOG_SIZE)) {
 		bcomp.setup.f_log = bconfig.elog_flag;
 	}
+#endif
 	// Калибровочный коэффициент топлива:
 	// Редактировать его требуется по формуле: F_новый_коэффициент = L_заправки / L_израсходованного * F_старый_коэффициент.
 	if (config_read(CPAR_SETUP_FUEL_CAL, (uint8_t*)&bcomp.setup.fuel_cal, CPAR_SETUP_FUEL_CAL_SIZE)) {
@@ -613,10 +621,12 @@ int main(void)
 	event_set(bcomp_calc, 1000); delay_ms(10);
 	// Получение аналоговых данных:
 	event_set(bcomp_analog, 500); delay_ms(10);
+#if ( ELOG_SUPPORT == 1 )
 	// Если установлен флаг логгирования, инициализируем соотв. событие:
 	if (bcomp.setup.f_log) {
 		event_set(bcomp_elog, 10000); delay_ms(10);
 	}
+#endif
 	// Асинхронный обработчик с проверками на предупреждения:
 	event_set(bcomp_warning, 5000); delay_ms(10);
 	// Сохраняем данные в EEPROM, только если задана её конфигурация:
@@ -626,8 +636,10 @@ int main(void)
 	// Инициализируем экран:
 	// -----------------------------------------------------------------------------
 
+#if ( GRAPH_SUPPORT == 1 )
 	oled_init(bcomp.setup.contrast, 0);
 	graph_clear();
+#endif
 
 	// -----------------------------------------------------------------------------
 	// Запускаем OBD-протокол:
@@ -638,11 +650,13 @@ int main(void)
 	// Стартовый экран (заставка/мелодия):
 	// -----------------------------------------------------------------------------
 
+#if ( GRAPH_SUPPORT == 1 )
 	if (bconfig.start_delay) {
 		// Новая версия заставки, только иконка:
 		graph_pic(&ico64_mitsu,64-32,0);
 		graph_update();
 	}
+#endif
 	if (bconfig.start_sound) {
 #if !defined( WIN32 )
 		beep_play(melody_start);
@@ -672,7 +686,9 @@ int main(void)
 	ret = 0;
 	while (1) {
 		int buttons;
+#if ( GRAPH_SUPPORT == 1 )
 		graph_clear();
+#endif
 		// Состояние кнопок:
 		ms = get_ms_timer();
 		while ((get_ms_timer() - ms) < 400) {
@@ -795,6 +811,7 @@ end_sw2_proc:
 repeate:
 		// Проверка, есть ли варининги: внутри устанавливается нужный флаг для работы.
 		warning_check();
+#if ( GRAPH_SUPPORT == 1 )
 		// Вывод справки по страницам:
 		//DBG("page = %d (buttons = %02x)\r\n", bcomp.page, buttons);
 		// Проверка флагов, потом основной SWITCH по командам.
@@ -803,7 +820,8 @@ repeate:
 			if (ret) {
 				goto repeate;
 			}
-		} else
+		} 
+		else
 		if (bcomp.page & GUI_FLAG_MENU) {
 			int contrast;
 			contrast = bcomp.setup.contrast;
@@ -913,9 +931,11 @@ repeate:
 					graph_puts16(64+32, 0, 1, str);
 				}
 			}
+#if ( PAJERO_SPECIFIC == 1 )
 			if (bcomp.at_present) {
 				show_drive(64, 14);
 			}
+#endif
 			_sprintf(str, "%dкм", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
 			graph_puts16(64, 48, 1, str);
 			break;
@@ -931,6 +951,7 @@ repeate:
 			}
 			graph_puts32c(64, 24, str);
 			break;
+#if ( PAJERO_SPECIFIC == 1 )
 		case 3:
 			// -----------------------------------------------------------------
 			// TRANSMISSION
@@ -952,6 +973,7 @@ repeate:
 			}
 			graph_puts32c(64, 38, str);
 			break;
+#endif
 		case 4:
 			// -----------------------------------------------------------------
 			// BATERY
@@ -1043,7 +1065,6 @@ trip:
 				graph_puts16(64, 48, 1, str);
 			}
 			break;
-#if 1
 		case 9:
 			// -----------------------------------------------------------------
 			// WHEELS
@@ -1062,7 +1083,7 @@ trip:
 			draw_rect(40,40,bcomp.angle);
 			draw_rect(88,40,bcomp.angle);
 			break;
-#endif
+#if ( PAJERO_SPECIFIC == 1 )
 		case 10:
 			if (bcomp.setup.f_gps == 0) {
 				if (buttons & BUTT_SW2) {
@@ -1084,6 +1105,7 @@ trip:
 				graph_puts16(64,32,1,"NO DATA");
 			}
 			break;
+#endif
 		default:
 			DBG("unknown page (%d)\r\n", bcomp.page);
 			if (buttons & BUTT_SW2) {
@@ -1094,7 +1116,6 @@ trip:
 			config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
 			goto repeate;
 		}
-
 		// -----------------------------------------------------------------
 		// Обновление экрана:
 		// -----------------------------------------------------------------
@@ -1102,7 +1123,7 @@ trip:
 		graph_update(); 
 		ms = get_ms_timer() - ms;
 		DBG("graph_update() work %dms\r\n", ms);
-
+#endif
 		// Сохранение изменяемых параметров:
 		if (save_flag & 0x01) {
 			save_params();
@@ -1112,10 +1133,12 @@ trip:
 			save_settings();
 			save_flag &= ~0x82;
 		}
+#if ( ELOG_SUPPORT == 1 )
 		if (save_flag & 0x08) {
 			elog_proc();
 			save_flag &= ~0x08;
 		}
+#endif
 	}
 	return 0;
 }

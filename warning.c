@@ -197,6 +197,7 @@ bcomp_warning_end:
 	event_set(bcomp_warning, 5000);
 }
 
+#if ( GRAPH_SUPPORT == 1 )
 // -----------------------------------------------------------------------------
 // show_XXX
 // Функции отображения информации.
@@ -273,6 +274,7 @@ int warning_show(int *act) {
 	}
 	return 0;
 }
+#endif
 
 void warning_check(void) {
 	int i;
