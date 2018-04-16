@@ -12,6 +12,8 @@ The Keil MDK project have some configurations:
 <b>bcomp11v2 (Debug)</b> - new (actual) interface version, debug build.<br>
 <b>bcomp11v2 (Release)</b> - new (actual) interface version, release build.<br>
 
+More information here: https://github.com/igkov/bcomp11/wiki/Firmware-structure.
+
 For build in GCC-ARM use Makefile. GCC build didn't full functionality, because GCC generate more code. 
 
 The sub-folder /pc contains HAL-level and build-script for compilation in MinGW-Win32. This build use for easy interface debug.
