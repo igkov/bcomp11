@@ -185,7 +185,7 @@ TIMER16_1_IRQHandler:
 TIMER32_0_IRQHandler:
 TIMER32_1_IRQHandler:
 SSP0_IRQHandler:
-UART_IRQHandler:
+//;UART_IRQHandler:
 USB_IRQHandler:
 USB_FIQHandler:
 ADC_IRQHandler:

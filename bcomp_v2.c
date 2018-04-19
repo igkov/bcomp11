@@ -436,8 +436,12 @@ int main(void)
 	i2c_init();
 #endif
 	adc_init();
+#if ( GRAPH_SUPPORT == 1)
 	warning_init();
+#endif
+#if ( NMEA_SUPPORT == 1 )
 	nmea_init();
+#endif
 	DBG("init ok!\r\n");
 
 	// -----------------------------------------------------------------------------
@@ -627,8 +631,10 @@ int main(void)
 		event_set(bcomp_elog, 10000); delay_ms(10);
 	}
 #endif
+#if ( WARNING_SUPPORT == 1 )
 	// Асинхронный обработчик с проверками на предупреждения:
 	event_set(bcomp_warning, 5000); delay_ms(10);
+#endif
 	// Сохраняем данные в EEPROM, только если задана её конфигурация:
 	event_set(bcomp_save, 30000); delay_ms(10);
 
@@ -708,9 +714,12 @@ int main(void)
 			if (bcomp.page & GUI_FLAG_MENU) {
 				// nop
 			} else
+#if ( WARNING_SUPPORT == 1 )
 			if (bcomp.page & GUI_FLAG_WARNING) {
 				// nop
-			} else {
+			} else 
+#endif
+			{
 				if (bcomp.page == 8) {
 					if (bcomp.service & 0x80) {
 						bcomp.service ^= 0x01;
@@ -732,9 +741,11 @@ end_sw1_proc:
 			if (bcomp.page & GUI_FLAG_MENU) {
 				// nop
 			} else
+#if ( WARNING_SUPPORT == 1 )
 			if (bcomp.page & GUI_FLAG_WARNING) {
 				// nop
 			} else
+#endif
 			if (bcomp.page == 1) {
 				buttons = 0;
 				bcomp.page |= GUI_FLAG_MENU;
@@ -789,9 +800,12 @@ end_sw1_proc:
 			if (bcomp.page & GUI_FLAG_MENU) {
 				// nop
 			} else
+#if ( WARNING_SUPPORT == 1 )
 			if (bcomp.page & GUI_FLAG_WARNING) {
 				// nop
-			} else {
+			} else 
+#endif
+			{
 				if (bcomp.page == 8) {
 					if (bcomp.service & 0x80) {
 						bcomp.service ^= 0x01;
@@ -809,9 +823,9 @@ end_sw2_proc:
 			DBG("buttons(): BUTT_SW2_LONG\r\n");
 		}
 repeate:
+#if ( WARNING_SUPPORT == 1 )
 		// Проверка, есть ли варининги: внутри устанавливается нужный флаг для работы.
 		warning_check();
-#if ( GRAPH_SUPPORT == 1 )
 		// Вывод справки по страницам:
 		//DBG("page = %d (buttons = %02x)\r\n", bcomp.page, buttons);
 		// Проверка флагов, потом основной SWITCH по командам.
@@ -821,7 +835,11 @@ repeate:
 				goto repeate;
 			}
 		} 
+#endif
+#if ( GRAPH_SUPPORT == 1 ) && ( WARNING_SUPPORT == 1 )
 		else
+#endif
+#if ( GRAPH_SUPPORT == 1 )
 		if (bcomp.page & GUI_FLAG_MENU) {
 			int contrast;
 			contrast = bcomp.setup.contrast;

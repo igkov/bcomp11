@@ -37,9 +37,10 @@ OPT = 2
 #
 
 # List C source files here:
-SRC     = bcomp.c
+#SRC     = bcomp.c
+SRC     = bcomp_v2.c
 SRC    += adc.c
-#SRC    += analog.c
+SRC    += analog.c
 SRC    += bconfig.c
 SRC    += beep.c
 SRC    += buttons.c
@@ -58,13 +59,14 @@ SRC    += leds.c
 #SRC    += menu.c
 #SRC    += nmea.c
 SRC    += obd.c
-SRC    += oled128.c
-SRC    += oled128_sh1106.c
-SRC    += oled128_ssd1306.c
+#SRC    += oled128.c
+#SRC    += oled128_sh1106.c
+#SRC    += oled128_ssd1306.c
 SRC    += printf.c
 SRC    += sounds.c
 SRC    += system_LPC11xx.c
 SRC    += timer.c
+SRC    += virtuino.c
 SRC    += uart0.c
 #SRC    += warning.c
 #SRC    += wheels.c
@@ -250,6 +252,8 @@ begin:
 prebuild:
 	@if [ ! -e .dep ]; then mkdir .dep; fi;
 	@if [ ! -e .obj ]; then mkdir .obj; fi;
+	@if [ ! -e .obj/fonts ]; then mkdir .obj/fonts; fi;
+	@if [ ! -e .obj/icons ]; then mkdir .obj/icons; fi;
 	@if [ ! -e .lst ]; then mkdir .lst; fi;
 	@if [ ! -e .out_gcc ]; then mkdir .out_gcc; fi;
 
