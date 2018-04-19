@@ -31,7 +31,11 @@ extern int melody_wrep2[];
 #define PAJERO_SPECIFIC 1
 
 #if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
-#error Unsupport 
+#error Unsupport ELOG and VIRTUINO sumultaneously.
+#endif
+
+#if ( NMEA_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
+#error Unsupport NMEA and VIRTUINO sumultaneously.
 #endif
 
 // Определения для экрана информации:
