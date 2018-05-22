@@ -13,6 +13,9 @@
 #include <string.h>
 #include "event.h"
 #include "buttons.h"
+#if ( BUTTONS_ANALOG == 1 )
+#include "adc.h"
+#endif
 
 static int state;
 static int last_state[MAX_BUTT];
@@ -26,6 +29,35 @@ extern int iMButton;
 #define SW2_READ ((LPC_GPIO0->DATA & (1UL<<3))?0:1)
 #endif
 
+#if ( BUTTONS_ANALOG == 1 ) 
+// Допуск на попадание (поправка на шумы и на погрешности):
+#define ADC_NOISE_LIMIT 0x30
+// 4.7k/(10k+4.7k) = 0.32 * ADC_VALUE_MAX = 327
+// 2.2k/(10k+2.2k) = 0.18 * ADC_VALUE_MAX = 184
+#define ADC_BUTTON1_VALUE 327
+#define ADC_BUTTON2_VALUE 184
+int button_state(int n) {
+	int tmp = adc_get(ADC_IN1);
+	switch (n) {
+	case BUTT_SW1:
+		if (tmp < ADC_BUTTON1_VALUE+ADC_NOISE_LIMIT &&
+			tmp > ADC_BUTTON1_VALUE-ADC_NOISE_LIMIT) {
+			return 1;
+		} else {
+			return 0;
+		}
+	case BUTT_SW2:
+		if (tmp < ADC_BUTTON2_VALUE+ADC_NOISE_LIMIT &&
+			tmp > ADC_BUTTON2_VALUE-ADC_NOISE_LIMIT) {
+			return 1;
+		} else {
+			return 0;
+		}
+	default:
+		return 0;
+	}
+}
+#else
 int button_state(int n) {
 	switch (n) {
 	case BUTT_SW1:
@@ -36,6 +68,7 @@ int button_state(int n) {
 		return 0;
 	}
 }
+#endif
 
 #if ( BUTTONS_SUPPORT_LONG == 0)
 static void button_proc(void) {
@@ -97,6 +130,9 @@ static void button_proc(void) {
 void button_init(void) {
 	state = 0;
 	memset(last_state, 0x00, sizeof(last_state));
+#if ( BUTTONS_ANALOG == 1 ) 
+	adc_init();
+#endif
 	event_set(button_proc, 10);
 }
 

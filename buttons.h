@@ -5,6 +5,10 @@
 // Функция длинных нажатий нужна для управления одной кнопкой.
 #define BUTTONS_SUPPORT_LONG 1
 
+// Поддержка внешнего блока кнопок.
+// Данный блок кнопок аналоговый, .
+#define BUTTONS_ANALOG 0
+
 #define MAX_BUTT 2
 
 #if ( BUTTONS_SUPPORT_LONG )
