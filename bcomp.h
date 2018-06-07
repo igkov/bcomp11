@@ -29,6 +29,8 @@ extern int melody_wrep2[];
 #define WARNING_SUPPORT 0
 // Специфичные возможности шины Mitsubishi Pajero Sport II:
 #define PAJERO_SPECIFIC 1
+// Тип кнопок:
+#define BUTTONS_ANALOG 1
 
 #if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
 #error Unsupport ELOG and VIRTUINO sumultaneously.
