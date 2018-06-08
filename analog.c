@@ -4,7 +4,7 @@
 
 float analog_temp(const termist_t *par) {
 	float R, T;
-	int adc = adc_get(ADC_IN1);
+	int adc = adc_get(ADC_IN2);
 	if ((adc<ADC_LIMIT)||
 		(adc>(ADC_VALUE_MAX-ADC_LIMIT)))
 		return NAN;  
