@@ -344,7 +344,7 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>CORTEX _DBGOUT _LPC1100_ NO_FILTER NO_SOUND BCOMP_V2</Define>
+              <Define>CORTEX _DBGOUT _LPC1100_ NO_SOUND BCOMP_V2</Define>
               <Undefine></Undefine>
               <IncludePath>.\</IncludePath>
             </VariousControls>
@@ -592,7 +592,7 @@
             <File>
               <FileName>virtuino.c</FileName>
               <FileType>1</FileType>
-              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\virtuino.c</FilePath>
+              <FilePath>.\virtuino.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2136,7 +2136,7 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>CORTEX _LPC1100_ RELEASE NO_FILTER BCOMP_V2</Define>
+              <Define>CORTEX _LPC1100_ RELEASE nNO_SOUND BCOMP_V2</Define>
               <Undefine></Undefine>
               <IncludePath>.\</IncludePath>
             </VariousControls>
@@ -2276,7 +2276,7 @@
             <File>
               <FileName>virtuino.c</FileName>
               <FileType>1</FileType>
-              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\virtuino.c</FilePath>
+              <FilePath>.\virtuino.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3882,7 +3882,7 @@
             <File>
               <FileName>virtuino.c</FileName>
               <FileType>1</FileType>
-              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\virtuino.c</FilePath>
+              <FilePath>.\virtuino.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5449,7 +5449,7 @@
             <File>
               <FileName>virtuino.c</FileName>
               <FileType>1</FileType>
-              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\virtuino.c</FilePath>
+              <FilePath>.\virtuino.c</FilePath>
             </File>
           </Files>
         </Group>

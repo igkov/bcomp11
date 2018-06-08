@@ -379,7 +379,7 @@ void CAN_rdMsg (uint32_t can_msgObj, CAN_msg *msg)  {
 	}
 }
 
-#if !defined( NO_FILTER )
+#if (0)
 /*----------------------------------------------------------------------------
   setup acceptance filter.
  *----------------------------------------------------------------------------*/
@@ -426,7 +426,6 @@ void CAN_wrFilter (uint32_t id, uint8_t format)  {
 }
 #endif
 
-#if defined( NO_FILTER )
 void CAN_noFilter (uint8_t format)  {
 	int32_t i;
 	uint32_t can_msgObj;
@@ -460,7 +459,6 @@ void CAN_noFilter (uint8_t format)  {
 	LPC_CAN->IF1_CMDREQ = can_msgObj;         /* Transfer message object data to message RAM */
 	while (LPC_CAN->IF1_CMDREQ & _CMDREQ_BUSY);
 }
-#endif
 
 /*----------------------------------------------------------------------------
   CAN interrupt handler

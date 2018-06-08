@@ -1,11 +1,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include "bcomp.h"
 #include "event.h"
 #include "buttons.h"
 #include "dbg.h"
 #include "graph.h"
-#include "bcomp.h"
 
 #include "menu.h"
 

@@ -2,8 +2,6 @@
 #define __BCOMP_H__
 
 #include <stdint.h>
-#include "analog.h"
-#include "nmea.h"
 
 #define GUI_FLAG_MENU    0x1000
 #define GUI_FLAG_WARNING 0x2000
@@ -16,21 +14,26 @@ extern int melody_wrep2[];
 #endif
 
 // Поддержка протокола Virtuino:
-#define VIRTUINO_SUPPORT 1
+#define VIRTUINO_SUPPORT 0
 // Флаг сборки для встраиваемой версии (другой тип экрана):
 #define INSIDE_VERSION 0
 // Поддержка графического интерфейса:
-#define GRAPH_SUPPORT 0
+#define GRAPH_SUPPORT 1
 // Поддержка вывода во внешний лог-файл:
-#define ELOG_SUPPORT 0
+#define ELOG_SUPPORT 1
 // Минимальная поддержка nmea:
-#define NMEA_SUPPORT 0
+#define NMEA_SUPPORT 1
 // Поддержка предупреждений:
-#define WARNING_SUPPORT 0
+#define WARNING_SUPPORT 1
 // Специфичные возможности шины Mitsubishi Pajero Sport II:
 #define PAJERO_SPECIFIC 1
 // Тип кнопок:
 #define BUTTONS_ANALOG 1
+// Поддержка OLED на контроллере SSD1306:
+#define OLED_SSD1306_SUPPORT 1
+// Поддержка OLED на контроллере SH1106:
+#define OLED_SH1106_SUPPORT 1
+
 
 #if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
 #error Unsupport ELOG and VIRTUINO sumultaneously.
@@ -46,6 +49,9 @@ extern int melody_wrep2[];
 #define INFO_AUTHOR   "igorkov"
 #define INFO_YEAR     "2018"
 // Максимальная длина строки на отображение: 10 символов!
+
+#include "analog.h"
+#include "nmea.h"
 
 typedef struct {
 	uint32_t time;   // Время маршрута (сек).

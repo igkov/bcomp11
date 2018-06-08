@@ -3,7 +3,7 @@
 #include "beep.h"
 #include "notes.h"
 
-#if defined( NO_SOUND ) 
+#if defined( NO_SOUND )
 #define timer1_pwm_on()
 #endif
 		 

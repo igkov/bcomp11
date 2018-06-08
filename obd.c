@@ -45,13 +45,11 @@ pid_obd_t pids_list[] = {
 
 // Обработчик пакетов от шины CAN (по протоколу J1979):
 void obd_loopback(CAN_msg *p) {
-#if defined( NO_FILTER )
 	if (can_id != p->id) {
 		// Сырые пакеты данных:
 		bcomp_raw(p->id, p->data, p->len);
 		return;
 	}
-#endif
 	if (can_len > can_offset) {
 		if (can_cnt == p->data[0]) {
 			memcpy(&can_buffer[can_offset], &p->data[1], (can_len-can_offset)>7?7:(can_len-can_offset));
@@ -119,7 +117,7 @@ obd_loopback_recv:
 
 void obd_getpid(uint16_t addr, uint16_t pid) {
 	//DBG("get_pid(%04x, %04x);\r\n", addr, pid);
-#if !defined( NO_FILTER )
+#if ( 0 )
 	// Настройка приема:
 	CAN_wrFilter(addr+0x08, STANDARD_FORMAT);
 #endif
@@ -187,9 +185,7 @@ void obd_init(void) {
 	CAN_setup(bconfig.can_speed);                  /* setup CAN Controller, 500kbit/s */
 	CAN_start();                                   /* start CAN Controller    */
 	CAN_waitReady();                               /* wait til tx mbx is empty */
-#if defined( NO_FILTER )
 	CAN_noFilter(STANDARD_FORMAT);
-#endif
 	// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
 	event_set(obd_manage, 5000);
 }

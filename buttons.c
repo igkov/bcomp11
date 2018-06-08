@@ -37,6 +37,9 @@ extern int iMButton;
 #define ADC_BUTTON2_VALUE 184
 
 int button_state(int n) {
+#if ( BUTTONS_ANALOG == 1 )
+	int tmp = adc_get(ADC_IN2);
+#endif
 	switch (n) {
 	case BUTT_SW1:
 #if ( BUTTONS_ANALOG == 1 ) 
