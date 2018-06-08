@@ -1,14 +1,14 @@
 #include <string.h>
 #include <lpc11xx.h>
-
+#include "bcomp.h"
 #include "dbg.h"
 #include "i2c.h"
 #include "eeprom.h"
-
-#include "bcomp.h"
 #define IS_2B_ADDRESS (bconfig.ee_size>16)
 
 #if !defined( EEPROM_STD_ADDRESS )
+#include "spi.h"
+
 unsigned char ee_getstat(void) {
 	unsigned char stat;
 	spi_select();
@@ -134,3 +134,8 @@ void ee_clear(void) {
 	}
 }
 
+int ee_size_detect(void) {
+	// 
+	// experimental function for detect I2C protocol type (1 or 2 bytes address).
+	// 
+}
