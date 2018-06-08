@@ -4,7 +4,7 @@
 
 float analog_temp(const termist_t *par) {
 	float R, T;
-	int adc = adc_get(ADC_CH2);
+	int adc = adc_get(ADC_IN1);
 	if ((adc<ADC_LIMIT)||
 		(adc>(ADC_VALUE_MAX-ADC_LIMIT)))
 		return NAN;  
@@ -33,7 +33,7 @@ float analog_temp(const termist_t *par) {
 /* Функция возвращает посчитанное сопротивление ДУТ */
 float analog_fuel(void) {
 	float V;
-	int adc = adc_get(ADC_CH1);
+	int adc = adc_get(ADC_IN3);
 	if ((adc<ADC_LIMIT)||
 		(adc>(ADC_VALUE_MAX-ADC_LIMIT)))
 		return NAN;
@@ -59,7 +59,7 @@ float analog_volt(void) {
 #define VOLT_BASE 3.3f
 float analog_volt(void) {
 	float V;
-	int adc = adc_get(ADC_CH3);
+	int adc = adc_get(ADC_IN4);
 	if ((adc<ADC_LIMIT)||
 		(adc>(ADC_VALUE_MAX-ADC_LIMIT)))
 		return NAN;
