@@ -214,7 +214,6 @@ void virtuino_proc(uint8_t data) {
 		default:
 			DBG("virtuino_proc(): unknown command '%c'\r\n", cmd[1]);
 		}
-end_send:
 		// Выставляем данные на асинхронную отправку:
 		uart0_puts((const uint8_t *)cmd);	
 	}

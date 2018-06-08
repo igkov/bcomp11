@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include "bcomp.h"
 #include "leds.h"
 #include "event.h"
 #include "adc.h"
@@ -47,7 +48,6 @@
 #include "wheels.h"
 #include "drive.h"
 
-#include "bcomp.h"
 #include "obd.h"
 #include "obd_pids.h"
 #include "oled128.h"

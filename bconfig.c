@@ -6,26 +6,26 @@ const bcomp_config_t bconfig = {
 	500000,                // CAN speed
 	115200,                // UART speed
 #if ( INSIDE_VERSION == 1 )
-	16,
+	16,					   // in inside version setup EEPROM 24LC16
 #else
 	#if ( VIRTUINO_SUPPORT == 1 )
-		0,
+		0,                 // no EEPROM for Virtuino
 	#else
-		64,                    // EEPROM size in kBit
+		64,                // EEPROM size in kBit, standart 24LC64
 	#endif
 #endif
-	16,                    // contrast
+	16,                    // default OLED contrast
 	4,                     // start delay
 	0,                     // start sound
-	100,                   // t_engine_warning
-	115,                   // t_akpp_warning
-	14.5f,                 // v_max
-	12.3f,                 // v_min
+	100,                   // t_engine default temperature warning
+	115,                   // t_akpp default temperature warning
+	14.5f,                 // v_max voltage warning
+	12.3f,                 // v_min voltage warning
 	3.33f,                 // fuel_coeff
 	1.0f,                  // speed_coeff
 	84000,                 // moto_dist_offset
 	0,                     // moto_time_offset
-	15000,                 // service distation (default = 15000km, recommended 7500km)
+	15000,                 // service distantion (default = 15000km, recommended 7500km)
 	250,                   // service moto time (default = 250h, recommended 150h)
 #if ( INSIDE_VERSION == 1 )
 	1,
