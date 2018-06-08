@@ -138,6 +138,9 @@ typedef struct {
 	char res4[3];
 } bcomp_t;
 
+/*
+	Актуальная версия структуры конфигурации:
+ */
 #define CONFIGURATON_VERSION 103
 
 typedef struct {
