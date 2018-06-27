@@ -1,6 +1,8 @@
 #ifndef __BUTTONS_H__
 #define __BUTTONS_H__
 
+#include "bcomp.h"
+
 // Поддержка длинных нажатий. 
 // Функция длинных нажатий нужна для управления одной кнопкой.
 #define BUTTONS_SUPPORT_LONG 1

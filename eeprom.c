@@ -138,4 +138,5 @@ int ee_size_detect(void) {
 	// 
 	// experimental function for detect I2C protocol type (1 or 2 bytes address).
 	// 
+	return 0;
 }

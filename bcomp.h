@@ -33,6 +33,8 @@ extern int melody_wrep2[];
 #define OLED_SSD1306_SUPPORT 1
 // Поддержка OLED на контроллере SH1106:
 #define OLED_SH1106_SUPPORT 1
+// Поддержка экрана с выводом положения колес:
+#define WHELLS_DRAW_SUPPORT 0
 
 
 #if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
@@ -96,6 +98,7 @@ typedef struct {
 		int f_esp;                // Флаг наличия системы курсовой устойчивости (ACS, ESP, ESC).
 		int f_log;                // Флаг надобности вывода лога.
 		int contrast;             // Значение уровня контраста/яркости.
+		int sound;                // Активация звуков.
 	} setup;
 
 	int page;                     // Страница отображения.

@@ -5,14 +5,10 @@ const bcomp_config_t bconfig = {
 	CONFIGURATON_VERSION,  // version
 	500000,                // CAN speed
 	115200,                // UART speed
-#if ( INSIDE_VERSION == 1 )
-	16,					   // in inside version setup EEPROM 24LC16
+#if ( VIRTUINO_SUPPORT == 1 )
+	0,                     // no EEPROM for Virtuino
 #else
-	#if ( VIRTUINO_SUPPORT == 1 )
-		0,                 // no EEPROM for Virtuino
-	#else
-		64,                // EEPROM size in kBit, standart 24LC64
-	#endif
+	16,                    // EEPROM size in kBit, standart 24LC64
 #endif
 	16,                    // default OLED contrast
 	4,                     // start delay

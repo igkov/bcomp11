@@ -1,5 +1,5 @@
 /*
-	OLED 128x64 0.96 driver.
+	OLED 128x64 0.96" driver.
 	SSD1306
  */
 #include <stdio.h>

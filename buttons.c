@@ -31,10 +31,12 @@ extern int iMButton;
 
 // Допуск на попадание (поправка на шумы и на погрешности):
 #define ADC_NOISE_LIMIT 0x30
+// 5.1k/(10k+5.1k) = 0.34 * ADC_VALUE_MAX = 345
 // 4.7k/(10k+4.7k) = 0.32 * ADC_VALUE_MAX = 327
+// 3.3k/(10k+3.3k) = 0.25 * ADC_VALUE_MAX = 254
 // 2.2k/(10k+2.2k) = 0.18 * ADC_VALUE_MAX = 184
-#define ADC_BUTTON1_VALUE 327
-#define ADC_BUTTON2_VALUE 184
+#define ADC_BUTTON1_VALUE 345 // 5.1k
+#define ADC_BUTTON2_VALUE 254 // 3.3k
 
 int button_state(int n) {
 #if ( BUTTONS_ANALOG == 1 )

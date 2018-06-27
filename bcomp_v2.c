@@ -400,7 +400,8 @@ void save_settings(void) {
 	config_save(CPAR_SETUP_F_ESP, (uint8_t*)&bcomp.setup.f_esp, CPAR_SETUP_F_ESP_SIZE);
 	config_save(CPAR_SETUP_FUEL_CAL, (uint8_t*)&bcomp.setup.fuel_cal, CPAR_SETUP_FUEL_CAL_SIZE);
 	config_save(CPAR_SETUP_F_LOG, (uint8_t*)&bcomp.setup.f_log, CPAR_SETUP_F_LOG_SIZE);
-	config_save(CPAR_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_CONTRAST_SIZE);
+	config_save(CPAR_SETUP_F_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_SETUP_F_CONTRAST_SIZE);
+	config_save(CPAR_SETUP_F_SOUND, (uint8_t*)&bcomp.setup.sound, CPAR_SETUP_F_SOUND_SIZE);
 }
 
 #if !defined( WIN32 )
@@ -605,8 +606,12 @@ int main(void)
 		bcomp.setup.fuel_cal = bconfig.fuel_coeff;
 	}
 	// Значение яркости экрана:
-	if (config_read(CPAR_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_CONTRAST_SIZE)) {
+	if (config_read(CPAR_SETUP_F_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_SETUP_F_CONTRAST_SIZE)) {
 		bcomp.setup.contrast = bconfig.contrast;
+	}
+	// Флаг, проигрывать ли звуки:
+	if (config_read(CPAR_SETUP_F_SOUND, (uint8_t*)&bcomp.setup.sound, CPAR_SETUP_F_SOUND_SIZE)) {
+		bcomp.setup.sound = 0;
 	}
 	// Флаг сервисного режима, сохраняется между сеансами работы, активируется на время сервисного обслуживания:
 	if (config_read(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE)) {
@@ -616,7 +621,6 @@ int main(void)
 	if (config_read(CPAR_FUEL_LEVEL, (uint8_t*)&bcomp.fuel_level, CPAR_FUEL_LEVEL_SIZE)) {
 		bcomp.fuel_level = 0.0f;
 	}
-
 	// -----------------------------------------------------------------------------
 	// Инициализируем асинхронные события:
 	// -----------------------------------------------------------------------------
@@ -708,8 +712,10 @@ int main(void)
 		if (buttons & BUTT_SW1) {
 			DBG("buttons(): BUTT_SW1\r\n");
 #if !defined( WIN32 )
-			// Нажатие на кнопку:
-			beep_play(melody_wrep);
+			if (bcomp.setup.sound) {
+				// Нажатие на кнопку:
+				beep_play(melody_wrep);
+			}
 #endif
 			if (bcomp.page & GUI_FLAG_MENU) {
 				// nop
@@ -735,8 +741,10 @@ end_sw1_proc:
 		if (buttons & BUTT_SW1_LONG) {
 			DBG("buttons(): BUTT_SW1_LONG\r\n");
 #if !defined( WIN32 )
-			// Нажатие на кнопку:
-			beep_play(melody_wrep2);
+			if (bcomp.setup.sound) {
+				// Нажатие на кнопку:
+				beep_play(melody_wrep2);
+			}
 #endif
 			if (bcomp.page & GUI_FLAG_MENU) {
 				// nop
@@ -794,8 +802,10 @@ end_sw1_proc:
 		if (buttons & BUTT_SW2) {
 			DBG("buttons(): BUTT_SW2\r\n");
 #if !defined( WIN32 )
-			// Нажатие на кнопку:
-			beep_play(melody_wrep);
+			if (bcomp.setup.sound) {
+				// Нажатие на кнопку:
+				beep_play(melody_wrep);
+			}
 #endif
 			if (bcomp.page & GUI_FLAG_MENU) {
 				// nop
@@ -921,6 +931,25 @@ repeate:
 				}
 #endif
 				break;
+#if 0
+			case 0xF4:
+				{
+					static int i = 0;
+					uint8_t data;
+					for ( ; i < 2048; i++) {
+						if ((i%16) == 0) {
+							DBG("\r\n%04x: ", i);
+						}
+						ee_read(i, &data, 1);
+						DBG("%02x", data);
+					}
+					if (i == 2048) {
+						DBG("\r\n");
+						i++;
+					}
+				}
+				break;
+#endif
 			default:
 				break;
 			}
@@ -1087,6 +1116,7 @@ trip:
 			// -----------------------------------------------------------------
 			// WHEELS
 			// -----------------------------------------------------------------
+#if ( WHELLS_DRAW_SUPPORT == 1 )
 			if (bcomp.esc_id == 0 ||
 				bcomp.setup.f_esp == 0) {
 				if (buttons & BUTT_SW2) {
@@ -1100,6 +1130,14 @@ trip:
 			graph_line(40+4,40,88-4,40);
 			draw_rect(40,40,bcomp.angle);
 			draw_rect(88,40,bcomp.angle);
+#else
+			if (buttons & BUTT_SW2) {
+				bcomp.page--;
+			} else {
+				bcomp.page++;
+			}
+			goto repeate;			
+#endif
 			break;
 #if ( PAJERO_SPECIFIC == 1 )
 		case 10:
@@ -1127,7 +1165,11 @@ trip:
 		default:
 			DBG("unknown page (%d)\r\n", bcomp.page);
 			if (buttons & BUTT_SW2) {
+#if ( PAJERO_SPECIFIC == 1 )
 				bcomp.page = 10;
+#else
+				bcomp.page = 9;
+#endif
 			} else {
 				bcomp.page = 1;
 			}
