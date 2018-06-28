@@ -8,6 +8,7 @@
  */
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "dbg.h"
 #include "nmea.h"
@@ -159,12 +160,15 @@ void nmea_parce(char *str) {
 	_sprintf(bcomp.gps_val_date, "%02d-%02d-%04d", bcomp.gtime.date, bcomp.gtime.month, bcomp.gtime.year);
 	// Заносим метку времени:
 	bcomp.utime = time_to_unix(&bcomp.gtime);
+	// Заносим скорость:
+	nmea_get_param(str, 7, bcomp.gps_val_speed);
+	bcomp.gps_speed = atof(bcomp.gps_val_speed) * 1.852f;
 	// Получаем координаты:
 	nmea_get_param(str, 4, bcomp.gps_val_lat);
 	nmea_get_param(str, 3, &bcomp.gps_val_lat[1]);
 	nmea_get_param(str, 6, bcomp.gps_val_lon);
 	nmea_get_param(str, 5, &bcomp.gps_val_lon[1]);
-	DBG("GPS:%s:%s:%s:%s\r\n", bcomp.gps_val_time, bcomp.gps_val_date, bcomp.gps_val_lat, bcomp.gps_val_lon);
+	DBG("GPS:%s:%s:%s:%s:%d\r\n", bcomp.gps_val_time, bcomp.gps_val_date, bcomp.gps_val_lat, bcomp.gps_val_lon, (int)bcomp.gps_speed);
 	return;
 }
 

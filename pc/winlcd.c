@@ -167,12 +167,19 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPa
 		break;
 	case WM_LBUTTONUP:
 		iMKey = 0;
-		iMButton = 0x00;
+		iMButton &= ~0x01;
+		break;
+	case WM_RBUTTONDOWN:
+		iMKey = 1;
+		iMButton |= 0x02;
+		break;
+	case WM_RBUTTONUP:
+		iMKey = 0;
+		iMButton &= ~0x02;
 		break;
 #endif
-	case WM_RBUTTONUP:
-		break;
 	case WM_KEYDOWN:
+		printf("WM_KEYDOWN: %02x\r\n", wParam);
 		switch (wParam) {
 		case VK_LEFT: break;
 		case VK_RIGHT: break;
@@ -190,6 +197,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT messg, WPARAM wParam, LPARAM lPa
 		}
 		break;
 	case WM_KEYUP:
+		printf("WM_KEYUP: %02x\r\n", wParam);
 		switch (wParam) {
 		case VK_LEFT: break;
 		case VK_RIGHT: break;

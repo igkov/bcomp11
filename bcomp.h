@@ -130,10 +130,12 @@ typedef struct {
 	uint32_t nmea_cnt;            // Счетчик принятых байт от GPS.
 	uint32_t utime;               // Текущее время с GPS-приемника (формат unix).
 	gpstime_t gtime;              // Структура с меткой времени.
+	float gps_speed;              // Скорость GPS (пересчитанная).
 	char gps_val_time[12];        // Строка с текущим временем.
 	char gps_val_date[12];        // Строка с текущей датой.
 	char gps_val_lon[12];         // Строка с текущей координатой.
 	char gps_val_lat[12];         // Строка с текущей координатой.
+	char gps_val_speed[12];       // Строка с текущей скоростью.
 	// END
 
 	trip_t trip[2];               // Данные поездок (2 поездки).

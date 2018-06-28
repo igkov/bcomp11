@@ -981,8 +981,22 @@ repeate:
 #if ( PAJERO_SPECIFIC == 1 )
 			if (bcomp.at_present) {
 				show_drive(64, 14);
-			}
+			} else
 #endif
+			{
+				int speed;
+#if ( NMEA_SUPPORT == 1 )
+				if (bcomp.g_correct) {
+					speed = (int)bcomp.gps_speed;
+				} else 
+#endif
+				{
+					speed = bcomp.speed;
+				}
+				_sprintf(str, "%dκμ/χ", bcomp.t_ext);
+				graph_puts16(64, 32, 1, str);
+			}
+
 			_sprintf(str, "%dκμ", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
 			graph_puts16(64, 48, 1, str);
 			break;
