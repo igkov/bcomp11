@@ -16,7 +16,7 @@ static uint16_t can_id;
 static uint8_t can_len;
 static uint8_t can_offset;
 static uint8_t can_cnt;
-static uint8_t can_buffer[32];
+static uint8_t can_buffer[128];
 static uint8_t can_done;
 // Переменная для "карусели":
 static int count;
@@ -30,7 +30,12 @@ pid_obd_t pids_list[] = {
 	{ PID_REQUEST_ENGINE,  ENGINE_COOLANT_TEMP,  1, {0xFF, 0xFF, 0xFF} }, // 3. Темп. двигателя (получаем сырыми данными).
 #endif
 	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 4. Напряжение бортовой сети.
-	{ PID_REQUEST_AT,      PAJERO_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки.
+#if ( PAJERO_SPECIFIC == 1 )
+	{ PID_REQUEST_AT,      PAJERO_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки (MITSUBISHI)
+#endif
+#if ( NISSAN_SPECIFIC == 1 )
+	{ PID_REQUEST_AT,      NISSAN_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки (NISSAN)
+#endif
 	{ PID_REQUEST_ENGINE,  GET_VIN,              1, {0xFF, 0xFF, 0xFF} }, // 6. Получение VIN-автомобиля.
 	{ PID_REQUEST_ENGINE,  INTAKE_PRESSURE,      1, {0xFF, 0xFF, 0xFF} }, // 7. Давление наддува.
 	//{ PID_REQUEST_ENGINE,  ENGINE_RUNTIME,       0, {0xFF, 0xFF, 0xFF} }, // 8. Время работы двигателя.
@@ -40,7 +45,9 @@ pid_obd_t pids_list[] = {
 	//{ PID_REQUEST_ENGINE,  BAROMETRIC_PRESSURE,  0, {0xFF, 0xFF, 0xFF} }, // 12. Наружное давление.
 	{ PID_REQUEST_ENGINE,  STATUS_DTC,           1, {0xFF, 0xFF, 0xFF} }, // 13. Информация об ощибках в ЭБУ двигателя.
 	{ PID_REQUEST_ENGINE,  FREEZE_DTC,           0, {0xFF, 0xFF, 0xFF} }, // 14. Получение кода ошибки из памяти (отключено по-умолчанию).
+#if ( PAJERO_SPECIFIC == 1 )
 	{ PID_REQUEST_ENGINE,  PAJERO_ODO_INFO,      0, {0xFF, 0xFF, 0xFF} }, // 15. Получение данных одометра.
+#endif
 };
 
 // Обработчик пакетов от шины CAN (по протоколу J1979):
@@ -52,13 +59,17 @@ void obd_loopback(CAN_msg *p) {
 	}
 	if (can_len > can_offset) {
 		if (can_cnt == p->data[0]) {
-			memcpy(&can_buffer[can_offset], &p->data[1], (can_len-can_offset)>7?7:(can_len-can_offset));
+			// TODO: требуется подправить и уточнить данное условие, оно граничивает размер принимаемых данных:
+			if (can_offset+7 <= sizeof(can_buffer)) {
+				memcpy(&can_buffer[can_offset], &p->data[1], (can_len-can_offset)>7?7:(can_len-can_offset));
+			}
 			
 			can_offset += (can_len-can_offset)>7?7:(can_len-can_offset);
 			can_cnt++;
 			
-			if (can_offset == can_len)
+			if (can_offset == can_len) {
 				goto obd_loopback_recv;
+			}
 		}
 		else {
 			DBG("Bad data sequence (%02x)!\r\n", p->data[0]);

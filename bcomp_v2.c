@@ -86,6 +86,37 @@ void exeption_proc(void) {
 // Асинхронные функции обработки различных событий.
 // -----------------------------------------------------------------------------
 
+
+//
+// Alphabet catalog:
+//
+//  1 - [A] - data[3]        27 - [AA] - data[29]
+//  2 - [B] - data[4]        28 - [AB] - data[30]
+//  3 - [C] - data[5]        29 - [AC] - data[31]
+//  4 - [D] - data[6]        30 - [AD] - data[32]
+//  5 - [E] - data[7]        31 - [AE] - data[33]
+//  6 - [F] - data[8]        32 - [AF] - data[34]
+//  7 - [G] - data[9]        33 - [AG] - data[35]
+//  8 - [H] - data[10]       34 - [AH] - data[36]
+//  9 - [I] - data[11]       35 - [AI] - data[37]
+// 10 - [J] - data[12]       36 - [AJ] - data[38]
+// 11 - [K] - data[13]       37 - [AK] - data[39]
+// 12 - [L] - data[14]       38 - [AL] - data[40]
+// 13 - [M] - data[15]       39 - [AM] - data[41]
+// 14 - [N] - data[16]       40 - [AN] - data[42]
+// 15 - [O] - data[17]       41 - [AO] - data[43]
+// 16 - [P] - data[18]       42 - [AP] - data[44]
+// 17 - [Q] - data[19]       43 - [AQ] - data[45]
+// 18 - [R] - data[20]       44 - [AR] - data[46]
+// 19 - [S] - data[21]       45 - [AS] - data[47]
+// 20 - [T] - data[22]       46 - [AT] - data[48]
+// 21 - [U] - data[23]       47 - [AU] - data[49]
+// 22 - [V] - data[24]       48 - [AV] - data[50]
+// 23 - [W] - data[25]       49 - [AW] - data[51]
+// 24 - [X] - data[26]       50 - [AX] - data[52]
+// 25 - [Y] - data[27]       51 - [AY] - data[53]
+// 26 - [Z] - data[28]       52 - [AZ] - data[54]
+
 /*
 	bcomp_proc()
 
@@ -129,11 +160,26 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 		bcomp.v_ecu = (float)((data[3]*256)+data[4])/1000.0f;
 		DBG("Volt = %d.%dV\r\n", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10.0f)%10);
 		break;
+#if ( PAJERO_SPECIFIC == 1 )
 	case PAJERO_AT_INFO:
 		// F-40 [degrees C]
 		bcomp.t_akpp = (data[8]-40);
 		DBG("AT temperature = %d°C\r\n", (int)bcomp.t_akpp);
 		break;
+#endif
+#if ( NISSAN_SPECIFIC == 1 )
+	case NISSAN_AT_INFO:
+		// (0.000000002344*(AD^5))+(-0.000001387*(AD^4))+(0.0003193*(AD^3))+(-0.03501*(AD^2))+(2.302*AD)+(-36.6) [degrees C]
+		// or:
+		// (0.01879280128 * AD)^5-(0.03431777443*AD)^4+(0.06834912716*AD)^3-(0.1871095936*AD)^2+(2.302*AD)-36.6  [degrees C]
+		// data[32] = AD
+		#define AT_PAR_1 (0.01879280128f * data[32])
+		#define AT_PAR_2 (0.03431777443f * data[32])
+		#define AT_PAR_3 (0.06834912716f * data[32])
+		#define AT_PAR_4 (0.1871095936f * data[32])
+		bcomp.t_akpp = AT_PAR_1 * AT_PAR_1 * AT_PAR_1 * AT_PAR_1 * AT_PAR_1 - AT_PAR_2 * AT_PAR_2 * AT_PAR_2 * AT_PAR_2 + AT_PAR_3 * AT_PAR_3 * AT_PAR_3 - AT_PAR_4 * AT_PAR_4 + 2.302f * data[32] - 36.6f;
+		break;
+#endif		
 	case GET_VIN:
 		// VIN-код получен, не требуется больше его читать!
 		obd_act_set(GET_VIN, 0);
@@ -171,6 +217,7 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 #endif
 		break;
 	}
+#if ( PAJERO_SPECIFIC == 1 )
 	case PAJERO_ODO_INFO:
 		// Деактивируем чтение одометра:
 		obd_act_set(PAJERO_ODO_INFO, 0);
@@ -178,6 +225,7 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 		bcomp.odometer = (data[4] * 256 + data[5]) * 256 + data[6];
 		DBG("Odometer in ECU: %dkm", bcomp.odometer);
 		break;
+#endif
 	default:
 		break;
 	}

@@ -27,6 +27,8 @@ extern int melody_wrep2[];
 #define WARNING_SUPPORT 1
 // Специфичные возможности шины Mitsubishi Pajero Sport II:
 #define PAJERO_SPECIFIC 1
+// Специфичные возможности шины Nissan:
+#define NISSAN_SPECIFIC 0
 // Тип кнопок:
 #define BUTTONS_ANALOG 1
 // Поддержка OLED на контроллере SSD1306:
@@ -38,11 +40,15 @@ extern int melody_wrep2[];
 
 
 #if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
-#error Unsupport ELOG and VIRTUINO sumultaneously.
+#error Unsupport ELOG and VIRTUINO simultaneously.
 #endif
 
 #if ( NMEA_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
-#error Unsupport NMEA and VIRTUINO sumultaneously.
+#error Unsupport NMEA and VIRTUINO simultaneously.
+#endif
+
+#if ( PAJERO_SPECIFIC == 1 ) && ( NISSAN_SPECIFIC == 1 )
+#error Conflict in simultaneously define PAJERO and NISSAN capabilities.
 #endif
 
 // Определения для экрана информации:
