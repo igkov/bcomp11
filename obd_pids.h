@@ -115,6 +115,8 @@
 #define PAJERO_AT_INFO      0x2102    // Automatic transmission status
 #define PAJERO_ODO_INFO     0x2103    // Distation status
 
+#define NISSAN_AT_INFO      0x2101    // Automatic transmission status
+
 #define PID_REQUEST_AT      0x7E1     // Automatic transmission address
 #define PID_REPLY_AT        0x7E9     // Automatic transmission reply address
 

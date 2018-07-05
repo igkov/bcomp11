@@ -282,9 +282,11 @@ void warning_check(void) {
 		if (errors_list[i].flags & WARN_FLAG_ACT) {
 			if ((errors_list[i].flags & WARN_FLAG_HIDE) == 0) {
 #if !defined( WIN32 )
-				if (beep_is_play() == 0 &&
-					(bcomp.page & GUI_FLAG_WARNING) == 0) {
-					beep_play(melody_warning);
+				if (bcomp.setup.sound) {
+					if (beep_is_play() == 0 &&
+						(bcomp.page & GUI_FLAG_WARNING) == 0) {
+						beep_play(melody_warning);
+					}
 				}
 #endif
 				// Выставляем ошибку:

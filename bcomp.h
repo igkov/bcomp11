@@ -27,20 +27,28 @@ extern int melody_wrep2[];
 #define WARNING_SUPPORT 1
 // Специфичные возможности шины Mitsubishi Pajero Sport II:
 #define PAJERO_SPECIFIC 1
+// Специфичные возможности шины Nissan:
+#define NISSAN_SPECIFIC 0
 // Тип кнопок:
 #define BUTTONS_ANALOG 1
 // Поддержка OLED на контроллере SSD1306:
 #define OLED_SSD1306_SUPPORT 1
 // Поддержка OLED на контроллере SH1106:
 #define OLED_SH1106_SUPPORT 1
+// Поддержка экрана с выводом положения колес:
+#define WHELLS_DRAW_SUPPORT 0
 
 
 #if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
-#error Unsupport ELOG and VIRTUINO sumultaneously.
+#error Unsupport ELOG and VIRTUINO simultaneously.
 #endif
 
 #if ( NMEA_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
-#error Unsupport NMEA and VIRTUINO sumultaneously.
+#error Unsupport NMEA and VIRTUINO simultaneously.
+#endif
+
+#if ( PAJERO_SPECIFIC == 1 ) && ( NISSAN_SPECIFIC == 1 )
+#error Conflict in simultaneously define PAJERO and NISSAN capabilities.
 #endif
 
 // Определения для экрана информации:
@@ -96,6 +104,7 @@ typedef struct {
 		int f_esp;                // Флаг наличия системы курсовой устойчивости (ACS, ESP, ESC).
 		int f_log;                // Флаг надобности вывода лога.
 		int contrast;             // Значение уровня контраста/яркости.
+		int sound;                // Активация звуков.
 	} setup;
 
 	int page;                     // Страница отображения.
@@ -127,10 +136,12 @@ typedef struct {
 	uint32_t nmea_cnt;            // Счетчик принятых байт от GPS.
 	uint32_t utime;               // Текущее время с GPS-приемника (формат unix).
 	gpstime_t gtime;              // Структура с меткой времени.
+	float gps_speed;              // Скорость GPS (пересчитанная).
 	char gps_val_time[12];        // Строка с текущим временем.
 	char gps_val_date[12];        // Строка с текущей датой.
 	char gps_val_lon[12];         // Строка с текущей координатой.
 	char gps_val_lat[12];         // Строка с текущей координатой.
+	char gps_val_speed[12];       // Строка с текущей скоростью.
 	// END
 
 	trip_t trip[2];               // Данные поездок (2 поездки).

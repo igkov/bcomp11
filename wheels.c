@@ -4,7 +4,7 @@
 #include "graph.h"
 #include "wheels.h"
 
-#if ( PAJERO_SPECIFIC == 1 ) && ( GRAPH_SUPPORT == 1 )
+#if ( PAJERO_SPECIFIC == 1 ) && ( GRAPH_SUPPORT == 1 ) && ( WHELLS_DRAW_SUPPORT == 1 )
 
 // Вращение точки, для отрисовки колес:
 static void point_rot(int *x, int *y, int angle) {

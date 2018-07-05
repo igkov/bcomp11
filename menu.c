@@ -29,7 +29,9 @@ const menu_t menu[] = {
 	{   15, MENU_FLOAT, 2, 0, "Калиб.топ.",  "",    &bcomp.setup.fuel_cal, 1, 300, 400 },
 	{   16, MENU_FLOAT, 2, 0, "Калиб.ск.",   "",    &bcomp.setup.speed_cal,1, 80, 120 },
 	{   17, MENU_FLAG,  0, 0, "Лог.дан.",    "",    &bcomp.setup.f_log,    1, 0, 1 },
-	{   18, MENU_INT,   2, 0, "Контраст",    "",    &bcomp.setup.contrast, 4, 1, 255 },
+	{   18, MENU_INT,   0, 0, "Контраст",    "",    &bcomp.setup.contrast, 4, 1, 255 },
+	{   19, MENU_FLAG,  0, 0, "Звуки",       "",    &bcomp.setup.sound,    1, 0, 1 },
+	//{ 0xF4, MENU_OTHER, 0, 0, "Дамп",        "",    (void*)0,              0, 0, 0 },
 	// ID ниже нельзя менять, они задействованы в логике уровнем выше! Порядок не важен.
 	{ 0xF0, MENU_OTHER, 0, 0, "Инфо",        "",    (void*)0,              0, 0, 0 },
 	{ 0xF2, MENU_OTHER, 0, 0, "VIN",         "",    (void*)0,              0, 0, 0 },
@@ -123,9 +125,14 @@ int menu_work(int *act) {
 		}
 	}
 	if (*act & BUTT_SW2_LONG) {
-		// Просто выход.
-		id = 0;
-		return 0;
+		if (menu_inside) {
+			menu_inside = 0;
+			*act ^= BUTT_SW1_LONG;
+		} else {	
+			// Просто выход.
+			id = 0;
+			return 0;
+		}
 	}
 	if (menu_inside) {
 		if (menu[id].type == MENU_OTHER) {

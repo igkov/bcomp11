@@ -11,6 +11,7 @@ void uart2_init(int speed) {
 	log_file = fopen(filename,"wb");
 	if (log_file == NULL) {
 		// error
+		prontf("ERROR: Cannot create file \"%s\"!\r\n", filename);
 	}
 }
 

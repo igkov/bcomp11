@@ -1,5 +1,5 @@
 /*
-	OLED 128x64 0.96 driver.
+	OLED 128x64 0.96" driver.
 	SSD1306
  */
 #include <stdio.h>
@@ -40,15 +40,27 @@ static void oled_setPowerOn(void) {
 static void oled_setCursorXY(uint8_t X, uint8_t Y) {
 	// Y - 1 unit = 1 page (8 pixel rows)
 	// X - 1 unit = 8 pixel columns
-	sendCommand(0x00 + (8*X & 0x0F)); 		//set column lower address
-	sendCommand(0x10 + ((8*X>>4)&0x0F)); 	//set column higher address
-	sendCommand(0xB0 + Y); 					//set page address
+	sendCommand(0x00 + ((8*X)    & 0x0F)); 	// set column lower address
+	sendCommand(0x10 + ((8*X>>4) & 0x0F)); 	// set column higher address
+	sendCommand(0xB0 + Y);                  // set page address
 }
 
+#if 1
+// safe draw
+void ssd1306_draw(const uint8_t *bitmaparray) {
+	int i;
+	for (i = 0; i < 8; i++) {
+		oled_setCursorXY( 0, i );
+		sendDataN((uint8_t*)&bitmaparray[i*128], 128);
+	}
+}
+#else
+// this function realization have line-addresation problems in some screens
 void ssd1306_draw(const uint8_t *bitmaparray) {
 	oled_setCursorXY( 0, 0 );
 	sendDataN((uint8_t*)bitmaparray, 128*64/8);
 }
+#endif
 
 // SSD1306 Commandset
 // ------------------
