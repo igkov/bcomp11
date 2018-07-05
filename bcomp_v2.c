@@ -169,15 +169,14 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 #endif
 #if ( NISSAN_SPECIFIC == 1 )
 	case NISSAN_AT_INFO:
+		// This formula analog of Taylor series:
 		// (0.000000002344*(AD^5))+(-0.000001387*(AD^4))+(0.0003193*(AD^3))+(-0.03501*(AD^2))+(2.302*AD)+(-36.6) [degrees C]
 		// or:
 		// (0.01879280128 * AD)^5-(0.03431777443*AD)^4+(0.06834912716*AD)^3-(0.1871095936*AD)^2+(2.302*AD)-36.6  [degrees C]
 		// data[32] = AD
-		#define AT_PAR_1 (0.01879280128f * data[32])
-		#define AT_PAR_2 (0.03431777443f * data[32])
-		#define AT_PAR_3 (0.06834912716f * data[32])
-		#define AT_PAR_4 (0.1871095936f * data[32])
-		bcomp.t_akpp = AT_PAR_1 * AT_PAR_1 * AT_PAR_1 * AT_PAR_1 * AT_PAR_1 - AT_PAR_2 * AT_PAR_2 * AT_PAR_2 * AT_PAR_2 + AT_PAR_3 * AT_PAR_3 * AT_PAR_3 - AT_PAR_4 * AT_PAR_4 + 2.302f * data[32] - 36.6f;
+		#define AD ((double)data[32])
+		bcomp.t_akpp = ((((0.000000002344f * AD - 0.000001387f) * AD + 0.0003193f) * AD - 0.03501f) * AD + 2.302f) * AD - 36.6f;
+		#undef AD
 		break;
 #endif		
 	case GET_VIN:
@@ -1041,7 +1040,7 @@ repeate:
 				{
 					speed = bcomp.speed;
 				}
-				_sprintf(str, "%dκμ/χ", bcomp.t_ext);
+				_sprintf(str, "%dκμ/χ", speed);
 				graph_puts16(64, 32, 1, str);
 			}
 
