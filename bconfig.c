@@ -26,11 +26,7 @@ const bcomp_config_t bconfig = {
 #if ( INSIDE_VERSION == 1 )
 	1,
 #else
-	#if ( VIRTUINO_SUPPORT == 1 )
-		255,                   // 255 - no display
-	#else
-		0,                     // 0 - OLED SSD1306, 1 - OLED SH1106
-	#endif
+	0,                     // 0 - OLED SSD1306, 1 - OLED SH1106
 #endif
 #if ( VIRTUINO_SUPPORT == 1 )
 	0,                     // UART-logging off

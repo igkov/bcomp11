@@ -11,3 +11,4 @@ pc/eeprom.bin
 *uvgui*
 *.bak
 *.dep
+*.c_

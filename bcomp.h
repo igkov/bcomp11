@@ -14,21 +14,21 @@ extern int melody_wrep2[];
 #endif
 
 // Поддержка протокола Virtuino:
-#define VIRTUINO_SUPPORT 0
+#define VIRTUINO_SUPPORT 1
 // Флаг сборки для встраиваемой версии (другой тип экрана):
 #define INSIDE_VERSION 0
 // Поддержка графического интерфейса:
 #define GRAPH_SUPPORT 1
 // Поддержка вывода во внешний лог-файл:
-#define ELOG_SUPPORT 1
+#define ELOG_SUPPORT 0
 // Минимальная поддержка nmea:
-#define NMEA_SUPPORT 1
+#define NMEA_SUPPORT 0
 // Поддержка предупреждений:
 #define WARNING_SUPPORT 1
 // Специфичные возможности шины Mitsubishi Pajero Sport II:
-#define PAJERO_SPECIFIC 1
+#define PAJERO_SPECIFIC 0
 // Специфичные возможности шины Nissan:
-#define NISSAN_SPECIFIC 0
+#define NISSAN_SPECIFIC 1
 // Тип кнопок:
 #define BUTTONS_ANALOG 1
 // Поддержка OLED на контроллере SSD1306:

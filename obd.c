@@ -24,7 +24,7 @@ static int count;
 /* Список PID-ов для получения. */
 pid_obd_t pids_list[] = {
 	// CAN ADDR          | PID              | ACT |  RES1  RES2  RES3     
-#if ( PAJERO_SPECIFIC == 1 )
+#if ( PAJERO_SPECIFIC == 0 )
 	{ PID_REQUEST_ENGINE,  ENGINE_RPM,           1, {0xFF, 0xFF, 0xFF} }, // 1. Обороты (получаем сырыми данными).
 	{ PID_REQUEST_ENGINE,  VEHICLE_SPEED,        1, {0xFF, 0xFF, 0xFF} }, // 2. Спидометр (получаем сырыми данными).
 	{ PID_REQUEST_ENGINE,  ENGINE_COOLANT_TEMP,  1, {0xFF, 0xFF, 0xFF} }, // 3. Темп. двигателя (получаем сырыми данными).
@@ -32,8 +32,7 @@ pid_obd_t pids_list[] = {
 	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 4. Напряжение бортовой сети.
 #if ( PAJERO_SPECIFIC == 1 )
 	{ PID_REQUEST_AT,      PAJERO_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки (MITSUBISHI)
-#endif
-#if ( NISSAN_SPECIFIC == 1 )
+#elif ( NISSAN_SPECIFIC == 1 )
 	{ PID_REQUEST_AT,      NISSAN_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки (NISSAN)
 #endif
 	{ PID_REQUEST_ENGINE,  GET_VIN,              1, {0xFF, 0xFF, 0xFF} }, // 6. Получение VIN-автомобиля.
@@ -43,8 +42,10 @@ pid_obd_t pids_list[] = {
 	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 10. Напряжение бортовой сети.
 	//{ PID_REQUEST_ENGINE,  MAF_SENSOR,           0, {0xFF, 0xFF, 0xFF} }, // 11. Данные с MAF-сенсора.
 	//{ PID_REQUEST_ENGINE,  BAROMETRIC_PRESSURE,  0, {0xFF, 0xFF, 0xFF} }, // 12. Наружное давление.
+#if 0
 	{ PID_REQUEST_ENGINE,  STATUS_DTC,           1, {0xFF, 0xFF, 0xFF} }, // 13. Информация об ощибках в ЭБУ двигателя.
 	{ PID_REQUEST_ENGINE,  FREEZE_DTC,           0, {0xFF, 0xFF, 0xFF} }, // 14. Получение кода ошибки из памяти (отключено по-умолчанию).
+#endif
 #if ( PAJERO_SPECIFIC == 1 )
 	{ PID_REQUEST_ENGINE,  PAJERO_ODO_INFO,      0, {0xFF, 0xFF, 0xFF} }, // 15. Получение данных одометра.
 #endif

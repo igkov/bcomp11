@@ -18,6 +18,7 @@ img2c.exe ico16-temp.bmp ico16_temp s >> icons11.c
 img2c.exe ico16-warning.bmp ico16_warning s >> icons11.c
 @echo.>> icons11.c
 img2c.exe ico64-mitsu.bmp ico64_mitsu ps >> icons11.c
+img2c.exe ico64-nissan.bmp ico64_nissan ps >> icons11.c
 @echo.>> icons11.c
 img2c.exe ico48-engine.bmp ico48_engine ps >> icons11.c
 img2c.exe ico48-silkroad.bmp ico48_silkroad ps >> icons11.c

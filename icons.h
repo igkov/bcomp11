@@ -35,6 +35,7 @@ extern const uint8_t ico16_warning_data[];
 
 // »конки (сжатые):
 extern const ico_t ico64_mitsu;
+extern const ico_t ico64_nissan;
 
 extern const ico_t ico48_engine;
 extern const ico_t ico48_silkroad;

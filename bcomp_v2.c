@@ -499,7 +499,11 @@ int main(void)
 	bcomp.t_engine = 0xFFFF;
 	bcomp.rpm = 0;
 	bcomp.speed = 0;
+#if ( NISSAN_SPECIFIC == 1 )
+	bcomp.at_present = 1;
+#else
 	bcomp.at_present = 0;
+#endif
 	bcomp.at_drive = 0xFF;
 	bcomp.connect = 0;
 	bcomp.v_ecu = NAN;
@@ -684,7 +688,7 @@ int main(void)
 #endif
 #if ( WARNING_SUPPORT == 1 )
 	// Асинхронный обработчик с проверками на предупреждения:
-	event_set(bcomp_warning, 5000); delay_ms(10);
+	event_set(bcomp_warning, 10000); delay_ms(10);
 #endif
 	// Сохраняем данные в EEPROM, только если задана её конфигурация:
 	event_set(bcomp_save, 30000); delay_ms(10);
@@ -709,8 +713,16 @@ int main(void)
 
 #if ( GRAPH_SUPPORT == 1 )
 	if (bconfig.start_delay) {
+#if ( PAJERO_SPECIFIC == 1 )
 		// Новая версия заставки, только иконка:
 		graph_pic(&ico64_mitsu,64-32,0);
+#elif ( NISSAN_SPECIFIC == 1 )
+		// Новая версия заставки, только иконка:
+		graph_pic(&ico64_nissan,64-36,8);
+#else
+		// Просто картинка заставки:
+		graph_pic(&ico48_mcu,64-24,8);
+#endif
 		graph_update();
 	}
 #endif
@@ -1059,7 +1071,6 @@ repeate:
 			}
 			graph_puts32c(64, 24, str);
 			break;
-#if ( PAJERO_SPECIFIC == 1 )
 		case 3:
 			// -----------------------------------------------------------------
 			// TRANSMISSION
@@ -1072,16 +1083,19 @@ repeate:
 				}
 				goto repeate;
 			}
+#if ( PAJERO_SPECIFIC == 1 ) || ( NISSAN_SPECIFIC == 1 )
 			graph_puts16(64, 0, 1, "TRANS");
+#if ( PAJERO_SPECIFIC == 1 )
 			show_drive(64, 14);
+#endif
 			if (bcomp.t_akpp == 0xFFFF) {
 				_sprintf(str, "--°C");
 			} else {
 				_sprintf(str, "%d°C", bcomp.t_akpp);
 			}
 			graph_puts32c(64, 38, str);
-			break;
 #endif
+			break;
 		case 4:
 			// -----------------------------------------------------------------
 			// BATERY
@@ -1200,8 +1214,8 @@ trip:
 			goto repeate;			
 #endif
 			break;
-#if ( PAJERO_SPECIFIC == 1 )
 		case 10:
+#if ( NMEA_SUPPORT == 1 )
 			if (bcomp.setup.f_gps == 0) {
 				if (buttons & BUTT_SW2) {
 					bcomp.page--;
@@ -1221,16 +1235,19 @@ trip:
 			} else {
 				graph_puts16(64,32,1,"NO DATA");
 			}
-			break;
+#else
+			if (buttons & BUTT_SW2) {
+				bcomp.page--;
+			} else {
+				bcomp.page++;
+			}
+			goto repeate;			
 #endif
+			break;
 		default:
 			DBG("unknown page (%d)\r\n", bcomp.page);
 			if (buttons & BUTT_SW2) {
-#if ( PAJERO_SPECIFIC == 1 )
 				bcomp.page = 10;
-#else
-				bcomp.page = 9;
-#endif
 			} else {
 				bcomp.page = 1;
 			}
