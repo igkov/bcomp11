@@ -12,3 +12,4 @@ pc/eeprom.bin
 *.bak
 *.dep
 *.c_
+*.bin
