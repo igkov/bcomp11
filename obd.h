@@ -13,7 +13,10 @@ typedef struct {
 // Размер раблицы PIDов:
 #define PIDS_SIZE (sizeof(pids_list)/sizeof(pid_obd_t))
 
+// Инцициализация OBD:
 void obd_init(void);
+// Отключение OBD:
+void obd_deinit(void);
 // Инициировать запрос к ЭБУ:
 void obd_getpid(uint16_t addr, uint16_t pid);
 // Обработчик, должен вызываться из CAN Interrupt:

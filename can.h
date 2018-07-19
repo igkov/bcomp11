@@ -35,6 +35,7 @@ typedef struct  {
 /* Functions defined in module CAN.c */
 void CAN_setup         (uint32_t baudrate);
 void CAN_init          (void);
+void CAN_init_low      (void);
 void CAN_start         (void);
 void CAN_stop          (void);
 void CAN_waitReady     (void);
@@ -46,6 +47,9 @@ void CAN_wrFilter      (uint32_t id, uint8_t filter_type);
 void CAN_noFilter      (uint8_t format);
 
 void CAN_testmode      (void);
+
+void CAN_rs_set(void);
+void CAN_rs_unset(void);
 
 extern CAN_msg       CAN_TxMsg;       /* CAN messge for sending               */
 extern CAN_msg       CAN_RxMsg;       /* CAN message for receiving            */                                

@@ -19,7 +19,7 @@
 typedef struct {
 	uint8_t flags;  // Флаги состояния.
 	uint8_t res[3]; // 
-	int time;       // Счетчик для контроля времени повтора.
+	uint32_t time;       // Счетчик для контроля времени повтора.
 } ecu_error_t, *pecu_error_t;
 
 extern void bcomp_warning(void);

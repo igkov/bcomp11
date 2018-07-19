@@ -13,6 +13,39 @@ extern int melody_wrep[];
 extern int melody_wrep2[];
 #endif
 
+#if 1
+
+// PAJERO CONFIGURATION:
+
+// Поддержка протокола Virtuino:
+#define VIRTUINO_SUPPORT 0
+// Флаг сборки для встраиваемой версии (другой тип экрана):
+#define INSIDE_VERSION 0
+// Поддержка графического интерфейса:
+#define GRAPH_SUPPORT 1
+// Поддержка вывода во внешний лог-файл:
+#define ELOG_SUPPORT 1
+// Минимальная поддержка nmea:
+#define NMEA_SUPPORT 1
+// Поддержка предупреждений:
+#define WARNING_SUPPORT 1
+// Специфичные возможности шины Mitsubishi Pajero Sport II:
+#define PAJERO_SPECIFIC 1
+// Специфичные возможности шины Nissan:
+#define NISSAN_SPECIFIC 0
+// Тип кнопок:
+#define BUTTONS_ANALOG 1
+// Поддержка OLED на контроллере SSD1306:
+#define OLED_SSD1306_SUPPORT 1
+// Поддержка OLED на контроллере SH1106:
+#define OLED_SH1106_SUPPORT 1
+// Поддержка экрана с выводом положения колес:
+#define WHELLS_DRAW_SUPPORT 0
+
+#else
+
+// NISSAN CONFIGURATION:
+
 // Поддержка протокола Virtuino:
 #define VIRTUINO_SUPPORT 1
 // Флаг сборки для встраиваемой версии (другой тип экрана):
@@ -30,7 +63,7 @@ extern int melody_wrep2[];
 // Специфичные возможности шины Nissan:
 #define NISSAN_SPECIFIC 1
 // Тип кнопок:
-#define BUTTONS_ANALOG 1
+#define BUTTONS_ANALOG 0
 // Поддержка OLED на контроллере SSD1306:
 #define OLED_SSD1306_SUPPORT 1
 // Поддержка OLED на контроллере SH1106:
@@ -38,6 +71,7 @@ extern int melody_wrep2[];
 // Поддержка экрана с выводом положения колес:
 #define WHELLS_DRAW_SUPPORT 0
 
+#endif
 
 #if ( ELOG_SUPPORT == 1 ) && ( VIRTUINO_SUPPORT == 1 ) 
 #error Unsupport ELOG and VIRTUINO simultaneously.

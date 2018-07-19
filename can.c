@@ -186,6 +186,25 @@ void CAN_testmode (void) {
 }
 
 /*----------------------------------------------------------------------------
+  set Rs signal
+ *----------------------------------------------------------------------------*/
+void CAN_rs_set(void) {
+	// Start Rs signal:
+	LPC_SYSCON->SYSAHBCLKCTRL |= (1UL <<  6);
+	LPC_GPIO3->DIR  |=  (1UL<<4);
+	LPC_GPIO3->DATA &= ~(1UL<<4);
+}
+
+/*----------------------------------------------------------------------------
+  unset Rs signal
+ *----------------------------------------------------------------------------*/
+void CAN_rs_unset(void) {
+	// Stop Rs signal:
+	LPC_SYSCON->SYSAHBCLKCTRL |= (1UL <<  6);
+	LPC_GPIO3->DIR  &= ~(1UL<<4);
+}
+
+/*----------------------------------------------------------------------------
   setup CAN interface.
  *----------------------------------------------------------------------------*/
 void CAN_setup (uint32_t baudrate)  {
@@ -224,6 +243,12 @@ void CAN_setup (uint32_t baudrate)  {
 					  _CNTL_SIE );                /* enable CAN status change interrupts */
 }
 
+void CAN_init_low(void) {
+	/* CAN_RX, CAN_TX are dedicated Pins so no GPIO configuration is necessary */ 
+	/* configure CAN */
+	LPC_SYSCON->PRESETCTRL    |=  (1UL <<  3);    /* de-asserts the reset signal */
+	LPC_SYSCON->SYSAHBCLKCTRL |=  (1UL << 17);    /* enable power to CAN  block */
+}
 
 /*----------------------------------------------------------------------------
   leave initialisation mode.
@@ -233,7 +258,7 @@ void CAN_start (void)  {
 }
 
 /*----------------------------------------------------------------------------
-  leave initialisation mode.
+  enter initialisation mode.
  *----------------------------------------------------------------------------*/
 void CAN_stop (void)  {
 	LPC_CAN->CNTL |=  _CNTL_TEST; /* enable Test mode */

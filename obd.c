@@ -58,14 +58,19 @@ void obd_loopback(CAN_msg *p) {
 		bcomp_raw(p->id, p->data, p->len);
 		return;
 	}
+	if (p->len != 8) {
+		DBG("ERROR: incorrect LEN in CAN frame, LEN = %d!\r\n", p->len);
+		return;
+	}
 	if (can_len > can_offset) {
 		if (can_cnt == p->data[0]) {
-			// TODO: требуется подправить и уточнить данное условие, оно граничивает размер принимаемых данных:
-			if (can_offset+7 <= sizeof(can_buffer)) {
-				memcpy(&can_buffer[can_offset], &p->data[1], (can_len-can_offset)>7?7:(can_len-can_offset));
+			int len = (can_len-can_offset)>7?7:(can_len-can_offset);
+
+			if (can_offset+len <= sizeof(can_buffer)) {
+				memcpy(&can_buffer[can_offset], &p->data[1], len);
 			}
 			
-			can_offset += (can_len-can_offset)>7?7:(can_len-can_offset);
+			can_offset += len;
 			can_cnt++;
 			
 			if (can_offset == can_len) {
@@ -185,6 +190,8 @@ static void obd_manage(void) {
 }
 
 void obd_init(void) {
+	// Start Rs signal:
+	CAN_rs_set();
 	// Обнуляем переменные:
 	can_pid = 0;
 	can_len = 0;
@@ -200,6 +207,13 @@ void obd_init(void) {
 	CAN_noFilter(STANDARD_FORMAT);
 	// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
 	event_set(obd_manage, 5000);
+}
+
+void obd_deinit(void) {
+	// Deinit CAN:
+	CAN_rs_unset();
+	CAN_init_low();
+	CAN_stop();
 }
 
 int obd_act_set(uint16_t pid, int flag) {

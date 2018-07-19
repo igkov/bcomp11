@@ -27,7 +27,7 @@
 ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Stack_Size          EQU     0x00000200
+Stack_Size          EQU     0x00000300
 
                     AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem           SPACE   Stack_Size
@@ -110,10 +110,13 @@ CRP_Key             DCD     0xFFFFFFFF
 Reset_Handler       PROC
                     EXPORT  Reset_Handler             [WEAK]
                     IMPORT  SystemInit
-                    IMPORT  ProtectDelay
+                    ;IMPORT  ProtectDelay
+					IMPORT obd_deinit
                     IMPORT  __main
-                    LDR     R0, =ProtectDelay
-                    BLX     R0
+                    ;LDR     R0, =ProtectDelay
+                    ;BLX     R0
+                    LDR     R0, =obd_deinit
+					BLX     R0
                     LDR     R0, =SystemInit
                     BLX     R0
                     LDR     R0, =__main

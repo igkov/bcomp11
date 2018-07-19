@@ -10,13 +10,19 @@
 #include "beep.h"
 #include "errors.h"
 
+#define WARNING_DEBUG 0
+
 static ecu_error_t errors_list[WARN_MAX_NUM];
+#if ( WARNING_DEBUG == 1)
+static int error_check_flag;
+#endif
 
 /*
 	Проверка выхода параметров за допустимые значения.
 	Выставление ошибок.
  */
 void bcomp_warning(void) {
+	DBG("bcomp_warning()\r\n");
 	// CHECK CONNECT
 	if (bcomp.connect == 0) {
 		if (errors_list[WARNING_ID_CONNECT].flags & WARN_FLAG_ACT) {
@@ -72,10 +78,11 @@ void bcomp_warning(void) {
 		errors_list[WARNING_ID_T_ENGINE].flags = 0;
 		errors_list[WARNING_ID_T_ENGINE].time = 0;
 	}
-	// AT EMPERATURE WARNING
+	// AT TEMPERATURE WARNING
 	if (bcomp.at_present) {
 		if (bcomp.t_akpp == 0xFFFF) {
-			// NOP
+			errors_list[WARNING_ID_CONNECT].flags = 0;
+			errors_list[WARNING_ID_CONNECT].time = 0;
 		} else
 		if (bcomp.t_akpp > bcomp.setup.t_at) {
 			if (errors_list[WARNING_ID_T_AT].flags & WARN_FLAG_ACT) {
@@ -88,15 +95,20 @@ void bcomp_warning(void) {
 				errors_list[WARNING_ID_T_AT].flags |= WARN_FLAG_ACT;
 				errors_list[WARNING_ID_T_AT].time = 0;
 			}
+		} else
+		if (bcomp.t_akpp < bcomp.setup.t_at-3) {
+			// Температура в норме, сбрасываем предупреждение:
+			errors_list[WARNING_ID_T_AT].flags = 0;
+			errors_list[WARNING_ID_T_AT].time = 0;
 		}
-	} else 
-	if (bcomp.t_akpp < bcomp.setup.t_at-3) {
+	} else {
 		errors_list[WARNING_ID_T_AT].flags = 0;
 		errors_list[WARNING_ID_T_AT].time = 0;
 	}
 	// BATTERY WARNING
 	if (isnan(bcomp.v_ecu)) {
-		// NOP
+		errors_list[WARNING_ID_BATTERY].flags = 0;
+		errors_list[WARNING_ID_BATTERY].time = 0;
 	} else
 	if (bcomp.v_ecu > bcomp.setup.v_max ||
 		bcomp.v_ecu < bcomp.setup.v_min) {
@@ -135,12 +147,16 @@ void bcomp_warning(void) {
 			} else {
 				errors_list[WARNING_ID_T_EXT].flags |= WARN_FLAG_ACT;
 			}
+		} else
+		if (bcomp.t_ext > bcomp.setup.t_ext+3) {
+			errors_list[WARNING_ID_T_EXT].flags = 0;
+			errors_list[WARNING_ID_T_EXT].time  = 0;
 		}
-	} else 
-	if (bcomp.t_ext > bcomp.setup.t_ext+3) {
+	} else {
 		errors_list[WARNING_ID_T_EXT].flags = 0;
 		errors_list[WARNING_ID_T_EXT].time  = 0;
 	}
+#if ( NMEA_SUPPORT == 1 )
 	// GPS WARNING
 	if (bcomp.setup.f_gps) {
 		if (bcomp.nmea_cnt < 100 ||
@@ -160,9 +176,13 @@ void bcomp_warning(void) {
 				}
 			}
 		}
+	} else {
+		errors_list[WARNING_ID_GPS].flags = 0;
+		errors_list[WARNING_ID_GPS].time  = 0;
 	}
+#endif
 	// SERVICE
-	if ((int)bcomp.moto_dist_service > bconfig.service_distation*1000 ||
+	if ((unsigned int)bcomp.moto_dist_service > bconfig.service_distation*1000 ||
 		bcomp.moto_time_service > bconfig.service_motohour*3600) {
 		if (errors_list[WARNING_ID_SERVICE].flags & WARN_FLAG_ACT) {
 			// nop
@@ -191,6 +211,9 @@ void bcomp_warning(void) {
 				}
 			}
 		}
+	} else {
+		errors_list[WARNING_ID_FUEL].flags = 0;
+		errors_list[WARNING_ID_FUEL].time = 0;
 	}
 bcomp_warning_end:
 	// Раз в 5 секунд:
@@ -216,6 +239,7 @@ int warning_show(int *act) {
 		// Скрытие ошибки, флаг ошибки не сбрасывается,
 		// после прохода заданного времени, ошибка возникает вновь!
 		errors_list[id].flags |= WARN_FLAG_HIDE;
+		return 2;
 	} else 
 	if (*act & BUTT_SW1_LONG) {
 		// Погасим саму ошибку.
@@ -224,8 +248,20 @@ int warning_show(int *act) {
 			// TODO:
 			// Для CHECK ENGINE здесь можно поставить логику сброса ошибки.
 		}
-		return 1;
+		return 2;
 	}
+#if ( WARNING_DEBUG == 1)
+	if (error_check_flag) {
+		_sprintf(str,"%d",error_check_flag);
+		graph_puts16(64,32,1,str);
+		graph_puts16(64,48,1,"FLAG ERROR");
+		return 0;
+	}
+	DBG("ERROR: id = %d errors[%d][%d][%d][%d][%d][%d][%d][%d]...\r\n", id, 
+		errors_list[0].flags, errors_list[1].flags, errors_list[2].flags, errors_list[3].flags,
+		errors_list[4].flags, errors_list[5].flags, errors_list[6].flags, errors_list[7].flags);
+
+#endif
 	switch (id) {
 	case WARNING_ID_CONNECT:
 		graph_pic(&ico48_connect,64-24,0);
@@ -264,11 +300,14 @@ int warning_show(int *act) {
 			graph_puts16(64,48,1,"NO SAT");
 		}
 		break;
-	case WARNING_ID_SERVICE:
+	case WARNING_ID_SERVICE:  
 		graph_pic(&ico48_service,64-24,0);
 		graph_puts16(64,48,1,"GO SERVICE");
 		break;
 	default:
+		_sprintf(str, "id=%d", id);
+		graph_puts16(64,16,1,"ERROR");
+		graph_puts16(64,32,1,str);
 		graph_puts16(64,48,1,"UNKNOWN");
 		break;
 	}
@@ -278,6 +317,12 @@ int warning_show(int *act) {
 
 void warning_check(void) {
 	int i;
+#if ( WARNING_DEBUG == 1)
+	if (error_check_flag) {
+		bcomp.page |= GUI_FLAG_WARNING;
+		return;
+	}
+#endif
 	for (i = 0; i < WARN_MAX_NUM; i++) {
 		if (errors_list[i].flags & WARN_FLAG_ACT) {
 			if ((errors_list[i].flags & WARN_FLAG_HIDE) == 0) {
@@ -301,4 +346,7 @@ void warning_check(void) {
 
 void warning_init(void) {
 	memset(errors_list, 0x00, sizeof(errors_list));
+#if ( WARNING_DEBUG == 1)
+	error_check_flag = 0;
+#endif
 }
