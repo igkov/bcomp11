@@ -205,8 +205,19 @@ void obd_init(void) {
 	CAN_start();                                   /* start CAN Controller    */
 	CAN_waitReady();                               /* wait til tx mbx is empty */
 	CAN_noFilter(STANDARD_FORMAT);
+#if ( PAJERO_SPECIFIC == 0 )
 	// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
 	event_set(obd_manage, 5000);
+#endif
+}
+
+void obd_act(int flag) {
+	if (flag) {
+		// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
+		event_set(obd_manage, 5000);
+	} else {
+		event_unset(obd_manage);
+	}
 }
 
 void obd_deinit(void) {

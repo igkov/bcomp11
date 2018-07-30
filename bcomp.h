@@ -86,7 +86,13 @@ extern int melody_wrep2[];
 #endif
 
 // Определения для экрана информации:
+#if ( PAJERO_SPECIFIC == 1 )
 #define INFO_DEVICE   "NMPS COMP"
+#elif ( NISSAN_SPECIFIC == 1 )
+#define INFO_DEVICE   "NISSAN-CO"
+#else
+#define INFO_DEVICE   "BCOMP11"
+#endif
 #define INFO_VERSION  "v2.1a"
 #define INFO_AUTHOR   "igorkov"
 #define INFO_YEAR     "2018"

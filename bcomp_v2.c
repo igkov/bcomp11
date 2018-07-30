@@ -273,6 +273,15 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		break;
 	case 0x0308:
 		bcomp.rpms = bcomp.rpm = (uint32_t)data[1] * 256 + data[2];
+		if (bcomp.rpm > 500) {
+			// Активация опроса по CAN-шине:
+			obd_act(1);
+		}
+		// NOTE:
+		// Эта активация сделана в попытках борьбы с ошибкой P1901.
+		// На аппаратной версии LPC17xx ошибка не проявляется, 
+		// на аппаратной версии LPC11Cxx ошибка проявляется.
+		// В настоящий момент причина до конца не понятна.
 		break;
 	case 0x0608:
 		bcomp.t_engine = (int32_t)data[0] - 40;
@@ -1248,6 +1257,14 @@ trip:
 			goto repeate;			
 #endif
 			break;
+#if 1
+		case 11:
+			_sprintf(str,"%ds",bcomp.utime);
+			graph_puts16(64,16,1,str);
+			_sprintf(str,"%ds",bcomp.time);
+			graph_puts16(64,32,1,str);
+			break;
+#endif
 		default:
 			DBG("unknown page (%d)\r\n", bcomp.page);
 			if (buttons & BUTT_SW2) {

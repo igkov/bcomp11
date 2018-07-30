@@ -17,6 +17,8 @@ typedef struct {
 void obd_init(void);
 // Отключение OBD:
 void obd_deinit(void);
+// Активация опроса (актуально для NMPS):
+void obd_act(int flag);
 // Инициировать запрос к ЭБУ:
 void obd_getpid(uint16_t addr, uint16_t pid);
 // Обработчик, должен вызываться из CAN Interrupt:
