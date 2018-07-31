@@ -198,7 +198,11 @@ void obd_init(void) {
 	can_offset = 0;
 	can_cnt = 0;
 	can_done = 0;
+#if ( PAJERO_SPECIFIC == 1 )
+	count = -1;
+#else
 	count = 0;
+#endif
 	memset(can_buffer, 0, sizeof(can_buffer));
 	// Инициализируем CAN-интерфейс:
 	CAN_setup(bconfig.can_speed);                  /* setup CAN Controller, 500kbit/s */
@@ -213,9 +217,13 @@ void obd_init(void) {
 
 void obd_act(int flag) {
 	if (flag) {
-		// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
-		event_set(obd_manage, 5000);
+		if (count == -1) {
+			count = 0;
+			// задержка 5 секунд перед началом опроса ECU:
+			event_set(obd_manage, 5000);
+		}
 	} else {
+		count = -1;
 		event_unset(obd_manage);
 	}
 }

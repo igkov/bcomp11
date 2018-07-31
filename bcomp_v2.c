@@ -14,7 +14,7 @@
 	Вторая итерация прошивки мини-бортового компьютера.
 	Обточка функционала для реализации полноценного устройства.
 	
-	igorkov / 2017 / igorkov.org/bcomp11v2
+	igorkov / 2017-2018 / igorkov.org/bcomp11v2
  */
 #if defined( WIN32 )
 #include <stdint.h>
@@ -274,8 +274,12 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 	case 0x0308:
 		bcomp.rpms = bcomp.rpm = (uint32_t)data[1] * 256 + data[2];
 		if (bcomp.rpm > 500) {
-			// Активация опроса по CAN-шине:
+			// Активируем опрос по CAN-шине:
 			obd_act(1);
+		} else 
+		if (bcomp.rpm == 0) {
+			// Останавливаем опрос по CAN-шине:
+			obd_act(0);
 		}
 		// NOTE:
 		// Эта активация сделана в попытках борьбы с ошибкой P1901.
@@ -289,7 +293,10 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.raw_fuel = (int32_t)data[5]*256 + data[6];
 		break;
 #endif
-#if 0 // OTHER VENDOR SPECIFIC CAN PAKCETS PROCESS:
+#if ( NISSAN_SPECIFIC == 1 )
+#endif
+#if 0
+	// OTHER VENDOR SPECIFIC CAN PAKCETS PROCESS
 #endif
 	default:
 		break;
