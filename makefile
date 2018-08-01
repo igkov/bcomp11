@@ -37,8 +37,7 @@ OPT = 2
 #
 
 # List C source files here:
-#SRC     = bcomp.c
-SRC     = bcomp_v2.c
+SRC     = bcomp.c
 SRC    += adc.c
 SRC    += analog.c
 SRC    += bconfig.c
@@ -128,7 +127,7 @@ ALLSRC = $(SRC) $(CPPSRC) $(ASRC)
 CSTANDARD = -std=gnu99
 
 # Place -D or -U options for C here:
-CDEFS =  -D__GCC__ -D__ARM__ -DCORTEX -D_LPC1100_ -DRELEASE -DNO_FILTER -DBCOMP
+CDEFS =  -D__GCC__ -D__ARM__ -DCORTEX -D_LPC1100_ -DCFG_GCC
 
 # Place -I options here:
 CINCS = 

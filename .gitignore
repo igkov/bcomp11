@@ -1,12 +1,10 @@
-.out
-.out_rel
-.out_v2
-.out_v2_rel
 .dep
+.debug
+.release
 .lst
 .obj
 .out_gcc
-pc/bcomp11v2.exe
+pc/bcomp11.exe
 pc/eeprom.bin
 *uvgui*
 *.bak
