@@ -7,10 +7,10 @@ Configurations
 
 The Keil MDK project have some configurations:
 
-<b>bcomp11 (Debug)</b> - old interface version, debug build.<br>
-<b>bcomp11 (Release)</b> - old interface version, release build.<br>
-<b>bcomp11v2 (Debug)</b> - new (actual) interface version, debug build.<br>
-<b>bcomp11v2 (Release)</b> - new (actual) interface version, release build.<br>
+<b>bcomp11 (Debug)</b> - debug build.<br>
+<b>bcomp11 Pajero (Release)</b> - release build for Mitsubishi Pajero.<br>
+<b>bcomp11 Nissan (Release)</b> - release build with experimental Nissan functions.<br>
+<b>bcomp11 Virtuino (Release)</b> - release build with Virtuino functionality.<br>
 
 More information here: https://github.com/igkov/bcomp11/wiki/Firmware-structure.
 
