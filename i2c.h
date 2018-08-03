@@ -14,12 +14,14 @@ int i2c_deinit(void);
 #define I2C_MT_DATA_ACK				0x28
 #define I2C_MT_DATA_NACK			0x30
 #define I2C_MT_ARB_LOST				0x38
+
 /* Master Receiver */
 #define I2C_MR_ARB_LOST				0x38
 #define I2C_MR_SLA_ACK				0x40
 #define I2C_MR_SLA_NACK				0x48
 #define I2C_MR_DATA_ACK				0x50
 #define I2C_MR_DATA_NACK			0x58
+
 /* Misc */
 #define I2C_NO_INFO					0xF8
 #define I2C_BUS_ERROR				0x00
@@ -55,7 +57,9 @@ int i2c_deinit(void);
 #define I2C_RECEIVE_ACK  0x06
 #define I2C_RECEIVE_NACK 0x07
 
+/* low level i2c driver: */
 uint8_t i2c(uint8_t stat, uint8_t data);
+
 #endif
 
 int i2c_write(uint8_t dev_addr, uint8_t addr, uint8_t *buffer, int len);
