@@ -248,21 +248,7 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		// AT-коробка в наличии!
 		bcomp.at_present = 1;
 		// Отображение передачи:
-		switch (data[2]) {
-		case 0x11:
-		case 0x22:
-		case 0x33:
-		case 0x44:
-		case 0x55:
-		case 0xdd:
-		case 0xbb:
-			// Включенная передача:
-			bcomp.at_drive = (uint8_t)data[2] & 0x0F;
-			break;
-		default:
-			bcomp.at_drive = 0xFF;
-			break;
-		}
+		bcomp.at_drive = (uint8_t)data[2] & 0x0F;
 		break;
 	case 0x0236:
 	case 236:
