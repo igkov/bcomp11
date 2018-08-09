@@ -19,7 +19,7 @@ const bcomp_config_t bconfig = {
 	12.3f,                 // v_min voltage warning
 	3.33f,                 // fuel_coeff
 	1.0f,                  // speed_coeff
-	90000,                 // moto_dist_offset
+	94056,                 // moto_dist_offset
 	0,                     // moto_time_offset
 	15000,                 // service distantion (default = 15000km, recommended 7500km)
 	250,                   // service moto time (default = 250h, recommended 150h)
