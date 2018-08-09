@@ -57,7 +57,7 @@ extern int melody_wrep2[];
 // Минимальная поддержка nmea:
 #define NMEA_SUPPORT 0
 // Поддержка предупреждений:
-#define WARNING_SUPPORT 1
+#define WARNING_SUPPORT 0
 // Специфичные возможности шины Mitsubishi Pajero Sport II:
 #define PAJERO_SPECIFIC 0
 // Специфичные возможности шины Nissan:
