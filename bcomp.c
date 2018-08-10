@@ -1250,18 +1250,18 @@ trip:
 			goto repeate;			
 #endif
 			break;
-#if 1
 		case 11:
-			_sprintf(str,"%ds",bcomp.utime);
-			graph_puts16(64,16,1,str);
-			_sprintf(str,"%ds",bcomp.time);
-			graph_puts16(64,32,1,str);
+			// -----------------------------------------------------------------
+			// RAIL PRESSURE
+			// -----------------------------------------------------------------
+			graph_puts16(64, 0, 1, "FUEL");
+			_sprintf(str,"%dMPa",bcomp.p_fuel);
+			graph_puts32c(64, 24, str);
 			break;
-#endif
 		default:
 			DBG("unknown page (%d)\r\n", bcomp.page);
 			if (buttons & BUTT_SW2) {
-				bcomp.page = 10;
+				bcomp.page = 11;
 			} else {
 				bcomp.page = 1;
 			}

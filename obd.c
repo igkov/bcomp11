@@ -166,7 +166,7 @@ static void obd_manage(void) {
 		//Свободны, обработка след. запроса:
 		can_pid = can_id = can_done = 0;
 		//Задержка перед следующей обработкой:
-		event_set(obd_manage, 200);
+		event_set(obd_manage, OBD_DELAY_PIDS);
 	} else 
 	if (can_pid == 0) {
 		// В случае установленного сервисного флага, запросы в ЭБУ не отправляются.
@@ -180,7 +180,7 @@ static void obd_manage(void) {
 			count++;
 		} while (pids_list[count%PIDS_SIZE].act == 0); 
 		// Запрос отправлен, ожидаем до 100мс:
-		event_set(obd_manage, 100);
+		event_set(obd_manage, OBD_DELAY_TIMEOUT);
 		return;
 	} else {
 		// Таймаут!
@@ -211,7 +211,7 @@ void obd_init(void) {
 	CAN_noFilter(STANDARD_FORMAT);
 #if ( PAJERO_SPECIFIC == 0 )
 	// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
-	event_set(obd_manage, 5000);
+	event_set(obd_manage, OBD_DELAY_START);
 #endif
 }
 
@@ -220,7 +220,7 @@ void obd_act(int flag) {
 		if (count == -1) {
 			count = 0;
 			// задержка 5 секунд перед началом опроса ECU:
-			event_set(obd_manage, 5000);
+			event_set(obd_manage, OBD_DELAY_START);
 		}
 	} else {
 		count = -1;

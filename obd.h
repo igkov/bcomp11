@@ -13,6 +13,10 @@ typedef struct {
 // Размер раблицы PIDов:
 #define PIDS_SIZE (sizeof(pids_list)/sizeof(pid_obd_t))
 
+#define OBD_DELAY_PIDS    150
+#define OBD_DELAY_TIMEOUT 100
+#define OBD_DELAY_START   5000
+
 // Инцициализация OBD:
 void obd_init(void);
 // Отключение OBD:
