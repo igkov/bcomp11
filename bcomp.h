@@ -5,6 +5,7 @@
 
 #define GUI_FLAG_MENU    0x1000
 #define GUI_FLAG_WARNING 0x2000
+#define GUI_FLAG_GRAPH   0x4000
 
 #if !defined( WIN32 )
 extern int melody_warning[];
@@ -133,6 +134,7 @@ extern int melody_wrep2[];
 
 #include "analog.h"
 #include "nmea.h"
+#include "diagram.h"
 
 typedef struct {
 	uint32_t time;   // Время маршрута (сек).
@@ -219,6 +221,12 @@ typedef struct {
 
 	trip_t trip[2];               // Данные поездок (2 поездки).
 	pars_t log[20];               // По 30 секунд слепки топливо/дистанция.
+	
+	diagram_t dia_engine;         // Данные диаграммы температуры двигателя.
+	diagram_t dia_trans;          // Данные диаграммы температуры коробки.
+	diagram_t dia_rail;           // Данные диаграммы давления в топливной рейке.
+	diagram_t dia_intake;         // Данные диаграммы давления во впускном коллекторе.
+	diagram_t dia_voltage;        // Данные диаграммы напряжения бортовой сети.
 
 	uint32_t moto_time;           // Счетчик моточасов (в секундах).
 	double moto_dist;             // Счетчик дистанции (в метрах).

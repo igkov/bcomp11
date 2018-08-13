@@ -25,6 +25,7 @@ extern const uint8_t ico16_engine_data[];
 extern const uint8_t ico16_fuel_data[];
 extern const uint8_t ico16_km_data[];
 extern const uint8_t ico16_kmh_data[];
+extern const uint8_t ico16_lhour_data[];
 extern const uint8_t ico16_time_data[];
 extern const uint8_t ico16_temp_data[];
 extern const uint8_t ico16_mt_data[];
