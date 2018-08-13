@@ -11,6 +11,7 @@ img2c.exe ico16-fuel.bmp ico16_fuel s >> icons11.c
 img2c.exe ico16-mt.bmp ico16_mt s >> icons11.c
 img2c.exe ico16-km.bmp ico16_km s >> icons11.c
 img2c.exe ico16-kmh.bmp ico16_kmh s >> icons11.c
+img2c.exe ico16-lhour.bmp ico16_lhour s >> icons11.c
 img2c.exe ico16-road.bmp ico16_road s >> icons11.c
 img2c.exe ico16-rpm.bmp ico16_rpm s >> icons11.c
 img2c.exe ico16-time.bmp ico16_time s >> icons11.c

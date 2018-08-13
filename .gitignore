@@ -11,4 +11,5 @@ pc/eeprom.bin
 *.dep
 *.c_
 *.bin
+*.TMP
 RTE

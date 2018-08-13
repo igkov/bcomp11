@@ -11,6 +11,20 @@
 	7) elog
 	8) warn
 	
+	Экраны:
+	1) Основной экран с передачей и пробегом. Так же возможен вывод температуры.
+	2) Температура двигателя.
+	3) Температура трансмиссии (АКПП).
+	4) Напряжение бортовой сети.
+	5) Расходы топлива.
+	6) Путь А.
+	7) Путь Б.
+	8) Сервисные интервалы.
+	9) Положение колес.
+	10) GPS-данные.
+	11) Давление в топливной рейке.
+	12) Давление во впускном коллекторе.
+	
 	Вторая итерация прошивки мини-бортового компьютера.
 	Обточка функционала для реализации полноценного устройства.
 	
@@ -47,6 +61,7 @@
 #include "menu.h"
 #include "wheels.h"
 #include "drive.h"
+#include "diagram.h"
 
 #include "obd.h"
 #include "obd_pids.h"
@@ -63,6 +78,10 @@
 #define delay_mks(a) Sleep(a/1000)
 #define delay_ms(a) Sleep(a)
 #endif
+
+#define BCOMP_PAGE()        (bcomp.page & 0x0FFF)
+#define BCOMP_PAGE_PREV()  (bcomp.page = ((bcomp.page & 0xF000) | ((bcomp.page - 1) & 0x0FFF)))
+#define BCOMP_PAGE_NEXT()  (bcomp.page = ((bcomp.page & 0xF000) | ((bcomp.page + 1) & 0x0FFF)))
 
 bcomp_t bcomp;
 volatile uint8_t save_flag = 0;
@@ -143,13 +162,17 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 		// A [kPa]
 		bcomp.p_intake = data[3];
 		DBG("Intake Pressure = %dkPa\r\n", (int)bcomp.p_intake);
+#if defined( WIN32 )
+		diagram_add(&bcomp.dia_intake, (float)bcomp.p_intake);
+#endif
 		break;
 	case FUEL_RAIL_PRES_ALT:
 		// ((A*256)+B)*10 [MPa]
 		bcomp.p_fuel = ((data[3] * 256)+data[4])*10;
-		DBG("Fuel pressure = %dMPa\r\n", (int)bcomp.p_fuel/1000);
+		DBG("Fuel pressure = %dkPa\r\n", (int)bcomp.p_fuel);
+		// Давление топлива попадает на график в реальном времени:
+		diagram_add(&bcomp.dia_rail, (float)bcomp.p_fuel);
 		break;
-
 	case VEHICLE_SPEED:
 		// A [km]
 		bcomp.speed = data[3];
@@ -159,6 +182,9 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 		// ((A*256)+B)/1000 [V]
 		bcomp.v_ecu = (float)((data[3]*256)+data[4])/1000.0f;
 		DBG("Volt = %d.%dV\r\n", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10.0f)%10);
+#if defined( WIN32 )
+		diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
+#endif
 		break;
 #if ( PAJERO_SPECIFIC == 1 )
 	case PAJERO_AT_INFO:
@@ -249,7 +275,10 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.at_present = 1;
 		// Отображение передачи:
 		bcomp.at_drive = (uint8_t)data[2] & 0x0F;
-		break;
+#if defined( WIN32 )
+		diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
+#endif
+	break;
 	case 0x0236:
 	case 236:
 		// Посылка с датчика положения руля, 
@@ -277,6 +306,9 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.t_engine = (int32_t)data[0] - 40;
 		// ТЕСТОВЫЙ ВАРИАНТ ПОТРЕБЛЕНИЯ ТОПЛИВА
 		bcomp.raw_fuel = (int32_t)data[5]*256 + data[6];
+#if defined( WIN32 )
+		diagram_add(&bcomp.dia_engine, (float)bcomp.t_engine);
+#endif
 		break;
 #endif
 #if ( NISSAN_SPECIFIC == 1 )
@@ -331,6 +363,15 @@ void bcomp_calc(void) {
 		// Таблица для рассчета потребления топлива:
 		bcomp.log[(bcomp.time/30)%20].fuel = bcomp.fuel;
 		bcomp.log[(bcomp.time/30)%20].dist = bcomp.dist;
+	}
+	
+	if ((bcomp.time % 60) == 0) {
+		// Каждую минуту заносим:
+		diagram_add(&bcomp.dia_engine, (float)bcomp.t_engine);
+		diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
+		//diagram_add(&bcomp.dia_rail, (float)bcomp.p_fuel);
+		diagram_add(&bcomp.dia_intake, (float)bcomp.p_intake);
+		diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
 	}
 
 	// Обнуляем параметры:
@@ -678,6 +719,17 @@ int main(void)
 	if (config_read(CPAR_FUEL_LEVEL, (uint8_t*)&bcomp.fuel_level, CPAR_FUEL_LEVEL_SIZE)) {
 		bcomp.fuel_level = 0.0f;
 	}
+	
+	// -----------------------------------------------------------------------------
+	// Инициализация диаграмм:
+	// -----------------------------------------------------------------------------
+	
+	diagram_create(&bcomp.dia_engine, 100, 50, 1); // от 50 до 100 градусов.
+	diagram_create(&bcomp.dia_trans, 115, 50, 1);  // от 50 до 115 градусов.
+	diagram_create(&bcomp.dia_rail, 60000, 10000, 1);   // от 10 до 60 МПа (от 100 до 600Атм).
+	diagram_create(&bcomp.dia_intake, 200, 80, 1); // от 0.8 до 2 Атм.
+	diagram_create(&bcomp.dia_voltage, 15.0f, 11.0f, 1); // от 11V до 15V Атм.
+	
 	// -----------------------------------------------------------------------------
 	// Инициализируем асинхронные события:
 	// -----------------------------------------------------------------------------
@@ -773,9 +825,12 @@ int main(void)
 				break;
 			}
 		}
+		// Вывод страницы:
+		DBG("bcomp.page = %08x\r\n", bcomp.page);
 		// Обработка кнопок:
 		if (buttons & BUTT_SW1) {
 			DBG("buttons(): BUTT_SW1\r\n");
+			bcomp.page &= ~GUI_FLAG_GRAPH;
 #if !defined( WIN32 )
 			if (bcomp.setup.sound) {
 				// Нажатие на кнопку:
@@ -813,16 +868,25 @@ end_sw1_proc:
 #endif
 			if (bcomp.page & GUI_FLAG_MENU) {
 				// nop
-			} else
+			} else 
 #if ( WARNING_SUPPORT == 1 )
 			if (bcomp.page & GUI_FLAG_WARNING) {
 				// nop
-			} else
+			} else 
 #endif
 			if (bcomp.page == 1) {
 				buttons = 0;
 				bcomp.page |= GUI_FLAG_MENU;
-			} else
+			} else 
+			if (bcomp.page == 2) {
+				bcomp.page ^= GUI_FLAG_GRAPH;
+			} else 
+			if (bcomp.page == 3) {
+				bcomp.page ^= GUI_FLAG_GRAPH;
+			} else 
+			if (bcomp.page == 4) {
+				bcomp.page ^= GUI_FLAG_GRAPH;
+			} else 
 			if (bcomp.page == 6) {
 				bcomp.trip[0].dist = 0;
 				bcomp.trip[0].time = 0;
@@ -831,7 +895,7 @@ end_sw1_proc:
 				config_save(CPAR_TRIPA_DIST, (uint8_t*)&bcomp.trip[0].dist, CPAR_TRIPA_DIST_SIZE);
 				config_save(CPAR_TRIPA_TIME, (uint8_t*)&bcomp.trip[0].time, CPAR_TRIPA_TIME_SIZE);
 				config_save(CPAR_TRIPA_FUEL, (uint8_t*)&bcomp.trip[0].fuel, CPAR_TRIPA_FUEL_SIZE);
-			} else
+			} else 
 			if (bcomp.page == 7) {
 				bcomp.trip[1].dist = 0;
 				bcomp.trip[1].time = 0;
@@ -840,7 +904,7 @@ end_sw1_proc:
 				config_save(CPAR_TRIPB_DIST, (uint8_t*)&bcomp.trip[1].dist, CPAR_TRIPB_DIST_SIZE);
 				config_save(CPAR_TRIPB_TIME, (uint8_t*)&bcomp.trip[1].time, CPAR_TRIPB_TIME_SIZE);
 				config_save(CPAR_TRIPB_FUEL, (uint8_t*)&bcomp.trip[1].fuel, CPAR_TRIPB_FUEL_SIZE);
-			} else
+			} else 
 			if (bcomp.page == 8) {
 				if (bcomp.service == 0) {
 					bcomp.service = 0x80;
@@ -861,11 +925,19 @@ end_sw1_proc:
 					bcomp.service = 0;
 				}
 				config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
-			}
+			} else
+			if (bcomp.page == 11) {
+				bcomp.page ^= GUI_FLAG_GRAPH;
+			} else 
+			if (bcomp.page == 12) {
+				bcomp.page ^= GUI_FLAG_GRAPH;
+			} 
+
 		}
 //end_sw1_long_proc:
 		if (buttons & BUTT_SW2) {
 			DBG("buttons(): BUTT_SW2\r\n");
+			bcomp.page &= ~GUI_FLAG_GRAPH;
 #if !defined( WIN32 )
 			if (bcomp.setup.sound) {
 				// Нажатие на кнопку:
@@ -1018,263 +1090,293 @@ repeate:
 			default:
 				break;
 			}
-		} else
-		switch (bcomp.page) {
-		// SCREENS:
-		//  1 - ODOMETER
-		//  2 - ENGINE
-		//  3 - TRANSMISSION (if present)
-		//  4 - BATTERY
-		//  5 - FUEL ECONOMY
-		//  6 - TRIP A
-		//  7 - TRIP B
-		//  8 - SERVICE
-		//  9 - WHEELS (if present)
-		// 10 - GPS (if present)
-		case 1:
-			// -----------------------------------------------------------------
-			// ODOMETER
-			// -----------------------------------------------------------------
-			if (bcomp.setup.f_ext) {
-				if (bcomp.t_ext == 0xFFFF) {
-					_sprintf(str, "--°C", bcomp.t_ext);
-				} else {
-					_sprintf(str, "%d°C", bcomp.t_ext);
-					graph_puts16(64+32, 0, 1, str);
+		} else {
+			switch (BCOMP_PAGE()) {
+			// SCREENS:
+			//  1 - ODOMETER
+			//  2 - ENGINE
+			//  3 - TRANSMISSION (if present)
+			//  4 - BATTERY
+			//  5 - FUEL ECONOMY
+			//  6 - TRIP A
+			//  7 - TRIP B
+			//  8 - SERVICE
+			//  9 - WHEELS (if present)
+			// 10 - GPS (if present)
+			// 11 - RAIL PRESSURE
+			// 12 - INTAKE PRESSURE
+			case 1:
+				// -----------------------------------------------------------------
+				// ODOMETER
+				// -----------------------------------------------------------------
+				if (bcomp.setup.f_ext) {
+					if (bcomp.t_ext == 0xFFFF) {
+						_sprintf(str, "--°C", bcomp.t_ext);
+					} else {
+						_sprintf(str, "%d°C", bcomp.t_ext);
+						graph_puts16(64+32, 0, 1, str);
+					}
 				}
-			}
 #if ( PAJERO_SPECIFIC == 1 )
-			if (bcomp.at_present) {
-				show_drive(64, 14);
-			} else
-#endif
-			{
-				int speed;
-#if ( NMEA_SUPPORT == 1 )
-				if (bcomp.g_correct) {
-					speed = (int)bcomp.gps_speed;
-				} else 
+				if (bcomp.at_present) {
+					show_drive(64, 14);
+				} else
 #endif
 				{
-					speed = bcomp.speed;
+					int speed;
+#if ( NMEA_SUPPORT == 1 )
+					if (bcomp.g_correct) {
+						speed = (int)bcomp.gps_speed;
+					} else 
+#endif
+					{
+						speed = bcomp.speed;
+					}
+					_sprintf(str, "%dкм/ч", speed);
+					graph_puts16(64, 32, 1, str);
 				}
-				_sprintf(str, "%dкм/ч", speed);
-				graph_puts16(64, 32, 1, str);
-			}
 
-			_sprintf(str, "%dкм", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
-			graph_puts16(64, 48, 1, str);
-			break;
-		case 2:
-			// -----------------------------------------------------------------
-			// ENGINE
-			// -----------------------------------------------------------------
-			graph_puts16(64, 0, 1, "ENGINE");
-			if (bcomp.t_engine == 0xFFFF) {
-				_sprintf(str, "--°C");
-			} else {
-				_sprintf(str, "%d°C", bcomp.t_engine);
-			}
-			graph_puts32c(64, 24, str);
-			break;
-		case 3:
-			// -----------------------------------------------------------------
-			// TRANSMISSION
-			// -----------------------------------------------------------------
-			if (bcomp.at_present == 0) {
-				if (buttons & BUTT_SW2) {
-					bcomp.page--;
+				_sprintf(str, "%dкм", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
+				graph_puts16(64, 48, 1, str);
+				break;
+			case 2:
+				// -----------------------------------------------------------------
+				// ENGINE
+				// -----------------------------------------------------------------
+				graph_puts16(64, 0, 1, "ENGINE");
+				if (bcomp.t_engine == 0xFFFF) {
+					_sprintf(str, "--°C");
 				} else {
-					bcomp.page++;
+					_sprintf(str, "%d°C", bcomp.t_engine);
 				}
-				goto repeate;
-			}
+				if (bcomp.page & GUI_FLAG_GRAPH) {
+					graph_puts16(64, 16, 1, str);
+					diagram_draw(&bcomp.dia_engine);
+				} else {
+					graph_puts32c(64, 24, str);
+				}
+				break;
+			case 3:
+				// -----------------------------------------------------------------
+				// TRANSMISSION
+				// -----------------------------------------------------------------
+				if (bcomp.at_present == 0) {
+					if (buttons & BUTT_SW2) {
+						BCOMP_PAGE_PREV(); //bcomp.page--;
+					} else {
+						BCOMP_PAGE_NEXT(); //bcomp.page++;
+					}
+					goto repeate;
+				}
 #if ( PAJERO_SPECIFIC == 1 ) || ( NISSAN_SPECIFIC == 1 )
-			graph_puts16(64, 0, 1, "TRANS");
+				graph_puts16(64, 0, 1, "TRANS");
+				if (bcomp.t_akpp == 0xFFFF) {
+					_sprintf(str, "--°C");
+				} else {
+					_sprintf(str, "%d°C", bcomp.t_akpp);
+				}
+				if (bcomp.page & GUI_FLAG_GRAPH) {
+					graph_puts16(64, 16, 1, str);
+					diagram_draw(&bcomp.dia_trans);
+				} else {
 #if ( PAJERO_SPECIFIC == 1 )
-			show_drive(64, 14);
+					show_drive(64, 14);
 #endif
-			if (bcomp.t_akpp == 0xFFFF) {
-				_sprintf(str, "--°C");
-			} else {
-				_sprintf(str, "%d°C", bcomp.t_akpp);
-			}
-			graph_puts32c(64, 38, str);
+					graph_puts32c(64, 38, str);
+				}
 #endif
-			break;
-		case 4:
-			// -----------------------------------------------------------------
-			// BATERY
-			// -----------------------------------------------------------------
-			graph_puts16(64, 0, 1, "BATTERY");
-			if (isnan(bcomp.v_ecu)) {
-				_sprintf(str, "--.-V");
-			} else {
-				_sprintf(str, "%d.%dV", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
-			}
-			graph_puts32c(64, 24, str);
-			break;
-		case 5:
-			// -----------------------------------------------------------------
-			// FUEL ECONOMY
-			// -----------------------------------------------------------------
-			graph_puts16(64, 0, 1, "FUEL");
-			// NOTE: Данный код показывает расход менее чем через 10 минут, это побочное 
-			// действие, из-за нулевого значения в ячейке "+1". Однако, это вполне правильный 
-			// вариант, постепенно расход подойдет к среднему за 10 минут.
-			if ((bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist) > 1000.0f) {
-				// Если за 10 минут проехали больше 1км:
-				float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
-				float d_dist = (bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist)/1000.0f;
-				float fuel_km = d_fuel / d_dist * 100.0f;
-				if (fuel_km < 50.0f) {
-					_sprintf(str, "%2d.%d", (int)fuel_km, (int)(fuel_km*10)%10);
+				break;
+			case 4:
+				// -----------------------------------------------------------------
+				// BATERY
+				// -----------------------------------------------------------------
+				graph_puts16(64, 0, 1, "BATTERY");
+				if (isnan(bcomp.v_ecu)) {
+					_sprintf(str, "--.-V");
+				} else {
+					_sprintf(str, "%d.%dV", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
+				}
+				if (bcomp.page & GUI_FLAG_GRAPH) {
+					graph_puts16(64, 16, 1, str);
+					diagram_draw(&bcomp.dia_voltage);
+				} else {
+					graph_puts32c(64, 24, str);
+				}
+				break;
+			case 5:
+				// -----------------------------------------------------------------
+				// FUEL ECONOMY
+				// -----------------------------------------------------------------
+				graph_puts16(64, 0, 1, "FUEL");
+				// NOTE: Данный код показывает расход менее чем через 10 минут, это побочное 
+				// действие, из-за нулевого значения в ячейке "+1". Однако, это вполне правильный 
+				// вариант, постепенно расход подойдет к среднему за 10 минут.
+				if ((bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist) > 1000.0f) {
+					// Если за 10 минут проехали больше 1км:
+					float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
+					float d_dist = (bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist)/1000.0f;
+					float fuel_km = d_fuel / d_dist * 100.0f;
+					if (fuel_km < 50.0f) {
+						_sprintf(str, "%2d.%d", (int)fuel_km, (int)(fuel_km*10)%10);
+					} else {			  
+						_sprintf(str, "--.-");
+					}
 				} else {			  
 					_sprintf(str, "--.-");
 				}
-			} else {			  
-				_sprintf(str, "--.-");
-			}
-			graph_puts32c(64, 14, str);
-			if (1) {
-				float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
-				float fuel_h;
-				if (bcomp.time < 60) {
-					_sprintf(str, "--.-");
-				} else
-				if (bcomp.time < 600) {
-					fuel_h = d_fuel*(3600/((bcomp.time/30)*30));
-					_sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
-				} else {
-					fuel_h = d_fuel*(3600/600);
-					_sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
+				graph_puts32c(64, 14, str);
+				graph_ico16(96, 24, ico16_100kms_data, 22); // l/100km
+				if (1) { // Часовой расход топлива
+					float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
+					float fuel_h;
+					if (bcomp.time < 60) {
+						_sprintf(str, "--.-");
+					} else
+					if (bcomp.time < 600) {
+						fuel_h = d_fuel*(3600/((bcomp.time/30)*30));
+						_sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
+					} else {
+						fuel_h = d_fuel*(3600/600);
+						_sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
+					}
 				}
-			}
-			graph_puts32c(64, 38, str);
-			break;
-		case 6:
-			// -----------------------------------------------------------------
-			// TRIP A
-			// -----------------------------------------------------------------
-			graph_puts16(64, 0, 1, "TRIP A");
-			goto trip;
-		case 7:
-			// -----------------------------------------------------------------
-			// TRIP B
-			// -----------------------------------------------------------------
-			graph_puts16(64, 0, 1, "TRIP B");
+				graph_puts32c(64, 38, str);
+				graph_ico16(96, 48, ico16_lhour_data, 22); // l/100km
+				break;
+			case 6:
+				// -----------------------------------------------------------------
+				// TRIP A
+				// -----------------------------------------------------------------
+				graph_puts16(64, 0, 1, "TRIP A");
+				goto trip;
+			case 7:
+				// -----------------------------------------------------------------
+				// TRIP B
+				// -----------------------------------------------------------------
+				graph_puts16(64, 0, 1, "TRIP B");
 trip:
-			_sprintf(str, "%dкм", (int)bcomp.trip[bcomp.page-6].dist/1000);
-			graph_puts16(64, 16, 1, str);
-			_sprintf(str, "%dч%02dм", (int)bcomp.trip[bcomp.page-6].time/3600, (int)(bcomp.trip[bcomp.page-6].time/60)%60);
-			graph_puts16(64, 32, 1, str);
-			_sprintf(str, "%dл", (int)bcomp.trip[bcomp.page-6].fuel);
-			graph_puts16(64, 48, 1, str);
-			break;
-		case 8:
-			// -----------------------------------------------------------------
-			// SERVICE
-			// -----------------------------------------------------------------
-			graph_puts16(64,  0, 1, "SERVICE");
-			if (bcomp.service & 0x80) {
-				graph_puts16(64, 16, 1, "Режим");
-				graph_puts16(64, 32, 1, "активен");
-				if (bcomp.service & 0x01) {
-					graph_puts16(64, 48, 1, "Сбросить");
-				} else {
-					graph_puts16(64, 48, 1, "Выход");
-				}
-			} else {
-				_sprintf(str, "%s", bcomp.moto_date_service);
+				_sprintf(str, "%dкм", (int)bcomp.trip[BCOMP_PAGE()-6].dist/1000);
 				graph_puts16(64, 16, 1, str);
-				_sprintf(str, "%dh", bcomp.moto_time_service/3600);
+				_sprintf(str, "%dч%02dм", (int)bcomp.trip[BCOMP_PAGE()-6].time/3600, (int)(bcomp.trip[BCOMP_PAGE()-6].time/60)%60);
 				graph_puts16(64, 32, 1, str);
-				_sprintf(str, "%dkm", (int)bcomp.moto_dist_service/1000);
+				_sprintf(str, "%dл", (int)bcomp.trip[BCOMP_PAGE()-6].fuel);
 				graph_puts16(64, 48, 1, str);
-			}
-			break;
-		case 9:
-			// -----------------------------------------------------------------
-			// WHEELS
-			// -----------------------------------------------------------------
+				break;
+			case 8:
+				// -----------------------------------------------------------------
+				// SERVICE
+				// -----------------------------------------------------------------
+				graph_puts16(64,  0, 1, "SERVICE");
+				if (bcomp.service & 0x80) {
+					graph_puts16(64, 16, 1, "Режим");
+					graph_puts16(64, 32, 1, "активен");
+					if (bcomp.service & 0x01) {
+						graph_puts16(64, 48, 1, "Сбросить");
+					} else {
+						graph_puts16(64, 48, 1, "Выход");
+					}
+				} else {
+					_sprintf(str, "%s", bcomp.moto_date_service);
+					graph_puts16(64, 16, 1, str);
+					_sprintf(str, "%dh", bcomp.moto_time_service/3600);
+					graph_puts16(64, 32, 1, str);
+					_sprintf(str, "%dkm", (int)bcomp.moto_dist_service/1000);
+					graph_puts16(64, 48, 1, str);
+				}
+				break;
+			case 9:
+				// -----------------------------------------------------------------
+				// WHEELS
+				// -----------------------------------------------------------------
 #if ( WHELLS_DRAW_SUPPORT == 1 )
-			if (bcomp.esc_id == 0 ||
-				bcomp.setup.f_esp == 0) {
-				if (buttons & BUTT_SW2) {
-					bcomp.page--;
-				} else {
-					bcomp.page++;
+				if (bcomp.esc_id == 0 ||
+					bcomp.setup.f_esp == 0) {
+					if (buttons & BUTT_SW2) {
+						BCOMP_PAGE_PREV(); //bcomp.page--;
+					} else {
+						BCOMP_PAGE_NEXT(); //bcomp.page++;
+					}
+					goto repeate;
 				}
-				goto repeate;
-			}
-			graph_puts16(64,0,1,"WHEELS");
-			graph_line(40+4,40,88-4,40);
-			draw_rect(40,40,bcomp.angle);
-			draw_rect(88,40,bcomp.angle);
+				graph_puts16(64,0,1,"WHEELS");
+				graph_line(40+4,40,88-4,40);
+				draw_rect(40,40,bcomp.angle);
+				draw_rect(88,40,bcomp.angle);
 #else
-			if (buttons & BUTT_SW2) {
-				bcomp.page--;
-			} else {
-				bcomp.page++;
-			}
-			goto repeate;			
+				if (buttons & BUTT_SW2) {
+					BCOMP_PAGE_PREV(); //bcomp.page--;
+				} else {
+					BCOMP_PAGE_NEXT(); //bcomp.page++;
+				}
+				goto repeate;			
 #endif
-			break;
-		case 10:
+				break;
+			case 10:
 #if ( NMEA_SUPPORT == 1 )
-			if (bcomp.setup.f_gps == 0) {
-				if (buttons & BUTT_SW2) {
-					bcomp.page--;
-				} else {
-					bcomp.page++;
+				if (bcomp.setup.f_gps == 0) {
+					if (buttons & BUTT_SW2) {
+						BCOMP_PAGE_PREV(); //bcomp.page--;
+					} else {
+						BCOMP_PAGE_NEXT(); //bcomp.page++;
+					}
+					goto repeate;
 				}
+				graph_puts16(64,0,1,"GPS");
+				if (bcomp.g_correct) {
+					_sprintf(str,"%s",bcomp.gps_val_time);
+					graph_puts16(64,16,1,str);
+					_sprintf(str,"%s",bcomp.gps_val_lon); str[10] = 0; // cutting
+					graph_puts16(64,32,1,str);
+					_sprintf(str,"%s",bcomp.gps_val_lat); str[10] = 0; // cutting
+					graph_puts16(64,48,1,str);
+				} else {
+					graph_puts16(64,32,1,"NO DATA");
+				}
+#else
+				if (buttons & BUTT_SW2) {
+					BCOMP_PAGE_PREV(); //bcomp.page--;
+				} else {
+					BCOMP_PAGE_NEXT(); //bcomp.page++;
+				}
+				goto repeate;			
+#endif
+				break;
+			case 11:
+				// -----------------------------------------------------------------
+				// RAIL PRESSURE
+				// -----------------------------------------------------------------
+				graph_puts16(64, 0, 1, "FUEL");
+				_sprintf(str,"%3d.%dMPa", (bcomp.p_fuel/1000), (bcomp.p_fuel/100)%10);
+				if (bcomp.page & GUI_FLAG_GRAPH) {
+					graph_puts16(64, 16, 1, str);
+					diagram_draw(&bcomp.dia_rail);
+				} else {
+					graph_puts32c(64, 24, str);
+				}
+				break;
+			case 12:
+				// -----------------------------------------------------------------
+				// INTAKE PRESSURE
+				// -----------------------------------------------------------------
+				graph_puts16(64, 0, 1, "INTAKE");
+				_sprintf(str,"%dkPa",bcomp.p_intake);
+				if (bcomp.page & GUI_FLAG_GRAPH) {
+					graph_puts16(64, 16, 1, str);
+					diagram_draw(&bcomp.dia_intake);
+				} else {
+					graph_puts32c(64, 24, str);
+				}
+				break;
+			default:
+				DBG("unknown page (%d)\r\n", bcomp.page);
+				if (buttons & BUTT_SW2) {
+					bcomp.page = 12;
+				} else {
+					bcomp.page = 1;
+				}
+				config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
 				goto repeate;
 			}
-			graph_puts16(64,0,1,"GPS");
-			if (bcomp.g_correct) {
-				_sprintf(str,"%s",bcomp.gps_val_time);
-				graph_puts16(64,16,1,str);
-				_sprintf(str,"%s",bcomp.gps_val_lon); str[10] = 0; // cutting
-				graph_puts16(64,32,1,str);
-				_sprintf(str,"%s",bcomp.gps_val_lat); str[10] = 0; // cutting
-				graph_puts16(64,48,1,str);
-			} else {
-				graph_puts16(64,32,1,"NO DATA");
-			}
-#else
-			if (buttons & BUTT_SW2) {
-				bcomp.page--;
-			} else {
-				bcomp.page++;
-			}
-			goto repeate;			
-#endif
-			break;
-		case 11:
-			// -----------------------------------------------------------------
-			// RAIL PRESSURE
-			// -----------------------------------------------------------------
-			graph_puts16(64, 0, 1, "FUEL");
-			_sprintf(str,"%dMPa",bcomp.p_fuel);
-			graph_puts32c(64, 24, str);
-			break;
-		case 12:
-			// -----------------------------------------------------------------
-			// INTAKE PRESSURE
-			// -----------------------------------------------------------------
-			graph_puts16(64, 0, 1, "INTAKE");
-			_sprintf(str,"%dkPa",bcomp.p_intake);
-			graph_puts32c(64, 24, str);
-			break;
-		default:
-			DBG("unknown page (%d)\r\n", bcomp.page);
-			if (buttons & BUTT_SW2) {
-				bcomp.page = 12;
-			} else {
-				bcomp.page = 1;
-			}
-			config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
-			goto repeate;
 		}
 		// -----------------------------------------------------------------
 		// Обновление экрана:

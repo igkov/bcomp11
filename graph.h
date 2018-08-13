@@ -21,6 +21,8 @@ void graph_ico16(int x, int y, const uint8_t *ico, int xsize);
 void graph_puts32c(int ox, int oy, char *str);
 // Новая функция вывода иконок:
 void graph_pic(const ico_t *p, int ox, int oy);
+// Низкоуровневая функция вывода пикселя:
+void graph_putpix(int x, int y, uint8_t value);
 
 // Графика:
 void graph_line(int x1, int y1, int x2, int y2);
