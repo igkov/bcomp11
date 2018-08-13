@@ -1258,10 +1258,18 @@ trip:
 			_sprintf(str,"%dMPa",bcomp.p_fuel);
 			graph_puts32c(64, 24, str);
 			break;
+		case 12:
+			// -----------------------------------------------------------------
+			// INTAKE PRESSURE
+			// -----------------------------------------------------------------
+			graph_puts16(64, 0, 1, "INTAKE");
+			_sprintf(str,"%dkPa",bcomp.p_intake);
+			graph_puts32c(64, 24, str);
+			break;
 		default:
 			DBG("unknown page (%d)\r\n", bcomp.page);
 			if (buttons & BUTT_SW2) {
-				bcomp.page = 11;
+				bcomp.page = 12;
 			} else {
 				bcomp.page = 1;
 			}
