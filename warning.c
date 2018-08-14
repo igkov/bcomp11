@@ -62,6 +62,10 @@ void bcomp_warning(void) {
 		errors_list[WARNING_ID_ENGINE].time = 0;
 	}
 	// ENGINE TEMPERATURE WARNING
+	if (bcomp.t_engine == 0xFFFF) {
+		errors_list[WARNING_ID_T_ENGINE].flags = 0;
+		errors_list[WARNING_ID_T_ENGINE].time = 0;
+	} else
 	if (bcomp.t_engine > bcomp.setup.t_eng) {
 		if (errors_list[WARNING_ID_T_ENGINE].flags & WARN_FLAG_ACT) {
 			errors_list[WARNING_ID_T_ENGINE].time += 5;
@@ -81,8 +85,8 @@ void bcomp_warning(void) {
 	// AT TEMPERATURE WARNING
 	if (bcomp.at_present) {
 		if (bcomp.t_akpp == 0xFFFF) {
-			errors_list[WARNING_ID_CONNECT].flags = 0;
-			errors_list[WARNING_ID_CONNECT].time = 0;
+			errors_list[WARNING_ID_T_AT].flags = 0;
+			errors_list[WARNING_ID_T_AT].time = 0;
 		} else
 		if (bcomp.t_akpp > bcomp.setup.t_at) {
 			if (errors_list[WARNING_ID_T_AT].flags & WARN_FLAG_ACT) {
@@ -135,7 +139,8 @@ void bcomp_warning(void) {
 	// EXT TEMP WARNING
 	if (bcomp.setup.f_ext_w && bcomp.setup.f_ext) {
 		if (bcomp.t_ext == 0xFFFF) {
-			// NOP
+			errors_list[WARNING_ID_T_EXT].flags = 0;
+			errors_list[WARNING_ID_T_EXT].time  = 0;
 		} else
 		if (bcomp.t_ext < bcomp.setup.t_ext) {
 			if (errors_list[WARNING_ID_T_EXT].flags & WARN_FLAG_ACT) {
@@ -260,7 +265,6 @@ int warning_show(int *act) {
 	DBG("ERROR: id = %d errors[%d][%d][%d][%d][%d][%d][%d][%d]...\r\n", id, 
 		errors_list[0].flags, errors_list[1].flags, errors_list[2].flags, errors_list[3].flags,
 		errors_list[4].flags, errors_list[5].flags, errors_list[6].flags, errors_list[7].flags);
-
 #endif
 	switch (id) {
 	case WARNING_ID_CONNECT:
@@ -273,12 +277,12 @@ int warning_show(int *act) {
 		graph_puts16(64,48,1,str);
 		break;
 	case WARNING_ID_T_ENGINE:
-		graph_pic(&ico48_trans,64-24,0);
+		graph_pic(&ico48_temp,64-24,0);
 		_sprintf(str, "%d°C", bcomp.t_engine);
 		graph_puts16(64,48,1,str);
 		break;
 	case WARNING_ID_T_AT:
-		graph_pic(&ico48_temp,64-24,0);
+		graph_pic(&ico48_trans,64-24,0);
 		_sprintf(str, "%d°C", bcomp.t_akpp);
 		graph_puts16(64,48,1,str);
 		break;

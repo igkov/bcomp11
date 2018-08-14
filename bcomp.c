@@ -191,6 +191,9 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 		// F-40 [degrees C]
 		bcomp.t_akpp = (data[8]-40);
 		DBG("AT temperature = %d°C\r\n", (int)bcomp.t_akpp);
+#if defined( WIN32 )
+		diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
+#endif
 		break;
 #endif
 #if ( NISSAN_SPECIFIC == 1 )
@@ -275,10 +278,7 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.at_present = 1;
 		// Отображение передачи:
 		bcomp.at_drive = (uint8_t)data[2] & 0x0F;
-#if defined( WIN32 )
-		diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
-#endif
-	break;
+		break;
 	case 0x0236:
 	case 236:
 		// Посылка с датчика положения руля, 
