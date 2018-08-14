@@ -213,8 +213,8 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 		obd_act_set(GET_VIN, 0);
 		// Сохраняем VIN:
 		//strcpy(bcomp.vin, (char*)&data[4]);
-		memcpy(bcomp.vin, (char*)&data[4], 19);
-		bcomp.vin[19] = 0;
+		memcpy(bcomp.vin, (char*)&data[4], 17);
+		bcomp.vin[17] = 0;
 		DBG("VIN: %s\r\n", bcomp.vin);
 		break;
 	case STATUS_DTC:
