@@ -1081,13 +1081,27 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>162807984</ColumnNumber>
+      <ColumnNumber>23</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>39</TopLine>
+      <CurrentLine>52</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\drive.c</PathWithFileName>
+      <FilenameWithoutPath>drive.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\drive.c</PathWithFileName>
-      <FilenameWithoutPath>drive.c</FilenameWithoutPath>
+      <PathWithFileName>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\diagram.c</PathWithFileName>
+      <FilenameWithoutPath>diagram.c</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -1116,10 +1130,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>21</ColumnNumber>
+      <ColumnNumber>35</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>112</TopLine>
-      <CurrentLine>112</CurrentLine>
+      <TopLine>364</TopLine>
+      <CurrentLine>372</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\bcomp.c</PathWithFileName>
       <FilenameWithoutPath>bcomp.c</FilenameWithoutPath>
@@ -1130,10 +1144,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>13</ColumnNumber>
+      <ColumnNumber>35</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>1</TopLine>
-      <CurrentLine>5</CurrentLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\obd.c</PathWithFileName>
       <FilenameWithoutPath>obd.c</FilenameWithoutPath>

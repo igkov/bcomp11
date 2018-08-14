@@ -359,7 +359,7 @@ void bcomp_calc(void) {
 		bcomp.moto_dist_service += d_dist;
 	}
 
-	if ((bcomp.time%30) == 0) {
+	if ((bcomp.time % 30) == 0) {
 		// Таблица для рассчета потребления топлива:
 		bcomp.log[(bcomp.time/30)%20].fuel = bcomp.fuel;
 		bcomp.log[(bcomp.time/30)%20].dist = bcomp.dist;
@@ -367,10 +367,10 @@ void bcomp_calc(void) {
 	
 	if ((bcomp.time % 60) == 0) {
 		// Каждую минуту заносим:
-		diagram_add(&bcomp.dia_engine, (float)bcomp.t_engine);
-		diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
-		//diagram_add(&bcomp.dia_rail, (float)bcomp.p_fuel);
-		diagram_add(&bcomp.dia_intake, (float)bcomp.p_intake);
+		diagram_add(&bcomp.dia_engine,  (float)bcomp.t_engine);
+		diagram_add(&bcomp.dia_trans,   (float)bcomp.t_akpp);
+		//diagram_add(&bcomp.dia_rail,    (float)bcomp.p_fuel);
+		diagram_add(&bcomp.dia_intake,  (float)bcomp.p_intake);
 		diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
 	}
 

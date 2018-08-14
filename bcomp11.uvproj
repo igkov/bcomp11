@@ -639,6 +639,11 @@
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
             </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\diagram.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1688,9 +1693,9 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>0</RunUserProg1>
-            <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>.\hex2bin.exe -s 0x00008000 -b 0x00000000 -o bcomp11.bin ".\.release\bcomp11.hex"</UserProg1Name>
-            <UserProg2Name>.\makecrc.exe CORTEX bcomp11.bin</UserProg2Name>
+            <RunUserProg2>1</RunUserProg2>
+            <UserProg1Name></UserProg1Name>
+            <UserProg2Name>fromelf --bin -o @L.bin "$L@L.axf"</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
           </AfterMake>
@@ -2146,6 +2151,11 @@
               <FileName>drive.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
+            </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\diagram.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3655,6 +3665,11 @@
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
             </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\diagram.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5162,6 +5177,11 @@
               <FileName>drive.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
+            </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:\Documents and Settings\Administrator\My Documents\projects-git\bcomp11\diagram.c</FilePath>
             </File>
           </Files>
         </Group>
