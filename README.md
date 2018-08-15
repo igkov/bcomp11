@@ -46,6 +46,13 @@ Program MCU
 
 For program MCU, please use USB-UART converter with DTR/RST control and programming utility as <a href="http://www.flashmagictool.com/">Flash Magic</a> or <a href="https://sourceforge.net/projects/lpc21isp/">lpc21isp</a>.
 
+PC Emulation build
+---------
+
+For interface simple debug, project have simple HAL-level for building in MinGW for Windows. Sample interface screens:
+
+<img src="http://igorkov.org/images/bcomp11v2/bcomp11-pcemu.png">
+
 Donate project
 ---------
 
