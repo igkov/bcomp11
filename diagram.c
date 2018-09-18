@@ -55,7 +55,7 @@ int diagram_add(pdiagram_t diag, float value) {
 }
 
 int diagram_draw(pdiagram_t diag) {
-	int x, y;
+	int x;
 	for	(x=0; x<DIAGRAM_SIZE_X; x++) {
 		int pos = ((int)diag->offset + 1 + x) % DIAGRAM_SIZE_X;
 #if ( DIAGRAM_DELIM_SUPPORT == 1 )
@@ -70,9 +70,17 @@ int diagram_draw(pdiagram_t diag) {
 #endif
 		if (diag->points[pos] == 0xFF) {
 			// NOP (min)
+			graph_putpix(
+				DIAGRAM_OFFSET_X+x, 
+				DIAGRAM_OFFSET_Y+DIAGRAM_SIZE_Y-1, 
+				0x00);
 		} else
 		if (diag->points[pos] == 0xFD) {
 			// NOP (max)
+			graph_putpix(
+				DIAGRAM_OFFSET_X+x, 
+				DIAGRAM_OFFSET_Y+0, 
+				0x00);
 		} else
 		if (diag->points[pos] == 0xFC) {
 			// NOP

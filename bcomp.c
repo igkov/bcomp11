@@ -726,7 +726,7 @@ int main(void)
 	
 	diagram_create(&bcomp.dia_engine, 100, 50, 1); // от 50 до 100 градусов.
 	diagram_create(&bcomp.dia_trans, 115, 50, 1);  // от 50 до 115 градусов.
-	diagram_create(&bcomp.dia_rail, 60000, 10000, 1);   // от 10 до 60 МПа (от 100 до 600Атм).
+	diagram_create(&bcomp.dia_rail, 60000, 25000, 1);   // от 25 до 60 МПа (от 250 до 600Атм).
 	diagram_create(&bcomp.dia_intake, 200, 80, 1); // от 0.8 до 2 Атм.
 	diagram_create(&bcomp.dia_voltage, 15.0f, 11.0f, 1); // от 11V до 15V Атм.
 	

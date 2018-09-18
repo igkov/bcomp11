@@ -15,7 +15,7 @@ typedef struct {
 
 #define OBD_DELAY_PIDS    150
 #define OBD_DELAY_TIMEOUT 100
-#define OBD_DELAY_START   5000
+#define OBD_DELAY_START   10000
 
 // Инцициализация OBD:
 void obd_init(void);

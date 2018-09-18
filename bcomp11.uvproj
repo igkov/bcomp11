@@ -639,6 +639,11 @@
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
             </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\diagram.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2146,6 +2151,11 @@
               <FileName>drive.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
+            </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\diagram.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3655,6 +3665,11 @@
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
             </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\diagram.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5162,6 +5177,11 @@
               <FileName>drive.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\drive.c</FilePath>
+            </File>
+            <File>
+              <FileName>diagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\diagram.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -71,9 +71,9 @@ int lcd_init(proc_f fucn_addr, char *name, int size_x, int size_y) {
 		return 2;
 	}
 #if (SCALE_2X == 1)
-	sprintf(title, "LCD Emu %dx%d", winx/2, winy/2);
+	sprintf(title, "BCOMP11 PC Emu %dx%d", winx/2, winy/2);
 #else
-	sprintf(title, "LCD Emu %dx%d", winx, winy);
+	sprintf(title, "BCOMP11 PC Emu %dx%d", winx, winy);
 #endif
 	printf("Title: %s\r\n", title);
 	// Создаем основное окно приложения
