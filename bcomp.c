@@ -213,8 +213,8 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 		obd_act_set(GET_VIN, 0);
 		// Сохраняем VIN:
 		//strcpy(bcomp.vin, (char*)&data[4]);
-		memcpy(bcomp.vin, (char*)&data[4], 19);
-		bcomp.vin[19] = 0;
+		memcpy(bcomp.vin, (char*)&data[4], 17);
+		bcomp.vin[17] = 0;
 		DBG("VIN: %s\r\n", bcomp.vin);
 		break;
 	case STATUS_DTC:
@@ -359,7 +359,7 @@ void bcomp_calc(void) {
 		bcomp.moto_dist_service += d_dist;
 	}
 
-	if ((bcomp.time%30) == 0) {
+	if ((bcomp.time % 30) == 0) {
 		// Таблица для рассчета потребления топлива:
 		bcomp.log[(bcomp.time/30)%20].fuel = bcomp.fuel;
 		bcomp.log[(bcomp.time/30)%20].dist = bcomp.dist;
@@ -367,10 +367,10 @@ void bcomp_calc(void) {
 	
 	if ((bcomp.time % 60) == 0) {
 		// Каждую минуту заносим:
-		diagram_add(&bcomp.dia_engine, (float)bcomp.t_engine);
-		diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
-		//diagram_add(&bcomp.dia_rail, (float)bcomp.p_fuel);
-		diagram_add(&bcomp.dia_intake, (float)bcomp.p_intake);
+		diagram_add(&bcomp.dia_engine,  (float)bcomp.t_engine);
+		diagram_add(&bcomp.dia_trans,   (float)bcomp.t_akpp);
+		//diagram_add(&bcomp.dia_rail,    (float)bcomp.p_fuel);
+		diagram_add(&bcomp.dia_intake,  (float)bcomp.p_intake);
 		diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
 	}
 

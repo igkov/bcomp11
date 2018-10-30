@@ -51,7 +51,7 @@ SRC    += eeprom.c
 #SRC    += elog.c
 SRC    += errors.c
 SRC    += event.c
-SRC    += graph.c
+#SRC    += graph.c
 SRC    += i2c.c
 SRC    += leds.c
 #SRC    += lzss.c
@@ -69,9 +69,9 @@ SRC    += virtuino.c
 SRC    += uart0.c
 #SRC    += warning.c
 #SRC    += wheels.c
-SRC    += ./fonts/font12x16.c
-SRC    += ./fonts/font6x8.c
-SRC    += ./icons/icons11.c
+#SRC    += ./fonts/font12x16.c
+#SRC    += ./fonts/font6x8.c
+#SRC    += ./icons/icons11.c
 
 # List C++ source files here:
 # Use file-extension cpp for C++-files!
