@@ -1,4 +1,5 @@
 #include <LPC11xx.h>
+//#include <LPC13xx.h>
 #include <string.h>
 #include "event.h"
 
@@ -13,7 +14,14 @@
 #else
 #endif
 
+#if defined( __LPC13xx_H__ )
+extern uint32_t SystemFrequency; 
+#define SYS_CLK SystemFrequency
+#elif defined( __LPC11xx_H__ )
 extern uint32_t SystemCoreClock; 
+#define SYS_CLK SystemCoreClock
+#else
+#endif
 #if (EVENT_64BIT == 1)
 static volatile uint64_t msTicks;
 #else
@@ -51,9 +59,9 @@ void SysTick_Handler(void) {
 void event_init(void) {
 	msTicks = 0;
 	memset(timer_events, 0, sizeof(timer_events));
-	if (SysTick_Config(SystemCoreClock / EVENTS_FREQ)) {
+	if (SysTick_Config(SYS_CLK / EVENTS_FREQ)) {
 #if defined( _DBGOUT )
-		DBG("event_init(): incorrerct SystemCoreClock, SysTick_Config() fault!\r\n");
+		DBG("event_init(): incorrerct SYS_CLK, SysTick_Config() fault!\r\n");
 #endif
 		while (1);
 	}
