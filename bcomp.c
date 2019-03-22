@@ -10,6 +10,7 @@
 	6) analog
 	7) elog
 	8) warn
+    9) rpm_flag_check
 	
 	Экраны:
 	1) Основной экран с передачей и пробегом. Так же возможен вывод температуры.
@@ -259,6 +260,20 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 	}
 }
 
+/* 
+    Процедура остановки CAN-шины.
+ */
+void bcomp_act_proc(void) {
+#if ( PAJERO_SPECIFIC == 1 )
+    if (bcomp.can_act) {
+        bcomp.can_act = 0;
+        obd_act(0);
+        // Так же для теста переключаем экран:
+        bcomp.page = 101;
+    }
+#endif
+}
+
 /*
 	bcomp_raw()
 
@@ -287,6 +302,8 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.esc_id = pid;
 		break;
 	case 0x0308:
+        // Событие приходит каждые 20мс.
+        // Проверка флага каждые 40мс
 		bcomp.rpms = bcomp.rpm = (uint32_t)data[1] * 256 + data[2];
 		if (bcomp.rpm > 500) {
 			// Активируем опрос по CAN-шине:
@@ -296,6 +313,11 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 			// Останавливаем опрос по CAN-шине:
 			obd_act(0);
 		}
+        // Активируем отложенную процедуру (через 50мс).
+        // В случае, если повторно приходит пакет RPM, тогда переустанавливаем, 
+        // таким образом при нормальной цепочке срабатывания данного события не произойдет.
+        event_unset(bcomp_act_proc);
+        event_set(bcomp_act_proc, 50);
 		// NOTE:
 		// Эта активация сделана в попытках борьбы с ошибкой P1901.
 		// На аппаратной версии LPC17xx ошибка не проявляется, 
@@ -545,6 +567,7 @@ int main(void)
 	bcomp.time = 0;
 	bcomp.t_engine = 0xFFFF;
 	bcomp.rpm = 0;
+    bcomp.can_act = 1;
 	bcomp.speed = 0;
 #if ( NISSAN_SPECIFIC == 1 )
 	bcomp.at_present = 1;
@@ -1367,6 +1390,12 @@ trip:
 					graph_puts32c(64, 24, str);
 				}
 				break;
+            case 101:
+                // -----------------------------------------------------------------
+                // CAN STOP SCREEN (silent)
+                // -----------------------------------------------------------------
+				graph_puts16(64, 16, 1, "CAN STOP");
+                break;
 			default:
 				DBG("unknown page (%d)\r\n", bcomp.page);
 				if (buttons & BUTT_SW2) {

@@ -149,6 +149,8 @@ typedef struct {
 
 typedef struct {
 	uint32_t time;                // Время работы.
+    uint8_t  can_act;             // Флаг активности работы.
+    uint8_t  res0[3];             // Выравнивание.
 	int t_engine;                 // Температура двигателя (°C).
 	int t_akpp;                   // Температура коробки передач (°C, специфично для NMPS/Pajero4).
 	int t_ext;                    // Внешняя температура (°C).
