@@ -535,7 +535,7 @@ int main(void)
 	char str[20];
 
 	// На всякий случай деинициализируем CAN и 
-	// переводим в состояние ожидания (в функции:
+	// переводим в состояние ожидания (в функции):
 	//obd_deinit();
 
 	// Инициализация периферийных модулей и библиотек:
@@ -1128,6 +1128,7 @@ repeate:
 			// 10 - GPS (if present)
 			// 11 - RAIL PRESSURE
 			// 12 - INTAKE PRESSURE
+            // 13 - TEST CAN ERROR COUNTERS
 			case 1:
 				// -----------------------------------------------------------------
 				// ODOMETER
@@ -1390,16 +1391,30 @@ trip:
 					graph_puts32c(64, 24, str);
 				}
 				break;
+            case 13:
+                {
+                    //
+                    //
+                    //
+                    uint8_t err_trans;
+                    uint8_t err_recv;
+                    CAN_erStat(&err_recv, &err_trans);
+                    graph_puts16(64, 0, 1, "CAN ERR");
+                    _sprintf(str,"r: %d", err_recv);
+                    graph_puts16(0, 16, 0, str);
+                    _sprintf(str,"t: %d", err_trans);
+                    graph_puts16(0, 16, 0, str);
+                }
             case 101:
                 // -----------------------------------------------------------------
                 // CAN STOP SCREEN (silent)
                 // -----------------------------------------------------------------
-				graph_puts16(64, 16, 1, "CAN STOP");
+                graph_puts16(64, 16, 1, "CAN STOP");
                 break;
 			default:
 				DBG("unknown page (%d)\r\n", bcomp.page);
 				if (buttons & BUTT_SW2) {
-					bcomp.page = 12;
+					bcomp.page = 13;
 				} else {
 					bcomp.page = 1;
 				}
