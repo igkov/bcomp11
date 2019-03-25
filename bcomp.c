@@ -268,8 +268,6 @@ void bcomp_act_proc(void) {
     if (bcomp.can_act) {
         bcomp.can_act = 0;
         obd_act(0);
-        // Так же для теста переключаем экран:
-        bcomp.page = 101;
     }
 #endif
 }
@@ -295,9 +293,12 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.at_drive = (uint8_t)data[2] & 0x0F;
 		break;
 	case 0x0236:
-	case 236:
-		// Посылка с датчика положения руля, 
-		// пока неизвестно где какие данные:
+		// Положение руля и посылка:
+		// правое       - 09 FE 10 00 10 00 00 3C
+		// центральное  - 10 02 10 00 D0 00 00 69
+		// левое        - 15 F9 10 00 E0 00 00 79
+
+		// Посылка с датчика положения руля, пока неизвестно где какие данные:
 		memcpy(bcomp.esc_data, data, 8);
 		bcomp.esc_id = pid;
 		break;
@@ -850,6 +851,11 @@ int main(void)
 		}
 		// Вывод страницы:
 		DBG("bcomp.page = %08x\r\n", bcomp.page);
+		// Экрна 101:
+		if (bcomp.can_act == 0) {
+			// nop
+			bcomp.page = 101;
+		}
 		// Обработка кнопок:
 		if (buttons & BUTT_SW1) {
 			DBG("buttons(): BUTT_SW1\r\n");
@@ -868,6 +874,9 @@ int main(void)
 				// nop
 			} else 
 #endif
+			if (bcomp.page == 101) {
+				// nop
+			} else
 			{
 				if (bcomp.page == 8) {
 					if (bcomp.service & 0x80) {
@@ -954,8 +963,12 @@ end_sw1_proc:
 			} else 
 			if (bcomp.page == 12) {
 				bcomp.page ^= GUI_FLAG_GRAPH;
-			} 
-
+			} else
+			if (bcomp.page == 101) {
+		        obd_act(1);
+				bcomp.can_act = 1;
+				config_read(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
+			}
 		}
 //end_sw1_long_proc:
 		if (buttons & BUTT_SW2) {
@@ -975,6 +988,9 @@ end_sw1_proc:
 				// nop
 			} else 
 #endif
+			if (bcomp.page == 101) {
+				// nop
+			} else
 			{
 				if (bcomp.page == 8) {
 					if (bcomp.service & 0x80) {
@@ -1141,6 +1157,13 @@ repeate:
 						graph_puts16(64+32, 0, 1, str);
 					}
 				}
+#if ( NMEA_SUPPORT == 1 )
+				else
+				if (bcomp.g_correct) {
+					_sprintf(str,"%d km/h",bcomp.gps_speed);
+					graph_puts16(64, 0, 1, str);
+				}
+#endif // NMEA_SUPPORT
 #if ( PAJERO_SPECIFIC == 1 )
 				if (bcomp.at_present) {
 					show_drive(64, 14);
@@ -1159,7 +1182,6 @@ repeate:
 					_sprintf(str, "%dкм/ч", speed);
 					graph_puts16(64, 32, 1, str);
 				}
-
 				_sprintf(str, "%dкм", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
 				graph_puts16(64, 48, 1, str);
 				break;
@@ -1336,6 +1358,7 @@ trip:
 #endif
 				break;
 			case 10:
+				// GPS
 #if ( NMEA_SUPPORT == 1 )
 				if (bcomp.setup.f_gps == 0) {
 					if (buttons & BUTT_SW2) {
