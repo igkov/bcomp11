@@ -110,13 +110,13 @@ CRP_Key             DCD     0xFFFFFFFF
 Reset_Handler       PROC
                     EXPORT  Reset_Handler             [WEAK]
                     IMPORT  SystemInit
-                    ;IMPORT  ProtectDelay
-					;IMPORT obd_deinit
+                    IMPORT  ProtectDelay
+                    IMPORT  obd_deinit
                     IMPORT  __main
+                    LDR     R0, =obd_deinit
+                    BLX     R0
                     ;LDR     R0, =ProtectDelay
                     ;BLX     R0
-                    ;LDR     R0, =obd_deinit
-					;BLX     R0
                     LDR     R0, =SystemInit
                     BLX     R0
                     LDR     R0, =__main

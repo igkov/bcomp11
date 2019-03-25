@@ -46,6 +46,8 @@ void CAN_rdMsg         (uint32_t can_msgObj, CAN_msg *msg);
 void CAN_wrFilter      (uint32_t id, uint8_t filter_type);
 void CAN_noFilter      (uint8_t format);
 
+void CAN_erStat(uint8_t *ercv, uint8_t *etrn);
+
 void CAN_testmode      (void);
 
 void CAN_rs_set(void);
