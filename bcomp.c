@@ -1168,7 +1168,7 @@ repeate:
 #if ( NMEA_SUPPORT == 1 )
 				else
 				if (bcomp.g_correct) {
-					_sprintf(str,"%d km/h",bcomp.gps_speed);
+					_sprintf(str,"%d km/h", (uint32_t)bcomp.gps_speed);
 					graph_puts16(64, 0, 1, str);
 				}
 #endif // NMEA_SUPPORT
@@ -1436,6 +1436,15 @@ trip:
                     _sprintf(str,"t: %d", err_trans);
                     graph_puts16(0, 16, 0, str);
                 }
+				break;
+			case 14:
+				{
+					//   ENG
+					//   AT
+					//  DRIVE
+					//  SPEED
+				}
+				break;
             case 101:
                 // -----------------------------------------------------------------
                 // CAN STOP SCREEN (silent)

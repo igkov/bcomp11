@@ -156,7 +156,7 @@ void nmea_parce(char *str) {
 	bcomp.gtime.date  = (strout[0] - '0') * 10 + (strout[1] - '0');
 	bcomp.gtime.month = (strout[2] - '0') * 10 + (strout[3] - '0');
 	bcomp.gtime.year  = (strout[4] - '0') * 10 + (strout[5] - '0') + 2000;
-	_sprintf(bcomp.gps_val_time, "%02d-%02d-%02d", bcomp.gtime.hour, bcomp.gtime.min, bcomp.gtime.sec);
+	_sprintf(bcomp.gps_val_time, "%02d:%02d:%02d", bcomp.gtime.hour, bcomp.gtime.min, bcomp.gtime.sec);
 	_sprintf(bcomp.gps_val_date, "%02d-%02d-%04d", bcomp.gtime.date, bcomp.gtime.month, bcomp.gtime.year);
 	// Заносим метку времени:
 	bcomp.utime = time_to_unix(&bcomp.gtime);
