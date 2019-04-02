@@ -293,7 +293,7 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		bcomp.at_drive = (uint8_t)data[2] & 0x0F;
 		break;
 	case 0x0236:
-		// Положение руля и посылка:
+		// Положение руля:
 		// правое       - 09 FE 10 00 10 00 00 3C
 		// центральное  - 10 02 10 00 D0 00 00 69
 		// левое        - 15 F9 10 00 E0 00 00 79
@@ -314,6 +314,7 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 			// Останавливаем опрос по CAN-шине:
 			obd_act(0);
 		}
+#if 0
 		if (bcomp.can_act == 1) {
 	        // Активируем отложенную процедуру (через 50мс).
 	        // В случае, если повторно приходит пакет RPM, тогда переустанавливаем, 
@@ -331,6 +332,7 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 		// Предположительно происходит из-за того, что CAN-шина 
 		// засыпает не сразу, а через какое-то время.
 		//
+#endif
 		break;
 	case 0x0608:
 		bcomp.t_engine = (int32_t)data[0] - 40;
@@ -1423,7 +1425,7 @@ trip:
             case 13:
                 {
                     //
-                    //
+                    // Экран с выводом счетчиков ошибок:
                     //
                     uint8_t err_trans;
                     uint8_t err_recv;

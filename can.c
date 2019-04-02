@@ -408,8 +408,8 @@ void CAN_rdMsg (uint32_t can_msgObj, CAN_msg *msg)  {
   CAN get error status
  *----------------------------------------------------------------------------*/
 void CAN_erStat(uint8_t *ercv, uint8_t *etrn) {
-  *ercv = (CAN->EC >> 8) & 0x7F;
-  *rtrn = (CAN->EC >> 0) & 0xFF;
+  *ercv = (LPC_CAN->EC >> 8) & 0x7F;
+  *etrn = (LPC_CAN->EC >> 0) & 0xFF;
   return;
 }
 
