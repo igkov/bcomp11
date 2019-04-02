@@ -54,6 +54,7 @@ void graph_puts8(int x, int y, int w, const char *str) {
 void graph_puts12(int x, int y, int w, const char *str) {
 	int i = 0;
 	int fx = 0;
+	// TODO
 }
 #endif
 
@@ -92,7 +93,7 @@ void graph_puts16(int x, int y, int w, const char *str) {
 	}
 }
 
-#if !defined( BCOMP_V2 )
+#if 1//!defined( BCOMP_V2 )
 // ICO XXx16
 void graph_ico16(int x, int y, const uint8_t *ico, int size) {
 	int fx;

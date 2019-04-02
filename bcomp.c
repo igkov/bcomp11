@@ -1434,15 +1434,66 @@ trip:
                     _sprintf(str,"r: %d", err_recv);
                     graph_puts16(0, 16, 0, str);
                     _sprintf(str,"t: %d", err_trans);
-                    graph_puts16(0, 16, 0, str);
+                    graph_puts16(0, 32, 0, str);
                 }
 				break;
 			case 14:
 				{
 					//   ENG
+					//graph_pic(ico16_at_data, 0, 0);
+					graph_ico16(16, 0, ico16_engine_data, 16);
+					if (bcomp.t_engine == 0xFFFF) {
+						_sprintf(str, "--°C");
+					} else {
+						_sprintf(str, "%d°C", bcomp.t_engine);
+					}
+					graph_puts16(64+16, 0, 1, str);
 					//   AT
+					//graph_pic(ico16_engine_data, 16, 0);
+					graph_ico16(16, 16, ico16_at_data, 16);
+					if (bcomp.t_akpp == 0xFFFF) {
+						_sprintf(str, "--°C");
+					} else {
+						_sprintf(str, "%d°C", bcomp.t_akpp);
+					}
+					graph_puts16(64+16, 16, 1, str);
 					//  DRIVE
+					switch (bcomp.at_drive) {
+					case 0x00:
+						graph_puts16(64+16, 32, 1, "N");
+						break;
+					case 0x01:
+						graph_puts16(64+16, 32, 1, "D/1");
+						break;
+					case 0x02:
+						graph_puts16(64+16, 32, 1, "D/2");
+						break;
+					case 0x03:
+						graph_puts16(64+16, 32, 1, "D/3");
+						break;
+					case 0x04:
+						graph_puts16(64+16, 32, 1, "D/4");
+						break;
+					case 0x05:
+						graph_puts16(64+16, 32, 1, "D/5");
+						break;
+					case 0x0d:
+						graph_puts16(64+16, 32, 1, "P");
+						break;
+					case 0x0b:
+						graph_puts16(64+16, 32, 1, "R");
+						break;
+					default:
+						graph_puts16(64+16, 32, 1, "ERR");
+						break;
+					}
 					//  SPEED
+					if (bcomp.g_correct) {
+						_sprintf(str,"%d km/h", (uint32_t)bcomp.gps_speed);
+					} else {
+						_sprintf(str,"--- km/h", (uint32_t)bcomp.gps_speed);
+					}
+					graph_puts16(64+16, 48, 1, str);
 				}
 				break;
             case 101:
@@ -1454,7 +1505,7 @@ trip:
 			default:
 				DBG("unknown page (%d)\r\n", bcomp.page);
 				if (buttons & BUTT_SW2) {
-					bcomp.page = 13;
+					bcomp.page = 14;
 				} else {
 					bcomp.page = 1;
 				}

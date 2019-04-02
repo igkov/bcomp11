@@ -93,3 +93,4 @@ void obd_init(void) {
 
 int obd_act_set(uint16_t pid, int flag){}
 void obd_act(int act){}
+void CAN_erStat(uint8_t *a, uint8_t *b){*a=5;*b=6;}
