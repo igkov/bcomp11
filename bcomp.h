@@ -220,6 +220,12 @@ typedef struct {
 	char gps_val_lat[12];         // Строка с текущей координатой.
 	char gps_val_speed[12];       // Строка с текущей скоростью.
 	// END
+    
+    // SUN
+    double sun_rise;
+    double sun_set;
+    double sun_day;
+    // END
 
 	trip_t trip[2];               // Данные поездок (2 поездки).
 	pars_t log[20];               // По 30 секунд слепки топливо/дистанция.

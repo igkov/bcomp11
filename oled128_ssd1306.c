@@ -97,8 +97,13 @@ void ssd1306_init(uint8_t contrast, uint8_t inverse) {
 	sendCommand(ASA_SET_DISPLAY_OFFSET);
 	sendCommand(0x0);
 	sendCommand(ASA_SET_START_LINE | 0x0);
+	//set charge pump disable=0x10, enable=0x14   reset default = 0x10  Causes alignment problem with big display  Needed for little display!! 
 	sendCommand(ASA_CHARGE_PUMP);
-	sendCommand(0x14);
+#if 1
+	sendCommand(0x14);  // enable
+#else
+	sendCommand(0x10);  // disable
+#endif
 	sendCommand(ASA_MEMORY_ADDR_MODE);
 	sendCommand(0x00);
 	sendCommand(ASA_SET_SEGMENT_REMAP | 0x1);

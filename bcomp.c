@@ -25,6 +25,9 @@
 	10) GPS-данные.
 	11) Давление в топливной рейке.
 	12) Давление во впускном коллекторе.
+    13) Счетчик ошибок на шине.
+    14) Общий экран с основными параметрами.
+    15) Рассветы/закаты.
 	
 	Вторая итерация прошивки мини-бортового компьютера.
 	Обточка функционала для реализации полноценного устройства.
@@ -73,6 +76,8 @@
 #include "virtuino.h"
 #include "warning.h"
 #include "nmea.h"
+
+#include "sun.h"
 
 #if defined( WIN32 )
 #define __WFI() Sleep(1)
@@ -408,6 +413,22 @@ void bcomp_calc(void) {
 
 	// Обнуляем параметры:
 	bcomp.rpm = 0;
+    
+#if defined( WIN32 )
+    // Для PC-сборки пролучаем актуальное время:
+    if (1) {
+        SYSTEMTIME st;
+        GetSystemTime(&st);
+        
+        // set current date:
+        bcomp.gtime.year  = st.wYear;
+        bcomp.gtime.month = st.wMonth;
+        bcomp.gtime.date  = st.wDay;
+        bcomp.gtime.hour  = st.wHour;
+        bcomp.gtime.min   = st.wMinute;
+        bcomp.gtime.sec   = st.wSecond;
+    }
+#endif
 
 	if (bcomp.utime) {
 		if (bcomp.g_correct) {
@@ -444,7 +465,7 @@ void bcomp_analog(void) {
 			// Защищает от случайного сброса, если вдруг пройдет какая-то помеха
 			// на аналоговой линии.
 			DBG("Fueling detect! Reset Trip B, previous fuel count: %d!\r\n", (int)bcomp.trip[1].fuel);
-
+            
 			// Сбрасываем путь "Б":
 			bcomp.trip[1].dist = 0.0f;
 			bcomp.trip[1].time = 0;
@@ -611,7 +632,21 @@ int main(void)
 	// Тестовая обработка GPS-данных:
 	//nmea_parce("$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A");    // year < 2000
 	//nmea_parce("$GPRMC,113650.0,A,5548.607,N,03739.387,E,000.01,25 5.6,210403,08.7,E*69"); // bad crc
-	nmea_parce("$GPRMC,194530.000,A,3051.8007,N,10035.9989,W,1.49,111.67,310714,,,A*74");
+	//nmea_parce("$GPRMC,194530.000,A,3051.8007,N,10035.9989,W,1.49,111.67,310714,,,A*74");  // old
+    nmea_parce("$GPRMC,202512.000,A,5554.0584,N,03744.0148,E,0.01,132.04,260319,,,A*63");    // actual
+
+    if (1) {
+        SYSTEMTIME st;
+        GetSystemTime(&st);
+        
+        // set current date:
+        bcomp.gtime.year  = st.wYear;
+        bcomp.gtime.month = st.wMonth;
+        bcomp.gtime.date  = st.wDay;
+        bcomp.gtime.hour  = st.wHour;
+        bcomp.gtime.min   = st.wMinute;
+        bcomp.gtime.sec   = st.wSecond;
+    }
 #endif
 
 	// -----------------------------------------------------------------------------
@@ -1367,6 +1402,7 @@ trip:
 				break;
 			case 10:
 				// GPS
+                DBG("bcomp.setup.f_gps = %d\r\n", bcomp.setup.f_gps);
 #if ( NMEA_SUPPORT == 1 )
 				if (bcomp.setup.f_gps == 0) {
 					if (buttons & BUTT_SW2) {
@@ -1496,48 +1532,90 @@ trip:
 					graph_puts16(64+16, 48, 1, str);
 				}
 				break;
+            case 15:
+                {
+                    double lat;
+                    double lon;
+                    
+                    DBG("GPS: %s %s\r\n", bcomp.gps_val_lat, bcomp.gps_val_lon);
+                    
+                    nmea_convert_coord_w(&bcomp.gps_val_lat[1], &lat);
+                    if (bcomp.gps_val_lat[0] == 'N') {
+                        // NOP
+                    } else 
+                    if (bcomp.gps_val_lat[1] == 'S') {
+                        lat = -lat;
+                    }
+                    nmea_convert_coord_l(&bcomp.gps_val_lon[1], &lon);
+                    if (bcomp.gps_val_lat[0] == 'E') {
+                        // NOP
+                    } else 
+                    if (bcomp.gps_val_lat[1] == 'W') {
+                        lon = -lon;
+                    }
+                    //
+                    //      YEAR  DD  MM  HH  MM  SS  TZ  LAT        LON
+                    //
+                    suncalc(
+                        bcomp.gtime.year, bcomp.gtime.month, bcomp.gtime.date, 
+                        bcomp.gtime.hour, bcomp.gtime.min, bcomp.gtime.sec,
+                        3, // TIME ZONE 
+                        lat, lon,
+                        &bcomp.sun_rise, &bcomp.sun_set, &bcomp.sun_day);
+                    graph_puts16(64, 0, 1, "SUN");
+                    graph_puts16( 0, 16, 0, "RISE:");
+                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_rise, (int)((bcomp.sun_rise-(int)bcomp.sun_rise)*60));
+                    graph_puts16(68, 16, 0, str);
+                    graph_puts16( 0, 32, 0, "SET:");
+                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_set, (int)((bcomp.sun_set-(int)bcomp.sun_set)*60));
+                    graph_puts16(68, 32, 0, str);
+                    graph_puts16( 0, 48, 0, "DAY:");
+                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_day, (int)((bcomp.sun_day-(int)bcomp.sun_day)*60));
+                    graph_puts16(68, 48, 0, str);
+                }
+                break;
             case 101:
                 // -----------------------------------------------------------------
                 // CAN STOP SCREEN (silent)
                 // -----------------------------------------------------------------
                 graph_puts16(64, 16, 1, "CAN STOP");
                 break;
-			default:
-				DBG("unknown page (%d)\r\n", bcomp.page);
-				if (buttons & BUTT_SW2) {
-					bcomp.page = 14;
-				} else {
-					bcomp.page = 1;
-				}
-				config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
-				goto repeate;
-			}
-		}
-		// -----------------------------------------------------------------
-		// Обновление экрана:
-		// -----------------------------------------------------------------
-		ms = get_ms_timer(); 
-		graph_update(); 
-		ms = get_ms_timer() - ms;
-		DBG("graph_update() work %dms\r\n", ms);
+            default:
+                DBG("unknown page (%d)\r\n", bcomp.page);
+                if (buttons & BUTT_SW2) {
+                    bcomp.page = 15;
+                } else {
+                    bcomp.page = 1;
+                }
+                config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
+                goto repeate;
+            }
+        }
+        // -----------------------------------------------------------------
+        // Обновление экрана:
+        // -----------------------------------------------------------------
+        ms = get_ms_timer(); 
+        graph_update(); 
+        ms = get_ms_timer() - ms;
+        DBG("graph_update() work %dms\r\n", ms);
 #endif
-		// Сохранение изменяемых параметров:
-		if (save_flag & 0x01) {
-			save_params();
-			save_flag &= ~0x01;
-		} else
-		if (save_flag & 0x02) {
-			save_settings();
-			save_flag &= ~0x82;
-		}
+        // Сохранение изменяемых параметров:
+        if (save_flag & 0x01) {
+            save_params();
+            save_flag &= ~0x01;
+        } else
+        if (save_flag & 0x02) {
+            save_settings();
+            save_flag &= ~0x82;
+        }
 #if ( ELOG_SUPPORT == 1 )
-		if (save_flag & 0x08) {
-			elog_proc();
-			save_flag &= ~0x08;
-		}
+        if (save_flag & 0x08) {
+            elog_proc();
+            save_flag &= ~0x08;
+        }
 #endif
-	}
-	return 0;
+    }
+    return 0;
 }
 
 #if defined( WIN32 )

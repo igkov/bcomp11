@@ -77,6 +77,65 @@ static int nmea_check(char *str) {
 }
 #endif
 
+/*
+	nmea_convert_coord_l()
+	ѕоддерживаютс€ форматы:
+		GGMM.XXXX - градусы-минуты-дробна€ часть минут
+		GG.XXXX - градусы-дробна€ часть градусов
+ */
+int nmea_convert_coord_l(char *str, double *coord) {
+	double dloc;
+	int i = 0;
+	double coeff = 0.1;
+	dloc = 0.0;
+	dloc += (double)(str[0] - '0') * 100 + (double)(str[1] - '0') * 10 + (str[2] - '0');
+	if (str[3] == '.')
+		i = 4;
+	else {
+		dloc += ((double)((str[3] - '0') * 10 + (str[4] - '0'))) / 60.0;
+		if (str[5] != '.')
+			return 1;
+		i = 6;
+		coeff /= 60.0;
+	}
+	while (str[i] != 0x00) {
+		dloc += ((double)(str[i] - '0')) * coeff;
+		coeff /= 10.0;
+		i++;
+	}
+	*coord = dloc;
+	return 0;
+}
+
+/*
+	nmea_convert_coord_w()
+	ѕоддерживаютс€ форматы:
+		GGMM.XXXX - градусы-минуты-дробна€ часть минут
+		GG.XXXX - градусы-дробна€ часть градусов
+ */
+int nmea_convert_coord_w(char *str, double *coord) {
+	double dloc;
+	int i = 0;
+	double coeff = 0.1;
+	dloc = 0.0;
+	dloc += (double)(str[0] - '0') * 10 + (str[1] - '0');
+	if (str[2] == '.')
+		i = 3;
+	else {
+		dloc += ((double)((str[2] - '0') * 10 + (str[3] - '0'))) / 60.0;
+		if (str[4] != '.')
+			return 1;
+		i = 5;
+		coeff /= 60.0;
+	}
+	while (str[i] != 0x00) {
+		dloc += ((double)(str[i] - '0')) * coeff;
+		coeff /= 10.0;
+		i++;
+	}
+	*coord = dloc;
+}
+
 static void nmea_get_param(char *str, int npar, char *strout) {
 	int n = 0;
 	int i = 0, j = 0;
