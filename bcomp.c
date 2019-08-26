@@ -1532,6 +1532,7 @@ trip:
 					graph_puts16(64+16, 48, 1, str);
 				}
 				break;
+#if defined( WIN32 )
             case 15:
                 {
                     double lat;
@@ -1574,6 +1575,7 @@ trip:
                     graph_puts16(68, 48, 0, str);
                 }
                 break;
+#endif
             case 101:
                 // -----------------------------------------------------------------
                 // CAN STOP SCREEN (silent)
@@ -1583,7 +1585,11 @@ trip:
             default:
                 DBG("unknown page (%d)\r\n", bcomp.page);
                 if (buttons & BUTT_SW2) {
+#if defined( WIN32 )
                     bcomp.page = 15;
+#else
+                    bcomp.page = 14;
+#endif
                 } else {
                     bcomp.page = 1;
                 }

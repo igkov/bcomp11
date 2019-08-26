@@ -134,6 +134,7 @@ int nmea_convert_coord_w(char *str, double *coord) {
 		i++;
 	}
 	*coord = dloc;
+    return 0;
 }
 
 static void nmea_get_param(char *str, int npar, char *strout) {

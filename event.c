@@ -82,6 +82,20 @@ int event_set(timer_event_f pfunc, uint32_t delay) {
 	return 1;
 }
 
+int event_reset(timer_event_f pfunc, uint32_t delay) {
+	int slot;
+	for (slot=0; slot<MAX_EVENT; slot++) {
+		if (timer_events[slot].pfunc == pfunc) {
+			if (delay < 1) {
+				delay = 1;
+			}
+			timer_events[slot].cmp_val = (msTicks + delay);
+			return 0;
+		}
+	}
+	return 1;
+}
+
 int event_unset(timer_event_f pfunc) {
 	int slot;
 	for (slot=0; slot<MAX_EVENT; slot++) {

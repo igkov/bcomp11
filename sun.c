@@ -14,7 +14,7 @@
 
 #define PI 3.141592654 // Pi
 
-static double JulDay(int date, int month, int year, double UT){
+static double JulDay(int date, int month, int year, double UT) {
     double A, B;
     if (year < 1900) {
         year = year + 1900;
@@ -37,6 +37,7 @@ static double sunL(double T) {
     return L;
 }
 
+#if 0
 static double EPS(double T) {
     double K = PI/180.0;
     double LS = sunL(T);
@@ -46,7 +47,9 @@ static double EPS(double T) {
     double deltaEps = (9.20*cos(K*omega) + 0.57*cos(K*2*LS) + 0.10*cos(K*2*LM) - 0.09*cos(K*2*omega))/3600;
     return eps0 + deltaEps;
 }
+#endif
 
+#if 0
 static double deltaPSI(double T) {
     double K = PI/180.0;
     double deltaPsi, omega, LS, LM;
@@ -61,6 +64,8 @@ static double deltaPSI(double T) {
     deltaPsi = deltaPsi / 3600.0;
     return deltaPsi;
 }
+#endif
+
 
 #if 0
 static double DEC;
@@ -147,9 +152,9 @@ static double frac(double X) {
 
 static double sunDecRA (int what, double jd) {
     double PI2 = 2.0 * PI;
-    double cos_eps = 0.917482;
-    double sin_eps = 0.397778;
-    double M, DL, L, SL, X, Y, Z, R;
+    //double cos_eps = 0.917482f;
+    double sin_eps = 0.397778f;
+    double M, DL, L, SL, /*X, Y,*/ Z, R;
     double T, dec;
     //double ra;
     T = (jd - 2451545.0) / 36525.0;	// number of Julian centuries since Jan 1, 2000, 0 GMT
@@ -157,8 +162,8 @@ static double sunDecRA (int what, double jd) {
     DL = 6893.0*sin(M) + 72.0*sin(2.0*M);
     L = PI2*frac(0.7859453 + M/PI2 + (6191.2*T+DL)/1296000);
     SL = sin(L);
-    X = cos(L);
-    Y = cos_eps*SL;
+    //X = cos(L);
+    //Y = cos_eps*SL;
     Z = sin_eps*SL;
     R = sqrt(1.0-Z*Z);
     dec = (360.0/PI2)*atan(Z/R);
@@ -209,7 +214,10 @@ static int QUAD(double yMinus, double yPlus, double Y0) {
 
 static int riseset(int DATE, int MONTH, int YEAR, int HOUR, float lat, float lon, double *UTRISE, double *UTSET) {
     int ret = 0;
-
+    int NZ = 0;
+    double zero1;
+    double zero2;
+    double YE;
     double K  = PI/180.0;
     double sh = sin(-K*0.8333);
     double jd = JulDay (DATE, MONTH, YEAR, HOUR);
@@ -218,43 +226,43 @@ static int riseset(int DATE, int MONTH, int YEAR, int HOUR, float lat, float lon
     double gha = computeGHA (DATE, MONTH, YEAR, HOUR);
     double Y0 = sin(K*computeHeight(dec, lat, lon, gha)) - sh;
     double jdPlus = JulDay(DATE, MONTH, YEAR, HOUR+1.0);
+    double yPlus, jdMinus, yMinus;
     dec = sunDecRA(1,jdPlus);
     //ra  = sunDecRA(2,jdPlus);
     gha = computeGHA (DATE, MONTH, YEAR, HOUR+1.0);
-    double yPlus = sin(K*computeHeight(dec, lat, lon, gha)) - sh;
-    double jdMinus = JulDay(DATE, MONTH, YEAR, HOUR-1.0);
+    yPlus = sin(K*computeHeight(dec, lat, lon, gha)) - sh;
+    jdMinus = JulDay(DATE, MONTH, YEAR, HOUR-1.0);
     dec = sunDecRA(1,jdMinus);
     //ra  = sunDecRA(2,jdMinus);
     gha = computeGHA (DATE, MONTH, YEAR, HOUR-1.0);
-    double yMinus = sin(K*computeHeight(dec, lat, lon, gha)) - sh;
+    yMinus = sin(K*computeHeight(dec, lat, lon, gha)) - sh;
     //ABOVE = (yMinus > 0.0);
     if (yMinus > 0.0) {
         ret |= FLAG_ABOVE; 
     }
 #if 0
-    int NZ = QUAD(yMinus, yPlus, Y0);
+    NZ = QUAD(yMinus, yPlus, Y0);
 #else
-    double zero1;
-    double zero2;
-    int NZ = 0;
-    double A = 0.5*(yMinus+yPlus) - Y0;
-    double B = 0.5*(yPlus-yMinus);
-    double C = Y0;
-    double XE = -B/(2.0*A);
-    double YE = (A*XE+B)*XE + C;
-    double DIS = B*B - 4.0*A*C;
-    if (DIS >= 0) {
-        double DX = 0.5*sqrt(DIS) / fabs(A);
-        zero1 = XE - DX;
-        zero2 = XE + DX;
-        if (fabs(zero1) <= 1.0) {
-            NZ = NZ + 1;
-        }
-        if (fabs(zero2) <= 1.0) {
-            NZ = NZ + 1;
-        }
-        if (zero1 < -1.0) {
-            zero1 = zero2;
+    if (1) {
+        double A = 0.5*(yMinus+yPlus) - Y0;
+        double B = 0.5*(yPlus-yMinus);
+        double C = Y0;
+        double XE = -B/(2.0*A);
+        double DIS = B*B - 4.0*A*C;
+        YE = (A*XE+B)*XE + C;
+        if (DIS >= 0) {
+            double DX = 0.5*sqrt(DIS) / fabs(A);
+            zero1 = XE - DX;
+            zero2 = XE + DX;
+            if (fabs(zero1) <= 1.0) {
+                NZ = NZ + 1;
+            }
+            if (fabs(zero2) <= 1.0) {
+                NZ = NZ + 1;
+            }   
+            if (zero1 < -1.0) {
+                zero1 = zero2;
+            }
         }
     }
 #endif
@@ -296,10 +304,10 @@ void suncalc(
     float lat, float lon,
     double *rise, double *set, double *day
     ) {
-    double UT;
     double UTRISE;
     double UTSET;
     int flags = 0;
+    int i;
    
     DBG("TIME: %02d:%02d:%02d\r\n", myHour, myMinute, mySeconds);
     DBG("DATE: %02d-%02d-%04d\r\n", myDay, myMonth, myYear);
@@ -308,24 +316,28 @@ void suncalc(
     if (offset*60 >= 1320) {
         offset = offset - 1440/60;
     }
-    //UT = myHour + (myMinute - offset*60)/60.0 + mySeconds/3600.0;
-    UT = myHour + myMinute/60.0 + mySeconds/3600.0;
     
 #if 0
-    double EOT;
-    double JD;
+    if (0) {
+        double EOT;
+        double JD;
+        double UT;
 
-    JD = JulDay(myDay, myMonth, myYear, UT);
-    DBG("JD = %f\r\n", JD);
-    EOT = eot(JD);
+        //UT = myHour + (myMinute - offset*60)/60.0 + mySeconds/3600.0;
+        UT = myHour + myMinute/60.0 + mySeconds/3600.0;
+
+        JD = JulDay(myDay, myMonth, myYear, UT);
+        DBG("JD = %f\r\n", JD);
+        EOT = eot(JD);
     
-    double GHA  = computeGHA(myDay, myMonth, myYear, UT);
-    double elev = computeHeight(DEC, lat, lon, GHA);
-    elev = round(elev*100)/100;
-    DBG("ELEV = %f\r\n", elev);
+        double GHA  = computeGHA(myDay, myMonth, myYear, UT);
+        double elev = computeHeight(DEC, lat, lon, GHA);
+        elev = round(elev*100)/100;
+        DBG("ELEV = %f\r\n", elev);
+    }
 #endif
 
-    for (int i = -offset; i < -offset+24; i++) {
+    for (i = -offset; i < -offset+24; i++) {
         flags |= riseset(myDay, myMonth, myYear, i, lat, lon, &UTRISE, &UTSET);
         //DBG("i = %d flags = %x\r\n", i, flags);
         if ((flags & FLAG_RISE) && (flags & FLAG_SETT)) {
