@@ -20,6 +20,54 @@ static char nmea_string[256];
 #define STROUT_SIZE 16
 #define NMEA_NO_CHECK 0
 
+static int _isdigit(char ch) {
+    if (ch <= '9' && ch >= '0') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+double _atof(char *s) {
+    double a = 0.0;
+    int e = 0;
+    int c;
+    while ((c = *s++) != '\0' && _isdigit(c)) {
+        a = a*10.0 + (c - '0');
+    }
+    if (c == '.') {
+        while ((c = *s++) != '\0' && _isdigit(c)) {
+            a = a*10.0 + (c - '0');
+            e = e-1;
+        }
+    }
+    if (c == 'e' || c == 'E') {
+        int sign = 1;
+        int i = 0;
+        c = *s++;
+        if (c == '+')
+            c = *s++;
+        else if (c == '-') {
+            c = *s++;
+            sign = -1;
+        }
+        while (_isdigit(c)) {
+            i = i*10 + (c - '0');
+            c = *s++;
+        }
+        e += i*sign;
+    }
+    while (e > 0) {
+        a *= 10.0;
+        e--;
+    }
+    while (e < 0) {
+        a *= 0.1;
+        e++;
+    }
+    return a;
+}
+
 #if (NMEA_NO_CHECK == 0)
 static char hex2char(char *str) {
 	char ret = 0;
@@ -222,7 +270,7 @@ void nmea_parce(char *str) {
 	bcomp.utime = time_to_unix(&bcomp.gtime);
 	// Заносим скорость:
 	nmea_get_param(str, 7, bcomp.gps_val_speed);
-	bcomp.gps_speed = atof(bcomp.gps_val_speed) * 1.852f;
+	bcomp.gps_speed = _atof(bcomp.gps_val_speed) * 1.852f;
 	// Получаем координаты:
 	nmea_get_param(str, 4, bcomp.gps_val_lat);
 	nmea_get_param(str, 3, &bcomp.gps_val_lat[1]);

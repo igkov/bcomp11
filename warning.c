@@ -10,12 +10,18 @@
 #include "beep.h"
 #include "errors.h"
 
+#if defined( WIN32 )
 #define WARNING_DEBUG 0
+#else
+#define WARNING_DEBUG 1
+#endif
+
+#if ( WARNING_DEBUG == 1)
+extern void STACK$$Base;
+extern void STACK$$Limit;
+#endif
 
 static ecu_error_t errors_list[WARN_MAX_NUM];
-#if ( WARNING_DEBUG == 1)
-static int error_check_flag;
-#endif
 
 /*
 	Проверка выхода параметров за допустимые значения.
@@ -256,10 +262,8 @@ int warning_show(int *act) {
 		return 2;
 	}
 #if ( WARNING_DEBUG == 1)
-	if (error_check_flag) {
-		_sprintf(str,"%d",error_check_flag);
-		graph_puts16(64,32,1,str);
-		graph_puts16(64,48,1,"FLAG ERROR");
+	if (*(uint32_t*)&STACK$$Base != 0xAEAEAEAE) {
+		graph_puts16(64,32,1,"STACK OVF");
 		return 0;
 	}
 	DBG("ERROR: id = %d errors[%d][%d][%d][%d][%d][%d][%d][%d]...\r\n", id, 
@@ -322,7 +326,7 @@ int warning_show(int *act) {
 void warning_check(void) {
 	int i;
 #if ( WARNING_DEBUG == 1)
-	if (error_check_flag) {
+	if (*(uint32_t*)&STACK$$Base != 0xAEAEAEAE) {
 		bcomp.page |= GUI_FLAG_WARNING;
 		return;
 	}
@@ -351,6 +355,6 @@ void warning_check(void) {
 void warning_init(void) {
 	memset(errors_list, 0x00, sizeof(errors_list));
 #if ( WARNING_DEBUG == 1)
-	error_check_flag = 0;
+    *(uint32_t*)&STACK$$Base = 0xAEAEAEAE;
 #endif
 }
