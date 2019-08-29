@@ -78,6 +78,7 @@
 #include "nmea.h"
 
 #include "sun.h"
+#include "moon.h"
 
 #if defined( WIN32 )
 #define __WFI() Sleep(1)
@@ -85,7 +86,7 @@
 #define delay_ms(a) Sleep(a)
 #endif
 
-#define BCOMP_PAGE()        (bcomp.page & 0x0FFF)
+#define BCOMP_PAGE()       (bcomp.page & 0x0FFF)
 #define BCOMP_PAGE_PREV()  (bcomp.page = ((bcomp.page & 0xF000) | ((bcomp.page - 1) & 0x0FFF)))
 #define BCOMP_PAGE_NEXT()  (bcomp.page = ((bcomp.page & 0xF000) | ((bcomp.page + 1) & 0x0FFF)))
 
@@ -265,18 +266,6 @@ void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
 	}
 }
 
-/* 
-    Процедура остановки CAN-шины.
- */
-void bcomp_act_proc(void) {
-#if ( PAJERO_SPECIFIC == 1 )
-    if (bcomp.can_act) {
-        bcomp.can_act = 0;
-        obd_act(0);
-    }
-#endif
-}
-
 /*
 	bcomp_raw()
 
@@ -319,25 +308,6 @@ void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
 			// Останавливаем опрос по CAN-шине:
 			obd_act(0);
 		}
-#if 0
-		if (bcomp.can_act == 1) {
-	        // Активируем отложенную процедуру (через 50мс).
-	        // В случае, если повторно приходит пакет RPM, тогда переустанавливаем, 
-	        // таким образом при нормальной цепочке срабатывания данного события не произойдет.
-			// Интервал задан двойным, чтобы исключить остановку в случае потери одного пакета 
-			// на CAN шине.
-	        event_unset(bcomp_act_proc);
-	        event_set(bcomp_act_proc, 50);
-		}
-		// NOTE:
-		// Эта активация сделана в попытках борьбы с ошибкой P1901.
-		// На аппаратной версии LPC17xx ошибка не проявляется, 
-		// на аппаратной версии LPC11Cxx ошибка проявляется.
-		// В настоящий момент причина до конца не понятна.
-		// Предположительно происходит из-за того, что CAN-шина 
-		// засыпает не сразу, а через какое-то время.
-		//
-#endif
 		break;
 	case 0x0608:
 		bcomp.t_engine = (int32_t)data[0] - 40;
@@ -532,11 +502,11 @@ void save_settings(void) {
 	config_save(CPAR_SETUP_T_AT, (uint8_t*)&bcomp.setup.t_at, CPAR_SETUP_T_AT_SIZE);
 	config_save(CPAR_SETUP_T_ENG, (uint8_t*)&bcomp.setup.t_eng, CPAR_SETUP_T_ENG_SIZE);
 	config_save(CPAR_SETUP_F_FUEL, (uint8_t*)&bcomp.setup.f_fuel, CPAR_SETUP_F_FUEL_SIZE);
-	config_save(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE);
+	//config_save(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE);
 	//config_save(CPAR_SETUP_TIME, (uint8_t*)&bcomp.setup.time, CPAR_SETUP_TIME_SIZE);
 	config_save(CPAR_SETUP_W_DELAY, (uint8_t*)&bcomp.setup.w_delay, CPAR_SETUP_W_DELAY_SIZE);
-	config_save(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE);
-	config_save(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE);
+	//config_save(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE);
+	//config_save(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE);
 	config_save(CPAR_SETUP_T_EXT, (uint8_t*)&bcomp.setup.t_ext, CPAR_SETUP_T_EXT_SIZE);
 	config_save(CPAR_SETUP_F_GPS, (uint8_t*)&bcomp.setup.f_gps, CPAR_SETUP_F_GPS_SIZE);
 	config_save(CPAR_SETUP_I_GPS, (uint8_t*)&bcomp.setup.i_gps, CPAR_SETUP_I_GPS_SIZE);
@@ -718,9 +688,9 @@ int main(void)
 		bcomp.setup.f_fuel = 0;
 	}
 	// Уровень топлива предупреждения на пустой бак:
-	if (config_read(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE)) {
-		bcomp.setup.l_fuel = 10.0f;
-	}
+	//if (config_read(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE)) {
+	//	bcomp.setup.l_fuel = 10.0f;
+	//}
 	// Смещение часового пояса:
 	//if (config_read(CPAR_SETUP_TIME, (uint8_t*)&bcomp.setup.time, CPAR_SETUP_TIME_SIZE)) {
 	//	bcomp.setup.time = 3600*3;
@@ -730,13 +700,13 @@ int main(void)
 		bcomp.setup.w_delay = 30;
 	}
 	// Флаг наличия внешнего датчика:
-	if (config_read(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE)) {
-		bcomp.setup.f_ext = 1;
-	}
+	//if (config_read(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE)) {
+	//	bcomp.setup.f_ext = 1;
+	//}
 	// Флаг вывода предупреждения о гололёде:
-	if (config_read(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE)) {
-		bcomp.setup.f_ext_w = 0;
-	}
+	//if (config_read(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE)) {
+	//	bcomp.setup.f_ext_w = 0;
+	//}
 	// Температура срабатывания предупреждения о гололёде:
 	if (config_read(CPAR_SETUP_T_EXT, (uint8_t*)&bcomp.setup.t_ext, CPAR_SETUP_T_EXT_SIZE)) {
 		bcomp.setup.t_ext = 1;
@@ -894,11 +864,7 @@ int main(void)
 			}
 		}
 		// Вывод страницы:
-		DBG("bcomp.page = %08x\r\n", bcomp.page);
-		// Экран 101:
-		if (bcomp.can_act == 0) {
-			bcomp.page = 101;
-		}
+		DBG("bcomp.page = %d\r\n", bcomp.page);
 		// Обработка кнопок:
 		if (buttons & BUTT_SW1) {
 			DBG("buttons(): BUTT_SW1\r\n");
@@ -917,9 +883,6 @@ int main(void)
 				// nop
 			} else 
 #endif
-			if (bcomp.page == 101) {
-				// nop
-			} else
 			{
 				if (bcomp.page == 8) {
 					if (bcomp.service & 0x80) {
@@ -1007,11 +970,9 @@ end_sw1_proc:
 			if (bcomp.page == 12) {
 				bcomp.page ^= GUI_FLAG_GRAPH;
 			} else
-			if (bcomp.page == 101) {
-		        obd_act(1);
-				bcomp.can_act = 1;
-				config_read(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
-			}
+            {
+                // nop
+            }
 		}
 //end_sw1_long_proc:
 		if (buttons & BUTT_SW2) {
@@ -1031,21 +992,16 @@ end_sw1_proc:
 				// nop
 			} else 
 #endif
-			if (bcomp.page == 101) {
-				// nop
-			} else
-			{
 				if (bcomp.page == 8) {
-					if (bcomp.service & 0x80) {
-						bcomp.service ^= 0x01;
-						config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
-						goto end_sw2_proc;
-					}
+				if (bcomp.service & 0x80) {
+					bcomp.service ^= 0x01;
+					config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
+					goto end_sw2_proc;
 				}
-				bcomp.page--;
-				//DBG("config_save(): new page %d\r\n", bcomp.page);
-				config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
 			}
+			bcomp.page--;
+			//DBG("config_save(): new page %d\r\n", bcomp.page);
+			config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
 		}
 end_sw2_proc:
 		if (buttons & BUTT_SW2_LONG) {
@@ -1053,7 +1009,7 @@ end_sw2_proc:
 		}
 repeate:
 #if ( WARNING_SUPPORT == 1 )
-		// Проверка, есть ли варининги: внутри устанавливается нужный флаг для работы.
+		// Проверка, есть ли варнинги: внутри устанавливается нужный флаг для работы.
 		warning_check();
 		// Вывод справки по страницам:
 		//DBG("page = %d (buttons = %02x)\r\n", bcomp.page, buttons);
@@ -1150,25 +1106,6 @@ repeate:
 				}
 #endif
 				break;
-#if 0
-			case 0xF4:
-				{
-					static int i = 0;
-					uint8_t data;
-					for ( ; i < 2048; i++) {
-						if ((i%16) == 0) {
-							DBG("\r\n%04x: ", i);
-						}
-						ee_read(i, &data, 1);
-						DBG("%02x", data);
-					}
-					if (i == 2048) {
-						DBG("\r\n");
-						i++;
-					}
-				}
-				break;
-#endif
 			default:
 				break;
 			}
@@ -1188,20 +1125,21 @@ repeate:
 			// 11 - RAIL PRESSURE
 			// 12 - INTAKE PRESSURE
             // 13 - TEST CAN ERROR COUNTERS
-			case 1:
+#if 0
+            // Временно убрал эту страницу информации.
+            case 1:
 				// -----------------------------------------------------------------
 				// ODOMETER
 				// -----------------------------------------------------------------
-				if (bcomp.setup.f_ext) {
-					if (bcomp.t_ext == 0xFFFF) {
-						_sprintf(str, "--°C", bcomp.t_ext);
-					} else {
-						_sprintf(str, "%d°C", bcomp.t_ext);
-						graph_puts16(64+32, 0, 1, str);
-					}
-				}
+				//if (bcomp.setup.f_ext) {
+				//	if (bcomp.t_ext == 0xFFFF) {
+				//		_sprintf(str, "--°C", bcomp.t_ext);
+				//	} else {
+				//		_sprintf(str, "%d°C", bcomp.t_ext);
+				//		graph_puts16(64+32, 0, 1, str);
+				//	}
+				//}
 #if ( NMEA_SUPPORT == 1 )
-				else
 				if (bcomp.g_correct) {
 					_sprintf(str,"%d km/h", (uint32_t)bcomp.gps_speed);
 					graph_puts16(64, 0, 1, str);
@@ -1228,6 +1166,7 @@ repeate:
 				_sprintf(str, "%dкм", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
 				graph_puts16(64, 48, 1, str);
 				break;
+#endif
 			case 2:
 				// -----------------------------------------------------------------
 				// ENGINE
@@ -1250,12 +1189,7 @@ repeate:
 				// TRANSMISSION
 				// -----------------------------------------------------------------
 				if (bcomp.at_present == 0) {
-					if (buttons & BUTT_SW2) {
-						BCOMP_PAGE_PREV(); //bcomp.page--;
-					} else {
-						BCOMP_PAGE_NEXT(); //bcomp.page++;
-					}
-					goto repeate;
+                    goto default_mark;
 				}
 #if ( PAJERO_SPECIFIC == 1 ) || ( NISSAN_SPECIFIC == 1 )
 				graph_puts16(64, 0, 1, "TRANS");
@@ -1344,13 +1278,16 @@ repeate:
 				// -----------------------------------------------------------------
 				graph_puts16(64, 0, 1, "TRIP B");
 trip:
-				_sprintf(str, "%dкм", (int)bcomp.trip[BCOMP_PAGE()-6].dist/1000);
-				graph_puts16(64, 16, 1, str);
-				_sprintf(str, "%dч%02dм", (int)bcomp.trip[BCOMP_PAGE()-6].time/3600, (int)(bcomp.trip[BCOMP_PAGE()-6].time/60)%60);
-				graph_puts16(64, 32, 1, str);
-				_sprintf(str, "%dл", (int)bcomp.trip[BCOMP_PAGE()-6].fuel);
-				graph_puts16(64, 48, 1, str);
-				break;
+                {
+                    int page = BCOMP_PAGE()-6;
+                    _sprintf(str, "%dкм", (int)bcomp.trip[page].dist/1000);
+                    graph_puts16(64, 16, 1, str);
+                    _sprintf(str, "%dч%02dм", (int)bcomp.trip[page].time/3600, (int)(bcomp.trip[page].time/60)%60);
+                    graph_puts16(64, 32, 1, str);
+                    _sprintf(str, "%dл", (int)bcomp.trip[page].fuel);
+                    graph_puts16(64, 48, 1, str);
+                }
+                break;
 			case 8:
 				// -----------------------------------------------------------------
 				// SERVICE
@@ -1373,44 +1310,27 @@ trip:
 					graph_puts16(64, 48, 1, str);
 				}
 				break;
+#if ( WHELLS_DRAW_SUPPORT == 1 )
 			case 9:
 				// -----------------------------------------------------------------
 				// WHEELS
 				// -----------------------------------------------------------------
-#if ( WHELLS_DRAW_SUPPORT == 1 )
 				if (bcomp.esc_id == 0 ||
 					bcomp.setup.f_esp == 0) {
-					if (buttons & BUTT_SW2) {
-						BCOMP_PAGE_PREV(); //bcomp.page--;
-					} else {
-						BCOMP_PAGE_NEXT(); //bcomp.page++;
-					}
-					goto repeate;
+                    goto default_mark;
 				}
 				graph_puts16(64,0,1,"WHEELS");
 				graph_line(40+4,40,88-4,40);
 				draw_rect(40,40,bcomp.angle);
 				draw_rect(88,40,bcomp.angle);
-#else
-				if (buttons & BUTT_SW2) {
-					BCOMP_PAGE_PREV(); //bcomp.page--;
-				} else {
-					BCOMP_PAGE_NEXT(); //bcomp.page++;
-				}
-				goto repeate;			
-#endif
 				break;
+#endif
+#if ( NMEA_SUPPORT == 1 )
 			case 10:
 				// GPS
                 DBG("bcomp.setup.f_gps = %d\r\n", bcomp.setup.f_gps);
-#if ( NMEA_SUPPORT == 1 )
 				if (bcomp.setup.f_gps == 0) {
-					if (buttons & BUTT_SW2) {
-						BCOMP_PAGE_PREV(); //bcomp.page--;
-					} else {
-						BCOMP_PAGE_NEXT(); //bcomp.page++;
-					}
-					goto repeate;
+                    goto default_mark;
 				}
 				graph_puts16(64,0,1,"GPS");
 				if (bcomp.g_correct) {
@@ -1423,15 +1343,8 @@ trip:
 				} else {
 					graph_puts16(64,32,1,"NO DATA");
 				}
-#else
-				if (buttons & BUTT_SW2) {
-					BCOMP_PAGE_PREV(); //bcomp.page--;
-				} else {
-					BCOMP_PAGE_NEXT(); //bcomp.page++;
-				}
-				goto repeate;			
-#endif
 				break;
+#endif
 			case 11:
 				// -----------------------------------------------------------------
 				// RAIL PRESSURE
@@ -1458,6 +1371,7 @@ trip:
 					graph_puts32c(64, 24, str);
 				}
 				break;
+#if 0
             case 13:
                 {
                     //
@@ -1473,10 +1387,10 @@ trip:
                     graph_puts16(0, 32, 0, str);
                 }
 				break;
+#endif
 			case 14:
 				{
 					//   ENG
-					//graph_pic(ico16_at_data, 0, 0);
 					graph_ico16(16, 0, ico16_engine_data, 16);
 					if (bcomp.t_engine == 0xFFFF) {
 						_sprintf(str, "--°C");
@@ -1532,28 +1446,15 @@ trip:
 					graph_puts16(64+16, 48, 1, str);
 				}
 				break;
-#if defined( WIN32 )
             case 15:
                 {
                     double lat;
                     double lon;
-                    
+                    float phase;
+                    // GPS convert
                     DBG("GPS: %s %s\r\n", bcomp.gps_val_lat, bcomp.gps_val_lon);
-                    
-                    nmea_convert_coord_w(&bcomp.gps_val_lat[1], &lat);
-                    if (bcomp.gps_val_lat[0] == 'N') {
-                        // NOP
-                    } else 
-                    if (bcomp.gps_val_lat[1] == 'S') {
-                        lat = -lat;
-                    }
-                    nmea_convert_coord_l(&bcomp.gps_val_lon[1], &lon);
-                    if (bcomp.gps_val_lat[0] == 'E') {
-                        // NOP
-                    } else 
-                    if (bcomp.gps_val_lat[1] == 'W') {
-                        lon = -lon;
-                    }
+                    nmea_convert_coord_w(&bcomp.gps_val_lat[1], bcomp.gps_val_lat[0], &lat);
+                    nmea_convert_coord_l(&bcomp.gps_val_lon[1], bcomp.gps_val_lon[0], &lon);
                     //
                     //      YEAR  DD  MM  HH  MM  SS  TZ  LAT        LON
                     //
@@ -1561,37 +1462,38 @@ trip:
                         bcomp.gtime.year, bcomp.gtime.month, bcomp.gtime.date, 
                         bcomp.gtime.hour, bcomp.gtime.min, bcomp.gtime.sec,
                         3, // TIME ZONE 
-                        lat, lon,
+                        (float)lat, (float)lon,
                         &bcomp.sun_rise, &bcomp.sun_set, &bcomp.sun_day);
+                    // moon calc
+                    phase = moon_phase(JulDay(bcomp.gtime.date, bcomp.gtime.month, bcomp.gtime.year, bcomp.gtime.hour));
+                    DBG("Moon phase: %f (day: %d)\r\n", phase, (int)(phase*29.5f)+1);
                     graph_puts16(64, 0, 1, "SUN");
                     graph_puts16( 0, 16, 0, "RISE:");
-                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_rise, (int)((bcomp.sun_rise-(int)bcomp.sun_rise)*60));
+                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_rise, (int)(fracf(bcomp.sun_rise)*60.0f));
                     graph_puts16(68, 16, 0, str);
                     graph_puts16( 0, 32, 0, "SET:");
-                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_set, (int)((bcomp.sun_set-(int)bcomp.sun_set)*60));
+                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_set, (int)(fracf(bcomp.sun_set)*60.0f));
                     graph_puts16(68, 32, 0, str);
                     graph_puts16( 0, 48, 0, "DAY:");
-                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_day, (int)((bcomp.sun_day-(int)bcomp.sun_day)*60));
+                    _sprintf(str,"%2d:%02d", (int)bcomp.sun_day, (int)(fracf(bcomp.sun_day)*60.0f));
                     graph_puts16(68, 48, 0, str);
                 }
                 break;
-#endif
-            case 101:
-                // -----------------------------------------------------------------
-                // CAN STOP SCREEN (silent)
-                // -----------------------------------------------------------------
-                graph_puts16(64, 16, 1, "CAN STOP");
-                break;
             default:
+default_mark:
                 DBG("unknown page (%d)\r\n", bcomp.page);
-                if (buttons & BUTT_SW2) {
-#if defined( WIN32 )
-                    bcomp.page = 15;
-#else
-                    bcomp.page = 14;
-#endif
+                if (bcomp.page > 0 && bcomp.page < 15) {
+                    if (buttons & BUTT_SW2) {
+                        BCOMP_PAGE_PREV();
+                    } else {
+                        BCOMP_PAGE_NEXT();
+                    }
                 } else {
-                    bcomp.page = 1;
+                    if (buttons & BUTT_SW2) {
+                        bcomp.page = 15;
+                    } else {
+                        bcomp.page = 1;
+                    }
                 }
                 config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
                 goto repeate;
@@ -1600,10 +1502,12 @@ trip:
         // -----------------------------------------------------------------
         // Обновление экрана:
         // -----------------------------------------------------------------
+#ifdef _DBGOUT
         ms = get_ms_timer(); 
         graph_update(); 
         ms = get_ms_timer() - ms;
         DBG("graph_update() work %dms\r\n", ms);
+#endif //_DBGOUT
 #endif
         // Сохранение изменяемых параметров:
         if (save_flag & 0x01) {

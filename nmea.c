@@ -131,27 +131,32 @@ static int nmea_check(char *str) {
 		GGMM.XXXX - градусы-минуты-дробная часть минут
 		GG.XXXX - градусы-дробная часть градусов
  */
-int nmea_convert_coord_l(char *str, double *coord) {
-	double dloc;
+int nmea_convert_coord_l(char *str, char hemi, double *coord) {
 	int i = 0;
-	double coeff = 0.1;
+	double dloc;
+	double coeff = 0.1f;
 	dloc = 0.0;
 	dloc += (double)(str[0] - '0') * 100 + (double)(str[1] - '0') * 10 + (str[2] - '0');
 	if (str[3] == '.')
 		i = 4;
 	else {
-		dloc += ((double)((str[3] - '0') * 10 + (str[4] - '0'))) / 60.0;
+		dloc += ((double)((str[3] - '0') * 10 + (str[4] - '0'))) / 60.0f;
 		if (str[5] != '.')
 			return 1;
 		i = 6;
-		coeff /= 60.0;
+		coeff /= 60.0f;
 	}
 	while (str[i] != 0x00) {
 		dloc += ((double)(str[i] - '0')) * coeff;
-		coeff /= 10.0;
+		coeff /= 10.0f;
 		i++;
 	}
-	*coord = dloc;
+    if (hemi == 'E') {
+        *coord = dloc;
+    } else 
+    if (hemi == 'W') {
+        *coord = -dloc;
+    }
 	return 0;
 }
 
@@ -161,27 +166,32 @@ int nmea_convert_coord_l(char *str, double *coord) {
 		GGMM.XXXX - градусы-минуты-дробная часть минут
 		GG.XXXX - градусы-дробная часть градусов
  */
-int nmea_convert_coord_w(char *str, double *coord) {
-	double dloc;
+int nmea_convert_coord_w(char *str, char hemi, double *coord) {
 	int i = 0;
-	double coeff = 0.1;
+	double dloc;
+	double coeff = 0.1f;
 	dloc = 0.0;
 	dloc += (double)(str[0] - '0') * 10 + (str[1] - '0');
 	if (str[2] == '.')
 		i = 3;
 	else {
-		dloc += ((double)((str[2] - '0') * 10 + (str[3] - '0'))) / 60.0;
+		dloc += ((double)((str[2] - '0') * 10 + (str[3] - '0'))) / 60.0f;
 		if (str[4] != '.')
 			return 1;
 		i = 5;
-		coeff /= 60.0;
+		coeff /= 60.0f;
 	}
 	while (str[i] != 0x00) {
 		dloc += ((double)(str[i] - '0')) * coeff;
-		coeff /= 10.0;
+		coeff /= 10.0f;
 		i++;
 	}
-	*coord = dloc;
+    if (hemi == 'N') {
+        *coord = dloc;
+    } else 
+    if (hemi == 'S') {
+        *coord = -dloc;
+    }
     return 0;
 }
 

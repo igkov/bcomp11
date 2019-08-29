@@ -38,8 +38,8 @@ typedef struct {
 uint32_t time_to_unix(pgpstime_t op);
 /* GPS parce functions: */
 void nmea_parce(char *str);
-int nmea_convert_coord_w(char *str, double *coord);
-int nmea_convert_coord_l(char *str, double *coord);
+int nmea_convert_coord_w(char *str, char hemi, double *coord);
+int nmea_convert_coord_l(char *str, char hemi, double *coord);
 /* Main Functions */
 void nmea_proc(uint8_t ch);
 void nmea_init(void);

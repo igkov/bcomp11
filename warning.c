@@ -142,6 +142,7 @@ void bcomp_warning(void) {
 		errors_list[WARNING_ID_BATTERY].flags = 0;
 		errors_list[WARNING_ID_BATTERY].time  = 0;
 	}
+#if 0
 	// EXT TEMP WARNING
 	if (bcomp.setup.f_ext_w && bcomp.setup.f_ext) {
 		if (bcomp.t_ext == 0xFFFF) {
@@ -167,6 +168,7 @@ void bcomp_warning(void) {
 		errors_list[WARNING_ID_T_EXT].flags = 0;
 		errors_list[WARNING_ID_T_EXT].time  = 0;
 	}
+#endif
 #if ( NMEA_SUPPORT == 1 )
 	// GPS WARNING
 	if (bcomp.setup.f_gps) {
@@ -202,6 +204,7 @@ void bcomp_warning(void) {
 			errors_list[WARNING_ID_SERVICE].time = 0;
 		}
 	}
+#if 0
 	// FUEL
 	if (bcomp.setup.f_fuel) {
 		if (bcomp.fuel_level < bcomp.setup.l_fuel) {
@@ -226,6 +229,7 @@ void bcomp_warning(void) {
 		errors_list[WARNING_ID_FUEL].flags = 0;
 		errors_list[WARNING_ID_FUEL].time = 0;
 	}
+#endif
 bcomp_warning_end:
 	// Раз в 5 секунд:
 	event_set(bcomp_warning, 5000);

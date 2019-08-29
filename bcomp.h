@@ -39,7 +39,7 @@ extern int melody_wrep2[];
 // Поддержка OLED на контроллере SSD1306:
 #define OLED_SSD1306_SUPPORT 1
 // Поддержка OLED на контроллере SH1106:
-#define OLED_SH1106_SUPPORT 1
+#define OLED_SH1106_SUPPORT 0
 // Поддержка экрана с выводом положения колес:
 #define WHELLS_DRAW_SUPPORT 0
 
@@ -127,9 +127,9 @@ extern int melody_wrep2[];
 #else
 #define INFO_DEVICE   "BCOMP11"
 #endif
-#define INFO_VERSION  "v2.1a"
+#define INFO_VERSION  "v2.3a"
 #define INFO_AUTHOR   "igorkov"
-#define INFO_YEAR     "2018"
+#define INFO_YEAR     "2019"
 // Максимальная длина строки на отображение: 10 символов!
 
 #include "analog.h"
@@ -222,9 +222,9 @@ typedef struct {
 	// END
     
     // SUN
-    double sun_rise;
-    double sun_set;
-    double sun_day;
+    float sun_rise;
+    float sun_set;
+    float sun_day;
     // END
 
 	trip_t trip[2];               // Данные поездок (2 поездки).

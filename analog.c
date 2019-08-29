@@ -9,8 +9,8 @@ float analog_temp(const termist_t *par) {
 		(adc>(ADC_VALUE_MAX-ADC_LIMIT)))
 		return NAN;  
 	R = adc * BALANCE_R / (float)(ADC_VALUE_MAX+1-adc);
-	//T  = 1.0f / (1.0f/TERMIST_T0 + (1.0f/TERMIST_B)*log(R/TERMIST_R0));
-	T  = 1.0f / (1.0f/par->t0 + (1.0f/par->b)*log(R/par->r0));
+	//T  = 1.0f / (1.0f/TERMIST_T0 + (1.0f/TERMIST_B)*logf(R/TERMIST_R0));
+	T  = 1.0f / (1.0f/par->t0 + (1.0f/par->b)*logf(R/par->r0));
 	T -= 273.15f;
 	return T;
 }

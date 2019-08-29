@@ -17,11 +17,11 @@ const menu_t menu[] = {
 	{    2, MENU_INT,   0, 0, "Коробка",     "°C",  &bcomp.setup.t_at,     1, 90, 130 },
 	{    3, MENU_INT,   0, 0, "Двигатель",   "°C",  &bcomp.setup.t_eng,    1, 70, 120 },
 	{    4, MENU_FLAG,  0, 0, "Дат.топл.",   "",    &bcomp.setup.f_fuel,   1, 0, 1 },
-	{    5, MENU_FLOAT, 1, 0, "Ур.топл.",    "Л",   &bcomp.setup.l_fuel,   5, 10, 100 },
+	//{    5, MENU_FLOAT, 1, 0, "Ур.топл.",    "Л",   &bcomp.setup.l_fuel,   5, 10, 100 },
 	//{    6, MENU_INT,   0, 0, "Час.пояс",    "ч",   &bcomp.setup.time,     1, -12, 12 },
 	{    7, MENU_INT,   0, 0, "Повт.пред.",  "мин", &bcomp.setup.w_delay,  5, 0, 240 },
-	{    8, MENU_FLAG,  0, 0, "Наруж.дат.",  "",    &bcomp.setup.f_ext,    1, 0, 1 },
-	{    9, MENU_FLAG,  0, 0, "Нар.пред.",   "",    &bcomp.setup.f_ext_w,  1, 0, 1 },
+	//{    8, MENU_FLAG,  0, 0, "Наруж.дат.",  "",    &bcomp.setup.f_ext,    1, 0, 1 },
+	//{    9, MENU_FLAG,  0, 0, "Нар.пред.",   "",    &bcomp.setup.f_ext_w,  1, 0, 1 },
 	{   10, MENU_INT,   0, 0, "Наруж.тем.",  "°C",  &bcomp.setup.t_ext,    1, -10, 10 },
 #if ( NMEA_SUPPORT == 1 )
 	{   12, MENU_FLAG,  0, 0, "GPS",         "",    &bcomp.setup.f_gps,    1, 0, 1 },
@@ -35,7 +35,6 @@ const menu_t menu[] = {
 	{   17, MENU_FLAG,  0, 0, "Лог.дан.",    "",    &bcomp.setup.f_log,    1, 0, 1 },
 	{   18, MENU_INT,   0, 0, "Контраст",    "",    &bcomp.setup.contrast, 4, 1, 255 },
 	{   19, MENU_FLAG,  0, 0, "Звуки",       "",    &bcomp.setup.sound,    1, 0, 1 },
-	//{ 0xF4, MENU_OTHER, 0, 0, "Дамп",        "",    (void*)0,              0, 0, 0 },
 	// ID ниже нельзя менять, они задействованы в логике уровнем выше! Порядок не важен.
 	{ 0xF0, MENU_OTHER, 0, 0, "Инфо",        "",    (void*)0,              0, 0, 0 },
 	{ 0xF2, MENU_OTHER, 0, 0, "VIN",         "",    (void*)0,              0, 0, 0 },

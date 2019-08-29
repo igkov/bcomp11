@@ -13,8 +13,9 @@ unsigned char crc8(unsigned char *block, unsigned int len) {
 	unsigned int i;
 	while (len--) {
 		crc ^= *block++;
-		for (i = 0; i < 8; i++)
+		for (i = 0; i < 8; i++) {
 			crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;
+        }
 	}
 	return crc;
 }

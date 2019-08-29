@@ -12,8 +12,6 @@
 #include "oled128.h"
 #endif
 
-// Extern:
-extern const uint8_t font6x8[256][6];
 extern const uint8_t font12x16[256][24];
 extern int _sprintf(char *out, const char *format, ...);
 
@@ -25,7 +23,8 @@ static uint8_t frame[128*64/8];
 #define SET_PIXEL(x,y) frame[SIZE_X * ((y)/8) + (x)] |= 1<<(y&0x07);
 #define CLR_PIXEL(x,y) frame[SIZE_X * ((y)/8) + (x)] &= ~(1<<(y&0x07));
 
-#if !defined( BCOMP_V2 )
+#if 0
+extern const uint8_t font6x8[256][6];
 // Font 6x8
 void graph_puts8(int x, int y, int w, const char *str) {
 	int i = 0;
@@ -48,13 +47,6 @@ void graph_puts8(int x, int y, int w, const char *str) {
 		i++;
 		x += fx;
 	}
-}
-
-// Font 8x12
-void graph_puts12(int x, int y, int w, const char *str) {
-	int i = 0;
-	int fx = 0;
-	// TODO
 }
 #endif
 
@@ -93,7 +85,6 @@ void graph_puts16(int x, int y, int w, const char *str) {
 	}
 }
 
-#if 1//!defined( BCOMP_V2 )
 // ICO XXx16
 void graph_ico16(int x, int y, const uint8_t *ico, int size) {
 	int fx;
@@ -106,7 +97,6 @@ void graph_ico16(int x, int y, const uint8_t *ico, int size) {
 		frame[SIZE_X * (fy + 2) + (x + fx)] |= ico[fx+1*size]>>(8-fm);
 	}
 }
-#endif
 
 #if !defined( __GCC__ )
 // Вывод графической иконки по дескриптору.
