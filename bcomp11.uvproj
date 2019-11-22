@@ -728,6 +728,16 @@
               <FileType>1</FileType>
               <FilePath>.\warning.c</FilePath>
             </File>
+            <File>
+              <FileName>sun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sun.c</FilePath>
+            </File>
+            <File>
+              <FileName>moon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\moon.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1778,13 +1788,13 @@
           <Flash1>
             <UseTargetDll>0</UseTargetDll>
             <UseExternalTool>1</UseExternalTool>
-            <RunIndependent>1</RunIndependent>
+            <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>0</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
             <DriverSelection>4096</DriverSelection>
           </Flash1>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"lpc21isp.exe" (./.release/bcomp11.hex -control com6 115200 12000)</Flash3>
+          <Flash3>"lpc21isp.exe" (./.release/bcomp11.hex -control com11 115200 12000)</Flash3>
           <Flash4></Flash4>
         </Utilities>
         <TargetArmAds>
@@ -2240,6 +2250,16 @@
               <FileName>warning.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\warning.c</FilePath>
+            </File>
+            <File>
+              <FileName>sun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sun.c</FilePath>
+            </File>
+            <File>
+              <FileName>moon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\moon.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3754,6 +3774,16 @@
               <FileType>1</FileType>
               <FilePath>.\warning.c</FilePath>
             </File>
+            <File>
+              <FileName>sun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sun.c</FilePath>
+            </File>
+            <File>
+              <FileName>moon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\moon.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5266,6 +5296,16 @@
               <FileName>warning.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\warning.c</FilePath>
+            </File>
+            <File>
+              <FileName>sun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sun.c</FilePath>
+            </File>
+            <File>
+              <FileName>moon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\moon.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -842,7 +842,7 @@ int main(void)
 		delay_ms(1000);
 	}
 
-	// Инцициализация закончена, выключаем красный светодиод:
+	// Инициализация закончена, выключаем красный светодиод:
 	led_red(0);
 		
 	// -----------------------------------------------------------------------------
@@ -1456,6 +1456,7 @@ trip:
 					graph_puts16(64+16, 48, 1, str);
 				}
 				break;
+#if 1
             case 15:
                 {
                     double lat;
@@ -1489,6 +1490,7 @@ trip:
                     graph_puts16(68, 48, 0, str);
                 }
                 break;
+#endif
             default:
 default_mark:
                 DBG("unknown page (%d)\r\n", bcomp.page);
@@ -1514,7 +1516,9 @@ default_mark:
         // -----------------------------------------------------------------
 #ifdef _DBGOUT
         ms = get_ms_timer(); 
+#endif //_DBGOUT
         graph_update(); 
+#ifdef _DBGOUT
         ms = get_ms_timer() - ms;
         DBG("graph_update() work %dms\r\n", ms);
 #endif //_DBGOUT
