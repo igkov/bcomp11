@@ -1408,35 +1408,45 @@ trip:
 					}
 					graph_puts16(64+16, 16, 1, str);
 					//  DRIVE
+					// 12x16. 128-(12+12+12)/2 = 110
 					switch (bcomp.at_drive) {
 					case 0x00:
-						graph_puts16(64+16, 32, 1, "N");
+						graph_puts16(110, 32, 1, "N");
 						break;
 					case 0x01:
-						graph_puts16(64+16, 32, 1, "D/1");
+						graph_puts16(110, 32, 1, "D/1");
 						break;
 					case 0x02:
-						graph_puts16(64+16, 32, 1, "D/2");
+						graph_puts16(110, 32, 1, "D/2");
 						break;
 					case 0x03:
-						graph_puts16(64+16, 32, 1, "D/3");
+						graph_puts16(110, 32, 1, "D/3");
 						break;
 					case 0x04:
-						graph_puts16(64+16, 32, 1, "D/4");
+						graph_puts16(110, 32, 1, "D/4");
 						break;
 					case 0x05:
-						graph_puts16(64+16, 32, 1, "D/5");
+						graph_puts16(110, 32, 1, "D/5");
 						break;
 					case 0x0d:
-						graph_puts16(64+16, 32, 1, "P");
+						graph_puts16(110, 32, 1, "P");
 						break;
 					case 0x0b:
-						graph_puts16(64+16, 32, 1, "R");
+						graph_puts16(110, 32, 1, "R");
 						break;
 					default:
-						graph_puts16(64+16, 32, 1, "ERR");
+						graph_puts16(110, 32, 1, "ERR");
 						break;
 					}
+					// BATTERY
+					graph_ico16(0, 32, ico16_battery_data, 16);
+					if (isnan(bcomp.v_ecu)) {
+						_sprintf(str, "--.-V");
+					} else {
+						_sprintf(str, "%d.%dV", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
+					}
+					// 128-36 = 92-16 = 76/2 = 38 + 16 = 
+					graph_puts16(54, 32, 1, str);
 					//  SPEED
 					if (bcomp.g_correct) {
 						_sprintf(str,"%d km/h", (uint32_t)bcomp.gps_speed);
