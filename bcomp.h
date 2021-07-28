@@ -25,17 +25,17 @@ extern int melody_wrep2[];
 // Поддержка графического интерфейса:
 #define GRAPH_SUPPORT 1
 // Поддержка вывода во внешний лог-файл:
-#define ELOG_SUPPORT 1
+#define ELOG_SUPPORT 0
 // Минимальная поддержка nmea:
-#define NMEA_SUPPORT 1
+#define NMEA_SUPPORT 0
 // Поддержка предупреждений:
-#define WARNING_SUPPORT 1
+#define WARNING_SUPPORT 0
 // Специфичные возможности шины Mitsubishi Pajero Sport II:
-#define PAJERO_SPECIFIC 1
+#define PAJERO_SPECIFIC 0
 // Специфичные возможности шины Nissan:
-#define NISSAN_SPECIFIC 0
+#define NISSAN_SPECIFIC 1
 // Тип кнопок:
-#define BUTTONS_ANALOG 1
+#define BUTTONS_ANALOG 0
 // Поддержка OLED на контроллере SSD1306:
 #define OLED_SSD1306_SUPPORT 1
 // Поддержка OLED на контроллере SH1106:
@@ -134,6 +134,7 @@ extern int melody_wrep2[];
 
 #include "analog.h"
 #include "nmea.h"
+#include "lowpass.h"
 #include "diagram.h"
 
 typedef struct {
@@ -151,16 +152,6 @@ typedef struct {
 	uint32_t time;                // Время работы.
     uint8_t  can_act;             // Флаг активности работы.
     uint8_t  res0[3];             // Выравнивание.
-	int t_engine;                 // Температура двигателя (°C).
-	int t_akpp;                   // Температура коробки передач (°C, специфично для NMPS/Pajero4).
-	int t_ext;                    // Внешняя температура (°C).
-	int rpm;                      // Обороты двигателя (об/м).
-	int rpms;                     // Обороты двигателя (об/м), на экран.
-	int speed;                    // Скорость автомобиля в текущий момент (км/ч).
-	int p_intake;                 // Давление во впускном коллекторе (кПа).
-	int p_fuel;                   // Давление топлива в рейке (МПа).
-	float v_ecu;                  // Напряжение бортовой сети (Вольт).
-	float v_analog;               // Напряжение бортовой сети (Вольт).
 
 	struct {
 		float v_max;              // Максимально допустимое напряжение бортовой сети (Вольт).
@@ -185,63 +176,16 @@ typedef struct {
 	} setup;
 
 	int page;                     // Страница отображения.
-	uint8_t at_drive;             // Передача, 0xFF - нет коробки.
-	uint8_t at_present;           // Наличие автоматической коробки.
-	uint8_t connect;              // Флаг коннекта к шине CAN, выставляется приходом любых данных по шине.
-	uint8_t service;              // Флаг входа в сервисный режим.
 
-	int raw_fuel;                 // Данные мгновенного расхода из пакета.
-	float fuel_level;             // Уровень топлива в баке (напряжение на датчике).
-	double fuel;                  // Съеденное топливо за текущий сеанс работы (л).
-	double dist;                  // Пробег за текущий сеанс работы (м).
+	int32_t press;
+	int32_t temp;
+    float mmhg;
+	float height;
+	filter_t filt_p;
 
-	uint8_t esc_data[8];          // Отладочный буфер для вычисления положения.
-	int esc_id;                   // Отладочная переменная для ID-посылки положения руля.
-	int angle;                    // Угол колес.
-
-	char vin[20];                 // VIN-номер
-
-	char mil;                     // Флаг наличия ошибки CHECK ENGINE.
-	char res2[3];                 // ...
-	int e_code;                   // Переменная сожержит код ошибки CHECK ENGINE.
-
-	int odometer;                 // Реальный одометр (значение в ЭБУ-машины).
-
-	// GPS
-	uint8_t g_correct;            // Флаг корректности слепка данных GPS.
-	uint8_t res3[3];              // ...
-	uint32_t nmea_cnt;            // Счетчик принятых байт от GPS.
-	uint32_t utime;               // Текущее время с GPS-приемника (формат unix).
-	gpstime_t gtime;              // Структура с меткой времени.
-	float gps_speed;              // Скорость GPS (пересчитанная).
-	char gps_val_time[12];        // Строка с текущим временем.
-	char gps_val_date[12];        // Строка с текущей датой.
-	char gps_val_lon[12];         // Строка с текущей координатой.
-	char gps_val_lat[12];         // Строка с текущей координатой.
-	char gps_val_speed[12];       // Строка с текущей скоростью.
-	// END
-    
-    // SUN
-    float sun_rise;
-    float sun_set;
-    float sun_day;
-    // END
-
-	trip_t trip[2];               // Данные поездок (2 поездки).
-	pars_t log[20];               // По 30 секунд слепки топливо/дистанция.
-	
-	diagram_t dia_engine;         // Данные диаграммы температуры двигателя.
-	diagram_t dia_trans;          // Данные диаграммы температуры коробки.
-	diagram_t dia_rail;           // Данные диаграммы давления в топливной рейке.
-	diagram_t dia_intake;         // Данные диаграммы давления во впускном коллекторе.
-	diagram_t dia_voltage;        // Данные диаграммы напряжения бортовой сети.
-
-	uint32_t moto_time;           // Счетчик моточасов (в секундах).
-	double moto_dist;             // Счетчик дистанции (в метрах).
-	uint32_t moto_time_service;   // Сбрасываемый счетчик моточасов (сервисный интервал).
-	double moto_dist_service;     // Сбрасываемый счетчик дистации (сервисный интервал).
-	char moto_date_service[13];   // Сбрасываемая метка времени проведенного сервисного обслуживания.
-	char res4[3];
+	diagram_t dia_press;         // Данные диаграммы температуры двигателя.
+	diagram_t dia_height;          // Данные диаграммы температуры коробки.
+	diagram_t dia_temp;          // Данные диаграммы температуры коробки.
 } bcomp_t;
 
 /*

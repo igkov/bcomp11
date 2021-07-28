@@ -1155,4 +1155,7 @@ const ico_t font_array[] = {
 	{24, 30, sizeof(font30_0x4D), font30_0x4D}, // 22 - Symbol 'M'
 	{16, 30, sizeof(font30_0x61), font30_0x61}, // 23 - Symbol 'a'
 	{15, 30, sizeof(font30_0x6B), font30_0x6B}, // 24 - Symbol 'k'
+    {24, 30, sizeof(font30_0x6D), font30_0x6D}, // 25 - Symbol 'm'
+    {21, 30, sizeof(font30_0x48), font30_0x48}, // 26 - Symbol 'H'
+    {16, 30, sizeof(font30_0x67), font30_0x67}, // 27 - Symbol 'g'
 };

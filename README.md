@@ -46,6 +46,8 @@ Program MCU
 
 For program MCU, please use USB-UART converter with DTR/RST control and programming utility as <a href="http://www.flashmagictool.com/">Flash Magic</a> or <a href="https://sourceforge.net/projects/lpc21isp/">lpc21isp</a>.
 
+<pre>lpc21isp bcomp11.hex com3 115200 14746</pre>
+
 PC Emulation build
 ---------
 

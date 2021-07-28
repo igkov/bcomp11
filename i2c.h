@@ -42,8 +42,8 @@ int i2c_deinit(void);
 	I2C_freq = VPBUS / (SCLH+SCLL) = 48MHz / (48 + 48) = 500kHz
 	I2C_freq = VPBUS / (SCLH+SCLL) = 48MHz / (24 + 24) = 1MHz
  */
-#define I2C_DIV_H 60
-#define I2C_DIV_L 60
+#define I2C_DIV_H 90
+#define I2C_DIV_L 90
 
 #define I2C_OK           0x00
 #define I2C_ERROR        0x01
