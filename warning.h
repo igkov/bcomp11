@@ -1,7 +1,7 @@
 #ifndef __WARNING_H__
 #define __WARNING_H__
 
-// Номера (по приоритетам, от высшего к низшему:
+// РќРѕРјРµСЂР° (РїРѕ РїСЂРёРѕСЂРёС‚РµС‚Р°Рј, РѕС‚ РІС‹СЃС€РµРіРѕ Рє РЅРёР·С€РµРјСѓ:
 #define WARNING_ID_CONNECT   0
 #define WARNING_ID_ENGINE    1
 #define WARNING_ID_T_ENGINE  2
@@ -17,9 +17,9 @@
 #define WARN_FLAG_HIDE  0x02
 
 typedef struct {
-	uint8_t flags;  // Флаги состояния.
+	uint8_t flags;  // Р¤Р»Р°РіРё СЃРѕСЃС‚РѕСЏРЅРёСЏ.
 	uint8_t res[3]; // 
-	uint32_t time;       // Счетчик для контроля времени повтора.
+	uint32_t time;       // РЎС‡РµС‚С‡РёРє РґР»СЏ РєРѕРЅС‚СЂРѕР»СЏ РІСЂРµРјРµРЅРё РїРѕРІС‚РѕСЂР°.
 } ecu_error_t, *pecu_error_t;
 
 extern void bcomp_warning(void);

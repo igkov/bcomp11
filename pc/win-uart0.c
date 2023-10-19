@@ -9,11 +9,11 @@ uint8_t uart0_getchar(void) {
 	return getch();
 }
 
-void uart0_putchar(const uint8_t c) {
+void uart0_putchar(const char c) {
 	putchar(c);
 }
 
-void uart0_puts(const uint8_t *str) {
+void uart0_puts(const char *str) {
 	int i = 0;
 	while (str[i]) {
 		putchar(str[i]);

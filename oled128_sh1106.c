@@ -57,23 +57,23 @@ void sh1106_draw(const uint8_t *bitmaparray) {
 }
 
 void sh1106_contrast(uint8_t contrast) {
-	sendCommand(0x81); sendCommand(contrast); // 0x81,0x7f — Set Contrast Control (0x7f) — яркость. 
+	sendCommand(0x81); sendCommand(contrast); // 0x81,0x7f вЂ” Set Contrast Control (0x7f) вЂ” СЏСЂРєРѕСЃС‚СЊ. 
 }
 
 void sh1106_init(uint8_t contrast, uint8_t inverse) {
 	sendCommand(0xAE); 
-	sendCommand(0xA8); sendCommand(0x3F); // 0xA8,0x3F — Set Multiplex Ratio (0x3F) — эта команда определяет, сколько строк будет использовано.
+	sendCommand(0xA8); sendCommand(0x3F); // 0xA8,0x3F вЂ” Set Multiplex Ratio (0x3F) вЂ” СЌС‚Р° РєРѕРјР°РЅРґР° РѕРїСЂРµРґРµР»СЏРµС‚, СЃРєРѕР»СЊРєРѕ СЃС‚СЂРѕРє Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅРѕ.
 	sendCommand(0xD5);
-	sendCommand(0x81); sendCommand(contrast); // 0x81,0x7f — Set Contrast Control (0x7f) — яркость. 
-	sendCommand(0xA0); // 0xA1 — Set Segment Re-map — развертка по горизонтали слева направо.
-	sendCommand(0xC0); // 0xC0 — Set Common Output Scan Direction — развертка сверху вниз
-	sendCommand(0xDA); sendCommand(0x12); // 0xDA,0x12 — Common Pads Hardware Configuration (Alternative Mode Set) — прогрессивная развертка. Можно включить и чересстрочную.
-	sendCommand(0xD3); sendCommand(0x00); // 0xD3,0x00 — Set Display Offset (0x00)
-	sendCommand(0x40); // 0x40 — Set Display Start Line 0
+	sendCommand(0x81); sendCommand(contrast); // 0x81,0x7f вЂ” Set Contrast Control (0x7f) вЂ” СЏСЂРєРѕСЃС‚СЊ. 
+	sendCommand(0xA0); // 0xA1 вЂ” Set Segment Re-map вЂ” СЂР°Р·РІРµСЂС‚РєР° РїРѕ РіРѕСЂРёР·РѕРЅС‚Р°Р»Рё СЃР»РµРІР° РЅР°РїСЂР°РІРѕ.
+	sendCommand(0xC0); // 0xC0 вЂ” Set Common Output Scan Direction вЂ” СЂР°Р·РІРµСЂС‚РєР° СЃРІРµСЂС…Сѓ РІРЅРёР·
+	sendCommand(0xDA); sendCommand(0x12); // 0xDA,0x12 вЂ” Common Pads Hardware Configuration (Alternative Mode Set) вЂ” РїСЂРѕРіСЂРµСЃСЃРёРІРЅР°СЏ СЂР°Р·РІРµСЂС‚РєР°. РњРѕР¶РЅРѕ РІРєР»СЋС‡РёС‚СЊ Рё С‡РµСЂРµСЃСЃС‚СЂРѕС‡РЅСѓСЋ.
+	sendCommand(0xD3); sendCommand(0x00); // 0xD3,0x00 вЂ” Set Display Offset (0x00)
+	sendCommand(0x40); // 0x40 вЂ” Set Display Start Line 0
 	if (inverse) {
 		sendCommand(0xA7);
 	} else {
 		sendCommand(0xA6);
 	}
-	sendCommand(0xAF); // 0xAF — Display ON
+	sendCommand(0xAF); // 0xAF вЂ” Display ON
 }

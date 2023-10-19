@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-// Модуль реализует защищенную запись в EEPROM. Каждый параметр хранится в 2х ячейках.
-// Это позволяет при повреждении данных в момент записи в одной из ячеек, при последующем 
-// чтении гарантированно восстановить корректное значение из другой ячейки.
+// РњРѕРґСѓР»СЊ СЂРµР°Р»РёР·СѓРµС‚ Р·Р°С‰РёС‰РµРЅРЅСѓСЋ Р·Р°РїРёСЃСЊ РІ EEPROM. РљР°Р¶РґС‹Р№ РїР°СЂР°РјРµС‚СЂ С…СЂР°РЅРёС‚СЃСЏ РІ 2С… СЏС‡РµР№РєР°С….
+// Р­С‚Рѕ РїРѕР·РІРѕР»СЏРµС‚ РїСЂРё РїРѕРІСЂРµР¶РґРµРЅРёРё РґР°РЅРЅС‹С… РІ РјРѕРјРµРЅС‚ Р·Р°РїРёСЃРё РІ РѕРґРЅРѕР№ РёР· СЏС‡РµРµРє, РїСЂРё РїРѕСЃР»РµРґСѓСЋС‰РµРј 
+// С‡С‚РµРЅРёРё РіР°СЂР°РЅС‚РёСЂРѕРІР°РЅРЅРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ РєРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РёР· РґСЂСѓРіРѕР№ СЏС‡РµР№РєРё.
 
-// 64 * 16 * 2 = 2048Б
+// 64 * 16 * 2 = 2048Р‘
 #define CONFIG_MAX_PARAM 64
 #define CONFIG_MAX_SIZE  13
 #define CONFIG_OFFSET    (0x0000)
@@ -20,53 +20,53 @@ typedef struct {
 	uint8_t data[CONFIG_MAX_SIZE];
 } config_unit_t, *pconfig_unit_t;
 
-// Последний экран:
+// РџРѕСЃР»РµРґРЅРёР№ СЌРєСЂР°РЅ:
 #define CPAR_PAGE                    1
 #define CPAR_PAGE_SIZE               4
-// Глобальный счетчик пробега:
+// Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ СЃС‡РµС‚С‡РёРє РїСЂРѕР±РµРіР°:
 #define CPAR_DIST_GLOB               2
 #define CPAR_DIST_GLOB_SIZE          8
-// Глобальный счетчик моточасов:
+// Р“Р»РѕР±Р°Р»СЊРЅС‹Р№ СЃС‡РµС‚С‡РёРє РјРѕС‚РѕС‡Р°СЃРѕРІ:
 #define CPAR_MOTO_GLOB               3
 #define CPAR_MOTO_GLOB_SIZE          4
-// Сервисный счетчик пробега:
+// РЎРµСЂРІРёСЃРЅС‹Р№ СЃС‡РµС‚С‡РёРє РїСЂРѕР±РµРіР°:
 #define CPAR_DIST_SERV               4
 #define CPAR_DIST_SERV_SIZE          8
-// Сервисный счетчик моточасов:
+// РЎРµСЂРІРёСЃРЅС‹Р№ СЃС‡РµС‚С‡РёРє РјРѕС‚РѕС‡Р°СЃРѕРІ:
 #define CPAR_MOTO_SERV               5
 #define CPAR_MOTO_SERV_SIZE          4
-// Путь А: Дистанция
+// РџСѓС‚СЊ Рђ: Р”РёСЃС‚Р°РЅС†РёСЏ
 #define CPAR_TRIPA_DIST              6
 #define CPAR_TRIPA_DIST_SIZE         8
-// Путь А: Время
+// РџСѓС‚СЊ Рђ: Р’СЂРµРјСЏ
 #define CPAR_TRIPA_TIME              7
 #define CPAR_TRIPA_TIME_SIZE         8
-// Путь А: Топливо
+// РџСѓС‚СЊ Рђ: РўРѕРїР»РёРІРѕ
 #define CPAR_TRIPA_FUEL              8
 #define CPAR_TRIPA_FUEL_SIZE         8
-// Путь Б: Дистанция
+// РџСѓС‚СЊ Р‘: Р”РёСЃС‚Р°РЅС†РёСЏ
 #define CPAR_TRIPB_DIST              9
 #define CPAR_TRIPB_DIST_SIZE         8
-// Путь Б: Время+Топливо
+// РџСѓС‚СЊ Р‘: Р’СЂРµРјСЏ+РўРѕРїР»РёРІРѕ
 #define CPAR_TRIPB_TIME              10
 #define CPAR_TRIPB_TIME_SIZE         8
-// Путь Б: Топливо
+// РџСѓС‚СЊ Р‘: РўРѕРїР»РёРІРѕ
 #define CPAR_TRIPB_FUEL              11
 #define CPAR_TRIPB_FUEL_SIZE         8
-// Одометр:
+// РћРґРѕРјРµС‚СЂ:
 //#define CPAR_SETUP_ODO               12
 //#define CPAR_SETUP_ODO_SIZE          4
-// Флаг сервисного режима:
+// Р¤Р»Р°Рі СЃРµСЂРІРёСЃРЅРѕРіРѕ СЂРµР¶РёРјР°:
 #define CPAR_SERVICE                 14
 #define CPAR_SERVICE_SIZE            1
-// Флаг сервисного режима:
+// Р¤Р»Р°Рі СЃРµСЂРІРёСЃРЅРѕРіРѕ СЂРµР¶РёРјР°:
 #define CPAR_DATE_SERV               15
 #define CPAR_DATE_SERV_SIZE          13
-// Переменная уровня топлива в баке:
+// РџРµСЂРµРјРµРЅРЅР°СЏ СѓСЂРѕРІРЅСЏ С‚РѕРїР»РёРІР° РІ Р±Р°РєРµ:
 #define CPAR_FUEL_LEVEL              16
 #define CPAR_FUEL_LEVEL_SIZE         4
 
-// Максимальное напряжение
+// РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РЅР°РїСЂСЏР¶РµРЅРёРµ
 #define CPAR_SETUP_V_MAX             20
 #define CPAR_SETUP_V_MAX_SIZE        4
 #define CPAR_SETUP_V_MIN             21
@@ -99,10 +99,10 @@ typedef struct {
 #define CPAR_SETUP_FUEL_CAL_SIZE     4
 #define CPAR_SETUP_F_LOG             35
 #define CPAR_SETUP_F_LOG_SIZE        4
-// Контраст экрана:
+// РљРѕРЅС‚СЂР°СЃС‚ СЌРєСЂР°РЅР°:
 #define CPAR_SETUP_F_CONTRAST        36
 #define CPAR_SETUP_F_CONTRAST_SIZE   4
-// Флаг проигрывания звуков:
+// Р¤Р»Р°Рі РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р·РІСѓРєРѕРІ:
 #define CPAR_SETUP_F_SOUND           37
 #define CPAR_SETUP_F_SOUND_SIZE      4
 

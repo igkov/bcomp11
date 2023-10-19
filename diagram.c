@@ -15,18 +15,18 @@ int diagram_create(pdiagram_t diag, float max, float min, float time) {
 #if ( DIAGRAM_DELIM_SUPPORT == 1 )
 int diagram_delim(pdiagram_t diag) {
 	int pos;
-	// Ïðèðàùåíèå ñìåùåíèÿ:
+	// ÐŸÑ€Ð¸Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ðµ ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ñ:
 	//diag->offset += diag->time;
-	// Òåêóùàÿ ïîçèöèÿ:
+	// Ð¢ÐµÐºÑƒÑ‰Ð°Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ:
 	pos = ((int)diag->offset) % DIAGRAM_SIZE_X;
-	// Ïðåäîòâðàùåíèå çàïîëíåíèÿ ëèíèÿìè:
+	// ÐŸÑ€ÐµÐ´Ð¾Ñ‚Ð²Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ðµ Ð·Ð°Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ Ð»Ð¸Ð½Ð¸ÑÐ¼Ð¸:
 	if (diag->points[(pos+DIAGRAM_SIZE_X-1)%DIAGRAM_SIZE_X] == 0xFE) {
-		// Óæå åñòü ëèíèÿ, íå âûñòàâëÿåì!
+		// Ð£Ð¶Ðµ ÐµÑÑ‚ÑŒ Ð»Ð¸Ð½Ð¸Ñ, Ð½Ðµ Ð²Ñ‹ÑÑ‚Ð°Ð²Ð»ÑÐµÐ¼!
 		return 0;
 	}
-	// Óñòàíîâêà çíà÷åíèÿ (ïî ñòàðîé ïîçèöèè):
+	// Ð£ÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ (Ð¿Ð¾ ÑÑ‚Ð°Ñ€Ð¾Ð¹ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸):
 	diag->points[pos] = 0xFE;
-	// Íîâàÿ ÿ÷åéêà:
+	// ÐÐ¾Ð²Ð°Ñ ÑÑ‡ÐµÐ¹ÐºÐ°:
 	diag->offset = ((int)diag->offset) + 1;
 	return 0;	
 }
@@ -34,11 +34,11 @@ int diagram_delim(pdiagram_t diag) {
 
 int diagram_add(pdiagram_t diag, float value) {
 	int pos;
-	// Ïðèðàùåíèå ñìåùåíèÿ:
+	// ÐŸÑ€Ð¸Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ðµ ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ñ:
 	diag->offset += diag->time;
-	// Òåêóùàÿ ïîçèöèÿ:
+	// Ð¢ÐµÐºÑƒÑ‰Ð°Ñ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ:
 	pos = ((int)diag->offset) % DIAGRAM_SIZE_X;
-	// Ðàññ÷åò òî÷êè:
+	// Ð Ð°ÑÑÑ‡ÐµÑ‚ Ñ‚Ð¾Ñ‡ÐºÐ¸:
 	if (isnan(value)) {
 		diag->points[pos] = 0xFC; // unk
 	} else if (value < diag->min) {

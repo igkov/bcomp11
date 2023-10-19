@@ -10,24 +10,24 @@ typedef struct {
 	uint8_t  res[3];
 } pid_obd_t, *ppids_obd_t;
 
-// Размер раблицы PIDов:
+// Р Р°Р·РјРµСЂ СЂР°Р±Р»РёС†С‹ PIDРѕРІ:
 #define PIDS_SIZE (sizeof(pids_list)/sizeof(pid_obd_t))
 
 #define OBD_DELAY_PIDS    150
 #define OBD_DELAY_TIMEOUT 100
 #define OBD_DELAY_START   10000
 
-// Инцициализация OBD:
+// РРЅС†РёС†РёР°Р»РёР·Р°С†РёСЏ OBD:
 void obd_init(void);
-// Отключение OBD:
+// РћС‚РєР»СЋС‡РµРЅРёРµ OBD:
 void obd_deinit(void);
-// Активация опроса (актуально для NMPS):
+// РђРєС‚РёРІР°С†РёСЏ РѕРїСЂРѕСЃР° (Р°РєС‚СѓР°Р»СЊРЅРѕ РґР»СЏ NMPS):
 void obd_act(int flag);
-// Инициировать запрос к ЭБУ:
+// РРЅРёС†РёРёСЂРѕРІР°С‚СЊ Р·Р°РїСЂРѕСЃ Рє Р­Р‘РЈ:
 void obd_getpid(uint16_t addr, uint16_t pid);
-// Обработчик, должен вызываться из CAN Interrupt:
+// РћР±СЂР°Р±РѕС‚С‡РёРє, РґРѕР»Р¶РµРЅ РІС‹Р·С‹РІР°С‚СЊСЃСЏ РёР· CAN Interrupt:
 void obd_loopback(CAN_msg *p);
-// Активация/деактивация PID-запроса:
+// РђРєС‚РёРІР°С†РёСЏ/РґРµР°РєС‚РёРІР°С†РёСЏ PID-Р·Р°РїСЂРѕСЃР°:
 int obd_act_set(uint16_t pid, int flag);
 
 #endif

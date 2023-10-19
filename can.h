@@ -54,10 +54,10 @@ void CAN_rs_set(void);
 void CAN_rs_unset(void);
 
 extern CAN_msg       CAN_TxMsg;       /* CAN messge for sending               */
-extern CAN_msg       CAN_RxMsg;       /* CAN message for receiving            */                                
-extern CAN_msg       CAN_RtMsg;       /* CAN message for RTR                  */                                
-extern unsigned int  CAN_TxRdy;       /* CAN HW ready to transmit a message   */
-extern unsigned int  CAN_RxRdy;       /* CAN HW received a message            */
+extern CAN_msg       CAN_RxMsg;       /* CAN message for receiving            */
+extern CAN_msg       CAN_RtMsg;       /* CAN message for RTR                  */
+extern unsigned int  CAN_TxRdy;      /* CAN HW ready to transmit a message   */
+extern unsigned int  CAN_RxRdy;      /* CAN HW received a message            */
 
 #if 0
 #define CAN_LOOPBACK(msg)  

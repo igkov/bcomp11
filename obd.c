@@ -1,5 +1,5 @@
 /* 
-	Упрощенный менеджер. Запросы через фиксированные интервалы времени.
+	РЈРїСЂРѕС‰РµРЅРЅС‹Р№ РјРµРЅРµРґР¶РµСЂ. Р—Р°РїСЂРѕСЃС‹ С‡РµСЂРµР· С„РёРєСЃРёСЂРѕРІР°РЅРЅС‹Рµ РёРЅС‚РµСЂРІР°Р»С‹ РІСЂРµРјРµРЅРё.
  */
 
 #include <stdint.h>
@@ -10,7 +10,7 @@
 #include "dbg.h"
 #include "bcomp.h"
 
-// Переменные обработчика
+// РџРµСЂРµРјРµРЅРЅС‹Рµ РѕР±СЂР°Р±РѕС‚С‡РёРєР°
 static uint16_t can_pid;
 static uint16_t can_id;
 static uint8_t can_len;
@@ -18,43 +18,43 @@ static uint8_t can_offset;
 static uint8_t can_cnt;
 static uint8_t can_buffer[128];
 static uint8_t can_done;
-// Переменная для "карусели":
+// РџРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ "РєР°СЂСѓСЃРµР»Рё":
 static int count;
 
-/* Список PID-ов для получения. */
+/* РЎРїРёСЃРѕРє PID-РѕРІ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ. */
 pid_obd_t pids_list[] = {
-	// CAN ADDR          | PID              | ACT |  RES1  RES2  RES3     
+	// CAN ADDR          | PID              | ACT |  RES1  RES2  RES3
 #if ( PAJERO_SPECIFIC == 0 )
-	{ PID_REQUEST_ENGINE,  ENGINE_RPM,           1, {0xFF, 0xFF, 0xFF} }, // 1. Обороты (получаем сырыми данными).
-	{ PID_REQUEST_ENGINE,  VEHICLE_SPEED,        1, {0xFF, 0xFF, 0xFF} }, // 2. Спидометр (получаем сырыми данными).
-	{ PID_REQUEST_ENGINE,  ENGINE_COOLANT_TEMP,  1, {0xFF, 0xFF, 0xFF} }, // 3. Темп. двигателя (получаем сырыми данными).
+	{ PID_REQUEST_ENGINE,  ENGINE_RPM,           1, {0xFF, 0xFF, 0xFF} }, // 1. РћР±РѕСЂРѕС‚С‹ (РїРѕР»СѓС‡Р°РµРј СЃС‹СЂС‹РјРё РґР°РЅРЅС‹РјРё).
+	{ PID_REQUEST_ENGINE,  VEHICLE_SPEED,        1, {0xFF, 0xFF, 0xFF} }, // 2. РЎРїРёРґРѕРјРµС‚СЂ (РїРѕР»СѓС‡Р°РµРј СЃС‹СЂС‹РјРё РґР°РЅРЅС‹РјРё).
+	{ PID_REQUEST_ENGINE,  ENGINE_COOLANT_TEMP,  1, {0xFF, 0xFF, 0xFF} }, // 3. РўРµРјРї. РґРІРёРіР°С‚РµР»СЏ (РїРѕР»СѓС‡Р°РµРј СЃС‹СЂС‹РјРё РґР°РЅРЅС‹РјРё).
 #endif
-	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 4. Напряжение бортовой сети.
+	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 4. РќР°РїСЂСЏР¶РµРЅРёРµ Р±РѕСЂС‚РѕРІРѕР№ СЃРµС‚Рё.
 #if ( PAJERO_SPECIFIC == 1 )
-	{ PID_REQUEST_AT,      PAJERO_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки (MITSUBISHI)
+	{ PID_REQUEST_AT,      PAJERO_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. РўРµРјРї. РєРѕСЂРѕР±РєРё (MITSUBISHI)
 #elif ( NISSAN_SPECIFIC == 1 )
-	{ PID_REQUEST_AT,      NISSAN_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. Темп. коробки (NISSAN)
+	{ PID_REQUEST_AT,      NISSAN_AT_INFO,       1, {0xFF, 0xFF, 0xFF} }, // 5. РўРµРјРї. РєРѕСЂРѕР±РєРё (NISSAN)
 #endif
-	{ PID_REQUEST_ENGINE,  GET_VIN,              1, {0xFF, 0xFF, 0xFF} }, // 6. Получение VIN-автомобиля.
-	{ PID_REQUEST_ENGINE,  INTAKE_PRESSURE,      1, {0xFF, 0xFF, 0xFF} }, // 7. Давление наддува.
-	//{ PID_REQUEST_ENGINE,  ENGINE_RUNTIME,       0, {0xFF, 0xFF, 0xFF} }, // 8. Время работы двигателя.
-	{ PID_REQUEST_ENGINE,  FUEL_RAIL_PRES_ALT,   1, {0xFF, 0xFF, 0xFF} }, // 9. Давление топлива в рейке.
-	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 10. Напряжение бортовой сети.
-	//{ PID_REQUEST_ENGINE,  MAF_SENSOR,           0, {0xFF, 0xFF, 0xFF} }, // 11. Данные с MAF-сенсора.
-	//{ PID_REQUEST_ENGINE,  BAROMETRIC_PRESSURE,  0, {0xFF, 0xFF, 0xFF} }, // 12. Наружное давление.
+	{ PID_REQUEST_ENGINE,  GET_VIN,              1, {0xFF, 0xFF, 0xFF} }, // 6. РџРѕР»СѓС‡РµРЅРёРµ VIN-Р°РІС‚РѕРјРѕР±РёР»СЏ.
+	{ PID_REQUEST_ENGINE,  INTAKE_PRESSURE,      1, {0xFF, 0xFF, 0xFF} }, // 7. Р”Р°РІР»РµРЅРёРµ РЅР°РґРґСѓРІР°.
+	//{ PID_REQUEST_ENGINE,  ENGINE_RUNTIME,       0, {0xFF, 0xFF, 0xFF} }, // 8. Р’СЂРµРјСЏ СЂР°Р±РѕС‚С‹ РґРІРёРіР°С‚РµР»СЏ.
+	{ PID_REQUEST_ENGINE,  FUEL_RAIL_PRES_ALT,   1, {0xFF, 0xFF, 0xFF} }, // 9. Р”Р°РІР»РµРЅРёРµ С‚РѕРїР»РёРІР° РІ СЂРµР№РєРµ.
+	{ PID_REQUEST_ENGINE,  ECU_VOLTAGE,          1, {0xFF, 0xFF, 0xFF} }, // 10. РќР°РїСЂСЏР¶РµРЅРёРµ Р±РѕСЂС‚РѕРІРѕР№ СЃРµС‚Рё.
+	//{ PID_REQUEST_ENGINE,  MAF_SENSOR,           0, {0xFF, 0xFF, 0xFF} }, // 11. Р”Р°РЅРЅС‹Рµ СЃ MAF-СЃРµРЅСЃРѕСЂР°.
+	//{ PID_REQUEST_ENGINE,  BAROMETRIC_PRESSURE,  0, {0xFF, 0xFF, 0xFF} }, // 12. РќР°СЂСѓР¶РЅРѕРµ РґР°РІР»РµРЅРёРµ.
 #if 0
-	{ PID_REQUEST_ENGINE,  STATUS_DTC,           1, {0xFF, 0xFF, 0xFF} }, // 13. Информация об ощибках в ЭБУ двигателя.
-	{ PID_REQUEST_ENGINE,  FREEZE_DTC,           0, {0xFF, 0xFF, 0xFF} }, // 14. Получение кода ошибки из памяти (отключено по-умолчанию).
+	{ PID_REQUEST_ENGINE,  STATUS_DTC,           1, {0xFF, 0xFF, 0xFF} }, // 13. РРЅС„РѕСЂРјР°С†РёСЏ РѕР± РѕС‰РёР±РєР°С… РІ Р­Р‘РЈ РґРІРёРіР°С‚РµР»СЏ.
+	{ PID_REQUEST_ENGINE,  FREEZE_DTC,           0, {0xFF, 0xFF, 0xFF} }, // 14. РџРѕР»СѓС‡РµРЅРёРµ РєРѕРґР° РѕС€РёР±РєРё РёР· РїР°РјСЏС‚Рё (РѕС‚РєР»СЋС‡РµРЅРѕ РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ).
 #endif
 #if ( PAJERO_SPECIFIC == 1 )
-	{ PID_REQUEST_ENGINE,  PAJERO_ODO_INFO,      0, {0xFF, 0xFF, 0xFF} }, // 15. Получение данных одометра.
+	{ PID_REQUEST_ENGINE,  PAJERO_ODO_INFO,      0, {0xFF, 0xFF, 0xFF} }, // 15. РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РѕРґРѕРјРµС‚СЂР°.
 #endif
 };
 
-// Обработчик пакетов от шины CAN (по протоколу J1979):
+// РћР±СЂР°Р±РѕС‚С‡РёРє РїР°РєРµС‚РѕРІ РѕС‚ С€РёРЅС‹ CAN (РїРѕ РїСЂРѕС‚РѕРєРѕР»Сѓ J1979):
 void obd_loopback(CAN_msg *p) {
 	if (can_id != p->id) {
-		// Сырые пакеты данных:
+		// РЎС‹СЂС‹Рµ РїР°РєРµС‚С‹ РґР°РЅРЅС‹С…:
 		bcomp_raw(p->id, p->data, p->len);
 		return;
 	}
@@ -116,14 +116,14 @@ void obd_loopback(CAN_msg *p) {
 			DBG("ERROR: incorrect PID in answer (wait %02x, receive %02x)!\r\n", (can_pid&0xFF), p->data[2]);
 			return;
 		}
-		// Копируем:
+		// РљРѕРїРёСЂСѓРµРј:
 		can_len = p->data[0];
 		can_offset = p->data[0];
 		
 		memset(can_buffer, 0, sizeof(can_buffer));
 		memcpy(can_buffer, &p->data[1], can_len);
 obd_loopback_recv:
-		// Завершились, флаг готовности данных:
+		// Р—Р°РІРµСЂС€РёР»РёСЃСЊ, С„Р»Р°Рі РіРѕС‚РѕРІРЅРѕСЃС‚Рё РґР°РЅРЅС‹С…:
 		can_done = 1;
 	}
 	else {
@@ -135,17 +135,17 @@ obd_loopback_recv:
 void obd_getpid(uint16_t addr, uint16_t pid) {
 	//DBG("get_pid(%04x, %04x);\r\n", addr, pid);
 #if ( 0 )
-	// Настройка приема:
+	// РќР°СЃС‚СЂРѕР№РєР° РїСЂРёРµРјР°:
 	CAN_wrFilter(addr+0x08, STANDARD_FORMAT);
 #endif
-	// Инициализация обработчика:
+	// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕР±СЂР°Р±РѕС‚С‡РёРєР°:
 	can_len = 0;
 	can_id = addr+0x08;
 	can_pid = pid;
 	can_offset = 0;
 	can_cnt = 0;
 	can_done = 0;
-	// Собираем запрос:
+	// РЎРѕР±РёСЂР°РµРј Р·Р°РїСЂРѕСЃ:
 	CAN_TxMsg.id = addr;
 	memset(CAN_TxMsg.data, 0x00, 8);
 	CAN_TxMsg.data[0] = 0x02;
@@ -154,36 +154,36 @@ void obd_getpid(uint16_t addr, uint16_t pid) {
 	CAN_TxMsg.len = 8;
 	CAN_TxMsg.format = STANDARD_FORMAT;
 	CAN_TxMsg.type = DATA_FRAME;
-	// Отправка запроса:
+	// РћС‚РїСЂР°РІРєР° Р·Р°РїСЂРѕСЃР°:
 	//CAN_writeMsg(1, &CAN_TxMsg);
 	CAN_wrMsg(&CAN_TxMsg);
 }
 
 static void obd_manage(void) {
 	if (can_done == 1) {
-		// Запрос обработан!
+		// Р—Р°РїСЂРѕСЃ РѕР±СЂР°Р±РѕС‚Р°РЅ!
 		bcomp_proc(can_pid, can_buffer, can_len);
-		//Свободны, обработка след. запроса:
+		//РЎРІРѕР±РѕРґРЅС‹, РѕР±СЂР°Р±РѕС‚РєР° СЃР»РµРґ. Р·Р°РїСЂРѕСЃР°:
 		can_pid = can_id = can_done = 0;
-		//Задержка перед следующей обработкой:
+		//Р—Р°РґРµСЂР¶РєР° РїРµСЂРµРґ СЃР»РµРґСѓСЋС‰РµР№ РѕР±СЂР°Р±РѕС‚РєРѕР№:
 		event_set(obd_manage, OBD_DELAY_PIDS);
 	} else 
 	if (can_pid == 0) {
-		// В случае установленного сервисного флага, запросы в ЭБУ не отправляются.
-		// Пассивное прослушивание шины при этом остается активным.
+		// Р’ СЃР»СѓС‡Р°Рµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕРіРѕ СЃРµСЂРІРёСЃРЅРѕРіРѕ С„Р»Р°РіР°, Р·Р°РїСЂРѕСЃС‹ РІ Р­Р‘РЈ РЅРµ РѕС‚РїСЂР°РІР»СЏСЋС‚СЃСЏ.
+		// РџР°СЃСЃРёРІРЅРѕРµ РїСЂРѕСЃР»СѓС€РёРІР°РЅРёРµ С€РёРЅС‹ РїСЂРё СЌС‚РѕРј РѕСЃС‚Р°РµС‚СЃСЏ Р°РєС‚РёРІРЅС‹Рј.
 		if (bcomp.service == 0) {
-			// Запрос к ЭБУ.
+			// Р—Р°РїСЂРѕСЃ Рє Р­Р‘РЈ.
 			obd_getpid(pids_list[count%PIDS_SIZE].addr, pids_list[count%PIDS_SIZE].pid);
 		}
-		// Позиция для следующего запроса:
+		// РџРѕР·РёС†РёСЏ РґР»СЏ СЃР»РµРґСѓСЋС‰РµРіРѕ Р·Р°РїСЂРѕСЃР°:
 		do {
 			count++;
 		} while (pids_list[count%PIDS_SIZE].act == 0); 
-		// Запрос отправлен, ожидаем до 100мс:
+		// Р—Р°РїСЂРѕСЃ РѕС‚РїСЂР°РІР»РµРЅ, РѕР¶РёРґР°РµРј РґРѕ 100РјСЃ:
 		event_set(obd_manage, OBD_DELAY_TIMEOUT);
 		return;
 	} else {
-		// Таймаут!
+		// РўР°Р№РјР°СѓС‚!
 		can_pid = 0;
 		event_set(obd_manage, 10);
 	}
@@ -192,7 +192,7 @@ static void obd_manage(void) {
 void obd_init(void) {
 	// Start Rs signal:
 	CAN_rs_set();
-	// Обнуляем переменные:
+	// РћР±РЅСѓР»СЏРµРј РїРµСЂРµРјРµРЅРЅС‹Рµ:
 	can_pid = 0;
 	can_len = 0;
 	can_offset = 0;
@@ -204,13 +204,13 @@ void obd_init(void) {
 	count = 0;
 #endif
 	memset(can_buffer, 0, sizeof(can_buffer));
-	// Инициализируем CAN-интерфейс:
+	// РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј CAN-РёРЅС‚РµСЂС„РµР№СЃ:
 	CAN_setup(bconfig.can_speed);                  /* setup CAN Controller, 500kbit/s */
 	CAN_start();                                   /* start CAN Controller    */
 	CAN_waitReady();                               /* wait til tx mbx is empty */
 	CAN_noFilter(STANDARD_FORMAT);
 #if ( PAJERO_SPECIFIC == 0 )
-	// 5000ms обработка, задержка 5 секунд перед началом опроса ECU:
+	// 5000ms РѕР±СЂР°Р±РѕС‚РєР°, Р·Р°РґРµСЂР¶РєР° 5 СЃРµРєСѓРЅРґ РїРµСЂРµРґ РЅР°С‡Р°Р»РѕРј РѕРїСЂРѕСЃР° ECU:
 	event_set(obd_manage, OBD_DELAY_START);
 #endif
 }
@@ -219,7 +219,7 @@ void obd_act(int flag) {
 	if (flag) {
 		if (count == -1) {
 			count = 0;
-			// задержка 5 секунд перед началом опроса ECU:
+			// Р·Р°РґРµСЂР¶РєР° 5 СЃРµРєСѓРЅРґ РїРµСЂРµРґ РЅР°С‡Р°Р»РѕРј РѕРїСЂРѕСЃР° ECU:
 			event_set(obd_manage, OBD_DELAY_START);
 		}
 	} else {
@@ -229,8 +229,8 @@ void obd_act(int flag) {
 }
 
 /*
-	TODO: Rs-сигнал имеет другое предназначение (используется для управления крутизной фронтов). 
-	Для High-speed CAN-шины он не актуален, его можно просто сажать на землю (как и сделано в прошлых реализациях).
+	TODO: Rs-СЃРёРіРЅР°Р» РёРјРµРµС‚ РґСЂСѓРіРѕРµ РїСЂРµРґРЅР°Р·РЅР°С‡РµРЅРёРµ (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ СѓРїСЂР°РІР»РµРЅРёСЏ РєСЂСѓС‚РёР·РЅРѕР№ С„СЂРѕРЅС‚РѕРІ). 
+	Р”Р»СЏ High-speed CAN-С€РёРЅС‹ РѕРЅ РЅРµ Р°РєС‚СѓР°Р»РµРЅ, РµРіРѕ РјРѕР¶РЅРѕ РїСЂРѕСЃС‚Рѕ СЃР°Р¶Р°С‚СЊ РЅР° Р·РµРјР»СЋ (РєР°Рє Рё СЃРґРµР»Р°РЅРѕ РІ РїСЂРѕС€Р»С‹С… СЂРµР°Р»РёР·Р°С†РёСЏС…).
  */
 void obd_deinit(void) {
 	// Deinit CAN:

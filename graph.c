@@ -19,7 +19,7 @@ extern int _sprintf(char *out, const char *format, ...);
 // 1 bit per pixel:
 static uint8_t frame[128*64/8];
 
-// Низкоуровневая работа с пикселями экрана:
+// РќРёР·РєРѕСѓСЂРѕРІРЅРµРІР°СЏ СЂР°Р±РѕС‚Р° СЃ РїРёРєСЃРµР»СЏРјРё СЌРєСЂР°РЅР°:
 #define SET_PIXEL(x,y) frame[SIZE_X * ((y)/8) + (x)] |= 1<<(y&0x07);
 #define CLR_PIXEL(x,y) frame[SIZE_X * ((y)/8) + (x)] &= ~(1<<(y&0x07));
 
@@ -27,118 +27,134 @@ static uint8_t frame[128*64/8];
 extern const uint8_t font6x8[256][6];
 // Font 6x8
 void graph_puts8(int x, int y, int w, const char *str) {
-	int i = 0;
-	int fx = 0;
-	if (w) {
-		x = x - 6*strlen(str)/2;
-		if (x < 0) {
-			x = 0;
-		}
-	}
-	while (str[i] != 0) {
-		for (fx=0; fx < 6; fx++) {
-			int offset;
-			if (x+fx > 255) {
-				continue;
-			}
-			offset = SIZE_X * (y/8) + (x + fx);
-			frame[offset] = font6x8[str[i]][fx];
-		}
-		i++;
-		x += fx;
-	}
+    int i = 0;
+    int fx = 0;
+    if (w) {
+        x = x - 6*strlen(str)/2;
+        if (x < 0) {
+            x = 0;
+        }
+    }
+    while (str[i] != 0) {
+        for (fx=0; fx < 6; fx++) {
+            int offset;
+            if (x+fx > 255) {
+                continue;
+            }
+            offset = SIZE_X * (y/8) + (x + fx);
+            frame[offset] = font6x8[str[i]][fx];
+        }
+        i++;
+        x += fx;
+    }
 }
 #endif
 
 // Font 12x16
 void graph_puts16(int x, int y, int w, const char *str) {
-	int i = 0;
-	int fx = 0;
-	int fy = y>>3;
-	int fm = y&0x07;
-	uint8_t ch;
-	if (w) {
-		x = x - 12*strlen(str)/2;
-		if (x < 0) {
-			x = 0;
-		}
-	}
-	while ((ch = str[i]) != 0) {
-		// nop codes 0x00-0x1F
-		// nop codes 0x80-0xAF
-		if (ch < 0x20) {
-			continue;
-		} else
-		if (ch >= 0xB0) {
-			ch -= (0x20 + 0x030);
-		} else {
-			ch -= 0x20;
-		}
-		for (fx=0; fx < 12; fx++) {
-			frame[SIZE_X * (fy + 0) + (x + fx)] |= font12x16[ch][fx]<<fm;
-			frame[SIZE_X * (fy + 1) + (x + fx)] |= font12x16[ch][fx]>>(8-fm);
-			frame[SIZE_X * (fy + 1) + (x + fx)] |= font12x16[ch][fx+12]<<fm;
-			frame[SIZE_X * (fy + 2) + (x + fx)] |= font12x16[ch][fx+12]>>(8-fm);
-		}
-		i++;
-		x += fx;
-	}
+    int i = 0;
+    int fx = 0;
+    int fy = y>>3;
+    int fm = y&0x07;
+    uint8_t ch;
+    uint8_t utf = 0;
+    if (w) {
+        x = x - 12*strlen(str)/2;
+        if (x < 0) {
+            x = 0;
+        }
+    }
+    while ((ch = str[i]) != 0) {
+        // nop codes 0x00-0x1F
+        // nop codes 0x80-0xAF
+#if 1 //SUPPORTED_UTF8
+        if (utf == 1) {
+            if (ch >= 0xB0) {
+                ch -= (0x20 + 0x030);
+            } else {
+                ch -= 0x20;
+            }
+            utf = 0;
+        } else
+        if (ch == 0xC2) {
+            utf = 1;
+            i++;
+            continue;
+        } else
+#endif
+        if (ch < 0x20) {
+            continue;
+        } else
+        if (ch >= 0xB0) {
+            ch -= (0x20 + 0x030);
+        } else {
+            ch -= 0x20;
+        }
+        for (fx=0; fx < 12; fx++) {
+            frame[SIZE_X * (fy + 0) + (x + fx)] |= font12x16[ch][fx]<<fm;
+            frame[SIZE_X * (fy + 1) + (x + fx)] |= font12x16[ch][fx]>>(8-fm);
+            frame[SIZE_X * (fy + 1) + (x + fx)] |= font12x16[ch][fx+12]<<fm;
+            frame[SIZE_X * (fy + 2) + (x + fx)] |= font12x16[ch][fx+12]>>(8-fm);
+        }
+        i++;
+        x += fx;
+    }
 }
 
 // ICO XXx16
 void graph_ico16(int x, int y, const uint8_t *ico, int size) {
-	int fx;
-	int fy = y>>3;
-	int fm = y&0x07;
-	for (fx=0; fx < size; fx++) {
-		frame[SIZE_X * (fy + 0) + (x + fx)] |= ico[fx+0*size]<<fm;
-		frame[SIZE_X * (fy + 1) + (x + fx)] |= ico[fx+0*size]>>(8-fm);
-		frame[SIZE_X * (fy + 1) + (x + fx)] |= ico[fx+1*size]<<fm;
-		frame[SIZE_X * (fy + 2) + (x + fx)] |= ico[fx+1*size]>>(8-fm);
-	}
+    int fx;
+    int fy = y>>3;
+    int fm = y&0x07;
+    for (fx=0; fx < size; fx++) {
+        frame[SIZE_X * (fy + 0) + (x + fx)] |= ico[fx+0*size]<<fm;
+        frame[SIZE_X * (fy + 1) + (x + fx)] |= ico[fx+0*size]>>(8-fm);
+        frame[SIZE_X * (fy + 1) + (x + fx)] |= ico[fx+1*size]<<fm;
+        frame[SIZE_X * (fy + 2) + (x + fx)] |= ico[fx+1*size]>>(8-fm);
+    }
 }
 
 #if !defined( __GCC__ )
-// Вывод графической иконки по дескриптору.
-// Поддерживает сжатие тела иконки.
+// Р’С‹РІРѕРґ РіСЂР°С„РёС‡РµСЃРєРѕР№ РёРєРѕРЅРєРё РїРѕ РґРµСЃРєСЂРёРїС‚РѕСЂСѓ.
+// РџРѕРґРґРµСЂР¶РёРІР°РµС‚ СЃР¶Р°С‚РёРµ С‚РµР»Р° РёРєРѕРЅРєРё.
 static uint8_t uncompress[64*64/8];
 void graph_pic(const ico_t *p, int ox, int oy) {
-	int x, y;
-	int size = sizeof(uncompress);
-	const uint8_t *data;
-	// Требуется предварительная распаковка функцией lzss_unpack():
-	lzss_decode(p->data, p->size, uncompress, &size);
-	y = p->sizey/8;
-	if (p->sizey%8) {
-		y++;
-	}
-	if (size != p->sizex*y) {
-		DBG("lzss_decode() error: need size %db (unpack %db)\r\n", p->sizex*y, size);
-		return;
-	}
-	data = uncompress;
-	for (y=0; y<p->sizey && (oy+y) < SIZE_Y; y++) {
-		for (x=0; x<p->sizex && (ox+x) < SIZE_X; x++) {
-			int offset = SIZE_X * (y+oy) + (x+ox);
-			if (offset > SIZE_X*SIZE_Y) {
-				continue;
-			}
-			if (data[p->sizex*(y/8) + x] & (1<<(y&7))) {
-				SET_PIXEL(ox+x,oy+y);
-			}
-		}
-	}
+    int x, y;
+    int size = sizeof(uncompress);
+    const uint8_t *data;
+    // РўСЂРµР±СѓРµС‚СЃСЏ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ СЂР°СЃРїР°РєРѕРІРєР° С„СѓРЅРєС†РёРµР№ lzss_unpack():
+    lzss_decode(p->data, p->size, uncompress, &size);
+    y = p->sizey/8;
+    if (p->sizey%8) {
+        y++;
+    }
+    if (size != p->sizex*y) {
+        DBG("lzss_decode() error: need size %db (unpack %db)\r\n", p->sizex*y, size);
+        return;
+    }
+    data = uncompress;
+    for (y=0; y<p->sizey && (oy+y) < SIZE_Y; y++) {
+        for (x=0; x<p->sizex && (ox+x) < SIZE_X; x++) {
+            int offset = SIZE_X * (y+oy) + (x+ox);
+            if (offset > SIZE_X*SIZE_Y) {
+                continue;
+            }
+            if (data[p->sizex*(y/8) + x] & (1<<(y&7))) {
+                SET_PIXEL(ox+x,oy+y);
+            }
+        }
+    }
 }
 #endif
 
 void graph_putpix(int x, int y, uint8_t value) {
-	// NOTE: значение value не поддерживается текущим экраном,
-	// однако, оставлено в прототипах, т.к. при переходе на другие 
-	// аппаратные платформы может быть полезным.
-	if (x >= 0 && x < SIZE_X &&
-		y >= 0 && y < SIZE_Y) {
-		SET_PIXEL(x,y);
-	}
+    // NOTE: Р·РЅР°С‡РµРЅРёРµ value РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ С‚РµРєСѓС‰РёРј СЌРєСЂР°РЅРѕРј,
+    // РѕРґРЅР°РєРѕ, РѕСЃС‚Р°РІР»РµРЅРѕ РІ РїСЂРѕС‚РѕС‚РёРїР°С…, С‚.Рє. РїСЂРё РїРµСЂРµС…РѕРґРµ РЅР° РґСЂСѓРіРёРµ 
+    // Р°РїРїР°СЂР°С‚РЅС‹Рµ РїР»Р°С‚С„РѕСЂРјС‹ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїРѕР»РµР·РЅС‹Рј.
+    if (x >= 0 && x < SIZE_X &&
+        y >= 0 && y < SIZE_Y) {
+        SET_PIXEL(x,y);
+    }
 }
 
 #if !defined( __GCC__ )
@@ -170,8 +186,8 @@ void graph_putpix(int x, int y, uint8_t value) {
 #define FONT_ARRAY font_array
 
 //
-// FONT_RECODE - определение, говорящее о том, что требуется перекодировка таблицы символов.
-// Сделано для экономии памяти. Можно добавлять только используемые символы.
+// FONT_RECODE - РѕРїСЂРµРґРµР»РµРЅРёРµ, РіРѕРІРѕСЂСЏС‰РµРµ Рѕ С‚РѕРј, С‡С‚Рѕ С‚СЂРµР±СѓРµС‚СЃСЏ РїРµСЂРµРєРѕРґРёСЂРѕРІРєР° С‚Р°Р±Р»РёС†С‹ СЃРёРјРІРѕР»РѕРІ.
+// РЎРґРµР»Р°РЅРѕ РґР»СЏ СЌРєРѕРЅРѕРјРёРё РїР°РјСЏС‚Рё. РњРѕР¶РЅРѕ РґРѕР±Р°РІР»СЏС‚СЊ С‚РѕР»СЊРєРѕ РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ СЃРёРјРІРѕР»С‹.
 //
 
 #if defined( FONT_RECODE )
@@ -181,53 +197,53 @@ const uint8_t map_font32[256] = {
 /* 0x10 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0x20 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  11,  12,  13,  
 /* 0x30 */    1,   2,   3,   4,   5,   6,   7,   8,   9,  10,   0,   0,   0,   0,   0,   0,  
-/* 0x40 */    0,   0,   0,  14,  15,   0,   0,   0,   0,   0,   0,   0,   0,  22,  16,   0,  
+/* 0x40 */    0,   0,   0,  14,  15,   0,   0,   0,   0,   0,   0,   0,   0,  21,  16,   0,  
 /* 0x50 */   17,   0,  18,   0,   0,   0,  19,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
-/* 0x60 */    0,  23,   0,   0,   0,   0,   0,   0,   0,   0,   0,  24,   0,   0,   0,   0,  
+/* 0x60 */    0,  22,   0,   0,   0,   0,   0,   0,   0,   0,   0,  23,   0,   0,   0,   0,  
 /* 0x70 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0x80 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0x90 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0xA0 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0xB0 */   20,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
-/* 0xC0 */    0,   0,  21,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
+/* 0xC0 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0xD0 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0xE0 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 /* 0xF0 */    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
 };
 #endif
-// Вывод строки символов высотой 32px с центрированием по указанной позиции (полутоновой шрифт)
+// Р’С‹РІРѕРґ СЃС‚СЂРѕРєРё СЃРёРјРІРѕР»РѕРІ РІС‹СЃРѕС‚РѕР№ 32px СЃ С†РµРЅС‚СЂРёСЂРѕРІР°РЅРёРµРј РїРѕ СѓРєР°Р·Р°РЅРЅРѕР№ РїРѕР·РёС†РёРё (РїРѕР»СѓС‚РѕРЅРѕРІРѕР№ С€СЂРёС„С‚)
 void graph_puts32c(int ox, int oy, char *str) {
-	uint8_t ch;
-	int offset = 0;
-	int i = 0;
-	int wide = 0;
-	// Рассчет выравнивания:
-	while ((ch = str[i]) != 0) {
+    uint8_t ch;
+    int offset = 0;
+    int i = 0;
+    int wide = 0;
+    // Р Р°СЃСЃС‡РµС‚ РІС‹СЂР°РІРЅРёРІР°РЅРёСЏ:
+    while ((ch = str[i]) != 0) {
 #if defined( FONT_RECODE )
-		ch = map_font32[ch];
+        ch = map_font32[ch];
 #else
-		ch -= 0x20;
+        ch -= 0x20;
 #endif
-		wide += FONT_ARRAY[ch].sizex;
-		i++;
-	}
-	ox -= wide/2; if (ox < 0) ox = 0;
-	// Вывод строки:
-	i = 0;
-	while ((ch = str[i]) != 0) {
+        wide += FONT_ARRAY[ch].sizex;
+        i++;
+    }
+    ox -= wide/2; if (ox < 0) ox = 0;
+    // Р’С‹РІРѕРґ СЃС‚СЂРѕРєРё:
+    i = 0;
+    while ((ch = str[i]) != 0) {
 #if defined( FONT_RECODE )
-		ch = map_font32[ch];
+        ch = map_font32[ch];
 #else
-		ch -= 0x20;
+        ch -= 0x20;
 #endif
-		if (FONT_ARRAY[ch].data == NULL) {
-			//nop
-		} else {
-			graph_pic(&FONT_ARRAY[ch], ox+offset, oy);
-		}
-		offset += FONT_ARRAY[ch].sizex;
-		i++;
-	}
+        if (FONT_ARRAY[ch].data == NULL) {
+            //nop
+        } else {
+            graph_pic(&FONT_ARRAY[ch], ox+offset, oy);
+        }
+        offset += FONT_ARRAY[ch].sizex;
+        i++;
+    }
 }
 // ---------------------------------------------
 // EXT FONT SUPPORT END
@@ -241,43 +257,43 @@ void graph_puts32c(int ox, int oy, char *str) {
 #define ABS(a) ((a)<0?-(a):(a))
 
 static void graph_swap(int* a, int* b) {
-	int t = *a; *a = *b; *b = t;
+    int t = *a; *a = *b; *b = t;
 }
 void graph_line(int x1, int y1, int x2, int y2) {
-	int dx, dy, d, incry, incre, incrne, slopegt1 = 0;
-	dx = ABS(x1-x2); dy = ABS(y1-y2);
-	if(dy > dx) {
-		graph_swap(&x1, &y1);
-		graph_swap(&x2, &y2);
-		graph_swap(&dx, &dy);
-		slopegt1 = 1;
-	}
-	if(x1 > x2) {
-		graph_swap(&x1, &x2);
-		graph_swap(&y1, &y2);
-	}
-	if(y1 > y2) {
-		incry = -1;
-	} else {
-		incry = 1;
-	}
-	d = 2*dy - dx;
-	incre = 2*dy;
-	incrne = 2*(dy - dx);
-	while(x1 < x2) {
-		if(d <= 0) {
-			d+=incre;
-		} else {
-			d  += incrne;
-			y1 += incry;
-		}
-		x1++;
-		if(slopegt1) {
-			SET_PIXEL(y1,x1);
-		} else {
-			SET_PIXEL(x1,y1);
-		}
-	}
+    int dx, dy, d, incry, incre, incrne, slopegt1 = 0;
+    dx = ABS(x1-x2); dy = ABS(y1-y2);
+    if(dy > dx) {
+        graph_swap(&x1, &y1);
+        graph_swap(&x2, &y2);
+        graph_swap(&dx, &dy);
+        slopegt1 = 1;
+    }
+    if(x1 > x2) {
+        graph_swap(&x1, &x2);
+        graph_swap(&y1, &y2);
+    }
+    if(y1 > y2) {
+        incry = -1;
+    } else {
+        incry = 1;
+    }
+    d = 2*dy - dx;
+    incre = 2*dy;
+    incrne = 2*(dy - dx);
+    while(x1 < x2) {
+        if(d <= 0) {
+            d+=incre;
+        } else {
+            d  += incrne;
+            y1 += incry;
+        }
+        x1++;
+        if(slopegt1) {
+            SET_PIXEL(y1,x1);
+        } else {
+            SET_PIXEL(x1,y1);
+        }
+    }
 }
 // ---------------------------------------------
 // LINE DRAW SUPPORT END 
@@ -285,13 +301,13 @@ void graph_line(int x1, int y1, int x2, int y2) {
 #endif // __GCC__
 
 void graph_clear(void) {
-	memset(frame, 0x00, sizeof(frame));
+    memset(frame, 0x00, sizeof(frame));
 }
 
 void graph_update(void) {
 #if defined( WIN32 )
-	lcd_cpframe(frame);
+    lcd_cpframe(frame);
 #else
-	oled_draw(frame);
+    oled_draw(frame);
 #endif
 }

@@ -16,7 +16,7 @@ int config_read(int param, uint8_t *value, int len) {
 	if (param >= CONFIG_MAX_PARAM ||
 		param < 0)
 		return 1;
-	// 1ое чтение:
+	// 1РѕРµ С‡С‚РµРЅРёРµ:
 	ee_read(addr, (uint8_t*)&unit, sizeof(config_unit_t));
 	if (unit.flag == 0xDE &&
 		unit.len >= len &&
@@ -24,7 +24,7 @@ int config_read(int param, uint8_t *value, int len) {
 		memcpy(value, unit.data, len);
 		return 0;
 	}
-	// Не прочитано. 2ое чтение:
+	// РќРµ РїСЂРѕС‡РёС‚Р°РЅРѕ. 2РѕРµ С‡С‚РµРЅРёРµ:
 	ee_read(addr+sizeof(config_unit_t), (uint8_t*)&unit, sizeof(config_unit_t));
 	if (unit.flag == 0xEA &&
 		unit.len >= len &&
@@ -47,21 +47,21 @@ int config_save(int param, uint8_t *value, int len) {
 	unit.crc8 = crc8(value, len);
 	unit.len = len;
 	memcpy(unit.data, value, len);
-	// 1ая запись:
+	// 1Р°СЏ Р·Р°РїРёСЃСЊ:
 	unit.flag = 0xDE;
 	ee_write(addr, (uint8_t*)&unit, sizeof(config_unit_t));
-	// NOTE: данная задержка актуальна для i2c-памяти, 
-	// т.к. мы имеем ошибки с недозаписью. Причем в силу архитектуры 
-	// конфига не проявляемые явно.
+	// NOTE: РґР°РЅРЅР°СЏ Р·Р°РґРµСЂР¶РєР° Р°РєС‚СѓР°Р»СЊРЅР° РґР»СЏ i2c-РїР°РјСЏС‚Рё, 
+	// С‚.Рє. РјС‹ РёРјРµРµРј РѕС€РёР±РєРё СЃ РЅРµРґРѕР·Р°РїРёСЃСЊСЋ. РџСЂРёС‡РµРј РІ СЃРёР»Сѓ Р°СЂС…РёС‚РµРєС‚СѓСЂС‹ 
+	// РєРѕРЅС„РёРіР° РЅРµ РїСЂРѕСЏРІР»СЏРµРјС‹Рµ СЏРІРЅРѕ.
 	for (n=0; n<30000; n++) {
 		__NOP();
 	}
-	// 2ая запись:
+	// 2Р°СЏ Р·Р°РїРёСЃСЊ:
 	unit.flag = 0xEA;
 	ee_write(addr+sizeof(config_unit_t), (uint8_t*)&unit, sizeof(config_unit_t));
-	// NOTE: данная задержка актуальна для i2c-памяти, 
-	// т.к. мы имеем ошибки с недозаписью. Причем в силу архитектуры 
-	// конфига не проявляемые явно.
+	// NOTE: РґР°РЅРЅР°СЏ Р·Р°РґРµСЂР¶РєР° Р°РєС‚СѓР°Р»СЊРЅР° РґР»СЏ i2c-РїР°РјСЏС‚Рё, 
+	// С‚.Рє. РјС‹ РёРјРµРµРј РѕС€РёР±РєРё СЃ РЅРµРґРѕР·Р°РїРёСЃСЊСЋ. РџСЂРёС‡РµРј РІ СЃРёР»Сѓ Р°СЂС…РёС‚РµРєС‚СѓСЂС‹ 
+	// РєРѕРЅС„РёРіР° РЅРµ РїСЂРѕСЏРІР»СЏРµРјС‹Рµ СЏРІРЅРѕ.
 	for (n=0; n<30000; n++) {
 		__NOP();
 	}

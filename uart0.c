@@ -6,24 +6,24 @@
 
 #if __UART_IRQ
 void UART_IRQHandler(void) {
-	uint8_t ch;
-	uint8_t IIR_val = (LPC_UART->IIR >> 1) & 0x07;
-	// Ïðèåìêà:
-	if (IIR_val == 0x03) {
-		if (LPC_UART->LSR & 0x01) {
-			ch = LPC_UART->RBR;
-			// Âûçûâàåì îáðàáîò÷èê ïðèøåäøåãî ñèìâîëà:
-			UART_DISPATCHER(ch);
-		} else {
-			return;
-		}
-	} else 
-	if (IIR_val == 0x02) {
-		ch = LPC_UART->RBR;
-		// Âûçûâàåì îáðàáîò÷èê ïðèøåäøåãî ñèìâîëà:
-		UART_DISPATCHER(ch);
-	}
-	return;
+    uint8_t ch;
+    uint8_t IIR_val = (LPC_UART->IIR >> 1) & 0x07;
+    // ÐŸÑ€Ð¸ÐµÐ¼ÐºÐ°:
+    if (IIR_val == 0x03) {
+        if (LPC_UART->LSR & 0x01) {
+            ch = LPC_UART->RBR;
+            // Ð’Ñ‹Ð·Ñ‹Ð²Ð°ÐµÐ¼ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸Ðº Ð¿Ñ€Ð¸ÑˆÐµÐ´ÑˆÐµÐ³Ð¾ ÑÐ¸Ð¼Ð²Ð¾Ð»Ð°:
+            UART_DISPATCHER(ch);
+        } else {
+            return;
+        }
+    } else 
+    if (IIR_val == 0x02) {
+        ch = LPC_UART->RBR;
+        // Ð’Ñ‹Ð·Ñ‹Ð²Ð°ÐµÐ¼ Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸Ðº Ð¿Ñ€Ð¸ÑˆÐµÐ´ÑˆÐµÐ³Ð¾ ÑÐ¸Ð¼Ð²Ð¾Ð»Ð°:
+        UART_DISPATCHER(ch);
+    }
+    return;
 }
 #endif
 
@@ -31,21 +31,21 @@ void uart0_init(uint32_t baudrate) {
     uint32_t  Fdiv;
 
 #if __UART_IRQ
-	NVIC_DisableIRQ(UART_IRQn);
+    NVIC_DisableIRQ(UART_IRQn);
 #endif
 
-	// UART power on:
-	LPC_SYSCON->SYSAHBCLKCTRL |= (1<<16) ;
+    // UART power on:
+    LPC_SYSCON->SYSAHBCLKCTRL |= (1<<16) ;
 
-	// UART I/O Config:
-	LPC_IOCON->PIO1_6 &= ~0x07;
-	LPC_IOCON->PIO1_6 |=  0x01;
-	LPC_IOCON->PIO1_7 &= ~0x07;
-	LPC_IOCON->PIO1_7 |=  0x01;
+    // UART I/O Config:
+    LPC_IOCON->PIO1_6 &= ~0x07;
+    LPC_IOCON->PIO1_6 |=  0x01;
+    LPC_IOCON->PIO1_7 &= ~0x07;
+    LPC_IOCON->PIO1_7 |=  0x01;
 
-	// Enable UART clock:
-	LPC_SYSCON->SYSAHBCLKCTRL |= (1<<12);
-	LPC_SYSCON->UARTCLKDIV     = 0x1;
+    // Enable UART clock:
+    LPC_SYSCON->SYSAHBCLKCTRL |= (1<<12);
+    LPC_SYSCON->UARTCLKDIV     = 0x1;
 
     LPC_UART->LCR = 0x83; // 8 bits, no Parity, 1 Stop bit
     Fdiv = ((SystemCoreClock/LPC_SYSCON->UARTCLKDIV)/16)/baudrate;
@@ -53,15 +53,15 @@ void uart0_init(uint32_t baudrate) {
     LPC_UART->DLL = Fdiv % 256;
     LPC_UART->LCR = 0x03;
 #if 1
-	LPC_UART->FCR = 0x07; // Enable and reset TX and RX FIFO.
+    LPC_UART->FCR = 0x07; // Enable and reset TX and RX FIFO.
 #endif
 #if __UART_IRQ
-	LPC_UART->IER = 0x01 | 0x04; // IER_RBR | IER_RLS
-	NVIC_EnableIRQ(UART_IRQn);
+    LPC_UART->IER = 0x01 | 0x04; // IER_RBR | IER_RLS
+    NVIC_EnableIRQ(UART_IRQn);
 #endif
 }
 
-void uart0_putchar (uint8_t ch) {
+void uart0_putchar (char ch) {
    while (!(LPC_UART->LSR & 0x20));
    LPC_UART->THR  = ch;
 }
@@ -71,8 +71,8 @@ uint8_t uart0_getchar (void) {
   return (LPC_UART->RBR);
 }
 
-void uart0_puts(const uint8_t * str) {
-	while ((*str) != 0) {
-		uart0_putchar(*str++);
-	}
+void uart0_puts(const char * str) {
+    while ((*str) != 0) {
+        uart0_putchar(*str++);
+    }
 }

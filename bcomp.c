@@ -1,38 +1,38 @@
 /*
-	BCOMP11 v2 firmware
-	
-	Асинхронные события:
-	1) button
-	2) calc
-	3) beep
-	4) save
-	5) obd
-	6) analog
-	7) elog
-	8) warn
+    BCOMP11 v2 firmware
+    
+    РђСЃРёРЅС…СЂРѕРЅРЅС‹Рµ СЃРѕР±С‹С‚РёСЏ:
+    1) button
+    2) calc
+    3) beep
+    4) save
+    5) obd
+    6) analog
+    7) elog
+    8) warn
     9) rpm_flag_check
-	
-	Экраны:
-	1) Основной экран с передачей и пробегом. Так же возможен вывод температуры.
-	2) Температура двигателя.
-	3) Температура трансмиссии (АКПП).
-	4) Напряжение бортовой сети.
-	5) Расходы топлива.
-	6) Путь А.
-	7) Путь Б.
-	8) Сервисные интервалы.
-	9) Положение колес.
-	10) GPS-данные.
-	11) Давление в топливной рейке.
-	12) Давление во впускном коллекторе.
-    13) Счетчик ошибок на шине.
-    14) Общий экран с основными параметрами.
-    15) Рассветы/закаты.
-	
-	Вторая итерация прошивки мини-бортового компьютера.
-	Обточка функционала для реализации полноценного устройства.
-	
-	igorkov / 2017-2018 / igorkov.org/bcomp11v2
+    
+    Р­РєСЂР°РЅС‹:
+    1) РћСЃРЅРѕРІРЅРѕР№ СЌРєСЂР°РЅ СЃ РїРµСЂРµРґР°С‡РµР№ Рё РїСЂРѕР±РµРіРѕРј. РўР°Рє Р¶Рµ РІРѕР·РјРѕР¶РµРЅ РІС‹РІРѕРґ С‚РµРјРїРµСЂР°С‚СѓСЂС‹.
+    2) РўРµРјРїРµСЂР°С‚СѓСЂР° РґРІРёРіР°С‚РµР»СЏ.
+    3) РўРµРјРїРµСЂР°С‚СѓСЂР° С‚СЂР°РЅСЃРјРёСЃСЃРёРё (РђРљРџРџ).
+    4) РќР°РїСЂСЏР¶РµРЅРёРµ Р±РѕСЂС‚РѕРІРѕР№ СЃРµС‚Рё.
+    5) Р Р°СЃС…РѕРґС‹ С‚РѕРїР»РёРІР°.
+    6) РџСѓС‚СЊ Рђ.
+    7) РџСѓС‚СЊ Р‘.
+    8) РЎРµСЂРІРёСЃРЅС‹Рµ РёРЅС‚РµСЂРІР°Р»С‹.
+    9) РџРѕР»РѕР¶РµРЅРёРµ РєРѕР»РµСЃ.
+    10) GPS-РґР°РЅРЅС‹Рµ.
+    11) Р”Р°РІР»РµРЅРёРµ РІ С‚РѕРїР»РёРІРЅРѕР№ СЂРµР№РєРµ.
+    12) Р”Р°РІР»РµРЅРёРµ РІРѕ РІРїСѓСЃРєРЅРѕРј РєРѕР»Р»РµРєС‚РѕСЂРµ.
+    13) РЎС‡РµС‚С‡РёРє РѕС€РёР±РѕРє РЅР° С€РёРЅРµ.
+    14) РћР±С‰РёР№ СЌРєСЂР°РЅ СЃ РѕСЃРЅРѕРІРЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё.
+    15) Р Р°СЃСЃРІРµС‚С‹/Р·Р°РєР°С‚С‹.
+    
+    Р’С‚РѕСЂР°СЏ РёС‚РµСЂР°С†РёСЏ РїСЂРѕС€РёРІРєРё РјРёРЅРё-Р±РѕСЂС‚РѕРІРѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР°.
+    РћР±С‚РѕС‡РєР° С„СѓРЅРєС†РёРѕРЅР°Р»Р° РґР»СЏ СЂРµР°Р»РёР·Р°С†РёРё РїРѕР»РЅРѕС†РµРЅРЅРѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР°.
+    
+    igorkov / 2017-2018 / igorkov.org/bcomp11v2
  */
 #if defined( WIN32 )
 #include <stdint.h>
@@ -95,21 +95,21 @@ volatile uint8_t save_flag = 0;
 
 // -----------------------------------------------------------------------------
 // exeption_proc
-// Попадание в эту функцию говорит о серьезной ошибке.
+// РџРѕРїР°РґР°РЅРёРµ РІ СЌС‚Сѓ С„СѓРЅРєС†РёСЋ РіРѕРІРѕСЂРёС‚ Рѕ СЃРµСЂСЊРµР·РЅРѕР№ РѕС€РёР±РєРµ.
 // -----------------------------------------------------------------------------
 void exeption_proc(void) {
-	DBG("exeption_proc(): while (1);\r\n");
-	while (1) {
-		delay_ms(300);
-		led_red(1);
-		delay_ms(300);
-		led_red(0);
-	}
+    DBG("exeption_proc(): while (1);\r\n");
+    while (1) {
+        delay_ms(300);
+        led_red(1);
+        delay_ms(300);
+        led_red(0);
+    }
 }
 
 // -----------------------------------------------------------------------------
 // bcomp_XXX
-// Асинхронные функции обработки различных событий.
+// РђСЃРёРЅС…СЂРѕРЅРЅС‹Рµ С„СѓРЅРєС†РёРё РѕР±СЂР°Р±РѕС‚РєРё СЂР°Р·Р»РёС‡РЅС‹С… СЃРѕР±С‹С‚РёР№.
 // -----------------------------------------------------------------------------
 
 
@@ -144,248 +144,253 @@ void exeption_proc(void) {
 // 26 - [Z] - data[28]       52 - [AZ] - data[54]
 
 /*
-	bcomp_proc()
+    bcomp_proc()
 
-	Вызывается из OBD.C
-	Парсит PID-s ответы, заносит параметры в структуру bcomp.
+    Р’С‹Р·С‹РІР°РµС‚СЃСЏ РёР· OBD.C
+    РџР°СЂСЃРёС‚ PID-s РѕС‚РІРµС‚С‹, Р·Р°РЅРѕСЃРёС‚ РїР°СЂР°РјРµС‚СЂС‹ РІ СЃС‚СЂСѓРєС‚СѓСЂСѓ bcomp.
  */
 void bcomp_proc(int pid, uint8_t *data, uint8_t size) {
-	data = data-1;
-	/*  Details from: http://en.wikipedia.org/wiki/OBD-II_PIDs */
-	switch (pid) {
-	//   A       B       C       D       E
-	// data[3] data[4] data[5] data[6] data[7]
-	case ENGINE_COOLANT_TEMP:
-		// A-40 [degree C]
-		bcomp.t_engine = data[3] - 40;
-		DBG("Engine temperature = %d°C\r\n", (int)bcomp.t_engine);
-		break;
-	case ENGINE_RPM:
-		// ((A*256)+B)/4 [RPM]
-		bcomp.rpms = bcomp.rpm = (uint32_t)((data[3]*256) + data[4])/4;
-		DBG("Engine RPM = %drpm\r\n", (int)bcomp.rpm);
-		break;
-	case INTAKE_PRESSURE:                   
-		// A [kPa]
-		bcomp.p_intake = data[3];
-		DBG("Intake Pressure = %dkPa\r\n", (int)bcomp.p_intake);
+    data = data-1;
+    /*  Details from: http://en.wikipedia.org/wiki/OBD-II_PIDs */
+    switch (pid) {
+    //   A       B       C       D       E
+    // data[3] data[4] data[5] data[6] data[7]
+    case ENGINE_COOLANT_TEMP:
+        // A-40 [degree C]
+        bcomp.t_engine = data[3] - 40;
+        DBG("Engine temperature = %dВ°C\r\n", (int)bcomp.t_engine);
+        break;
+    case ENGINE_RPM:
+        // ((A*256)+B)/4 [RPM]
+        bcomp.rpms = bcomp.rpm = (uint32_t)((data[3]*256) + data[4])/4;
+        DBG("Engine RPM = %drpm\r\n", (int)bcomp.rpm);
+        break;
+    case INTAKE_PRESSURE:
+        // A [kPa]
+        bcomp.p_intake = data[3];
+        DBG("Intake Pressure = %dkPa\r\n", (int)bcomp.p_intake);
 #if defined( WIN32 )
-		diagram_add(&bcomp.dia_intake, (float)bcomp.p_intake);
+        diagram_add(&bcomp.dia_intake, (float)bcomp.p_intake);
 #endif
-		break;
-	case FUEL_RAIL_PRES_ALT:
-		// ((A*256)+B)*10 [MPa]
-		bcomp.p_fuel = ((data[3] * 256)+data[4])*10;
-		DBG("Fuel pressure = %dkPa\r\n", (int)bcomp.p_fuel);
-		// Давление топлива попадает на график в реальном времени:
-		diagram_add(&bcomp.dia_rail, (float)bcomp.p_fuel);
-		break;
-	case VEHICLE_SPEED:
-		// A [km]
-		bcomp.speed = data[3];
-		DBG("Speed = %dkm\r\n", (int)bcomp.speed);
-		break;
-	case ECU_VOLTAGE:
-		// ((A*256)+B)/1000 [V]
-		bcomp.v_ecu = (float)((data[3]*256)+data[4])/1000.0f;
-		DBG("Volt = %d.%dV\r\n", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10.0f)%10);
+        break;
+    case FUEL_RAIL_PRES_ALT:
+        // ((A*256)+B)*10 [MPa]
+        bcomp.p_fuel = ((data[3] * 256)+data[4])*10;
+        DBG("Fuel pressure = %dkPa\r\n", (int)bcomp.p_fuel);
+        // Р”Р°РІР»РµРЅРёРµ С‚РѕРїР»РёРІР° РїРѕРїР°РґР°РµС‚ РЅР° РіСЂР°С„РёРє РІ СЂРµР°Р»СЊРЅРѕРј РІСЂРµРјРµРЅРё:
+        diagram_add(&bcomp.dia_rail, (float)bcomp.p_fuel);
+        break;
+    case VEHICLE_SPEED:
+        // A [km]
+        bcomp.speed = data[3];
+        DBG("Speed = %dkm\r\n", (int)bcomp.speed);
+        break;
+    case ECU_VOLTAGE:
+        // ((A*256)+B)/1000 [V]
+        bcomp.v_ecu = (float)((data[3]*256)+data[4])/1000.0f;
+        DBG("Volt = %d.%dV\r\n", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10.0f)%10);
 #if defined( WIN32 )
-		diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
+        diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
 #endif
-		break;
+        break;
 #if ( PAJERO_SPECIFIC == 1 )
-	case PAJERO_AT_INFO:
-		// F-40 [degrees C]
-		bcomp.t_akpp = (data[8]-40);
-		DBG("AT temperature = %d°C\r\n", (int)bcomp.t_akpp);
+    case PAJERO_AT_INFO:
+        // A = data[3]
+        bcomp.t_akpp = (data[8]-40);                 // A/T temp  = F-40 deg
+        bcomp.akpp_input = data[4]*128 + data[5]/2;  // A/T-enter = B*128 + C*0.5
+        bcomp.akpp_output = data[6]*128 + data[7]/2; // A/T-exit  = D*128 + E*0.5
+        bcomp.akpp_relay = data[9] * 3315 / 255;     // A/T contr = G*33.15/255
+        bcomp.akpp_speed = data[10] * 714 / 255;     // Speed     = H*714/255
+        bcomp.akpp_demf = data[11] - 51;             // Р”РµРјРїС„ Р±СѓРєСЃ = I-51
+        DBG("AT temperature = %dВ°C\r\n", (int)bcomp.t_akpp);
 #if defined( WIN32 )
-		diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
+        diagram_add(&bcomp.dia_trans, (float)bcomp.t_akpp);
 #endif
-		break;
+        break;
 #endif
 #if ( NISSAN_SPECIFIC == 1 )
-	case NISSAN_AT_INFO:
-		// This formula analog of Taylor series:
-		// (0.000000002344*(AD^5))+(-0.000001387*(AD^4))+(0.0003193*(AD^3))+(-0.03501*(AD^2))+(2.302*AD)+(-36.6) [degrees C]
-		// or:
-		// (0.01879280128 * AD)^5-(0.03431777443*AD)^4+(0.06834912716*AD)^3-(0.1871095936*AD)^2+(2.302*AD)-36.6  [degrees C]
-		// data[32] = AD
-		#define AD ((double)data[32])
-		bcomp.t_akpp = ((((0.000000002344f * AD - 0.000001387f) * AD + 0.0003193f) * AD - 0.03501f) * AD + 2.302f) * AD - 36.6f;
-		#undef AD
-		break;
-#endif		
-	case GET_VIN:
-		// VIN-код получен, не требуется больше его читать!
-		obd_act_set(GET_VIN, 0);
-		// Сохраняем VIN:
-		//strcpy(bcomp.vin, (char*)&data[4]);
-		memcpy(bcomp.vin, (char*)&data[4], 17);
-		bcomp.vin[17] = 0;
-		DBG("VIN: %s\r\n", bcomp.vin);
-		break;
-	case STATUS_DTC:
-		if (data[3] & 0x80) {
-			// MIL Light on
-			//bcomp.mil = 1;
-			// FIX: флаг ставится только после чтения кода ошибки
-			obd_act_set(FREEZE_DTC, 1);
-			DBG("MIL ON (DTCs = %d)!\r\n", data[3]&0x7F);
-		} else {
-			// MIL Light off
-			bcomp.mil = 0;
-			DBG("MIL OFF (DTCs = %d)!\r\n", data[3]&0x7F);
-		}
-		break;
-	case FREEZE_DTC: {
+    case NISSAN_AT_INFO:
+        // This formula analog of Taylor series:
+        // (0.000000002344*(AD^5))+(-0.000001387*(AD^4))+(0.0003193*(AD^3))+(-0.03501*(AD^2))+(2.302*AD)+(-36.6) [degrees C]
+        // or:
+        // (0.01879280128 * AD)^5-(0.03431777443*AD)^4+(0.06834912716*AD)^3-(0.1871095936*AD)^2+(2.302*AD)-36.6  [degrees C]
+        // data[32] = AD
+        #define AD ((double)data[32])
+        bcomp.t_akpp = ((((0.000000002344f * AD - 0.000001387f) * AD + 0.0003193f) * AD - 0.03501f) * AD + 2.302f) * AD - 36.6f;
+        #undef AD
+        break;
+#endif        
+    case GET_VIN:
+        // VIN-РєРѕРґ РїРѕР»СѓС‡РµРЅ, РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ Р±РѕР»СЊС€Рµ РµРіРѕ С‡РёС‚Р°С‚СЊ!
+        obd_act_set(GET_VIN, 0);
+        // РЎРѕС…СЂР°РЅСЏРµРј VIN:
+        //strcpy(bcomp.vin, (char*)&data[4]);
+        memcpy(bcomp.vin, (char*)&data[4], 17);
+        bcomp.vin[17] = 0;
+        DBG("VIN: %s\r\n", bcomp.vin);
+        break;
+    case STATUS_DTC:
+        if (data[3] & 0x80) {
+            // MIL Light on
+            //bcomp.mil = 1;
+            // FIX: С„Р»Р°Рі СЃС‚Р°РІРёС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ С‡С‚РµРЅРёСЏ РєРѕРґР° РѕС€РёР±РєРё
+            obd_act_set(FREEZE_DTC, 1);
+            DBG("MIL ON (DTCs = %d)!\r\n", data[3]&0x7F);
+        } else {
+            // MIL Light off
+            bcomp.mil = 0;
+            DBG("MIL OFF (DTCs = %d)!\r\n", data[3]&0x7F);
+        }
+        break;
+    case FREEZE_DTC: {
 #if defined( _DBGOUT )
-		char error_code[8];
+        char error_code[8];
 #endif
-		// Деактивируем чтение кода:
-		obd_act_set(FREEZE_DTC, 0);
-		// Сохраняем код:
-		bcomp.e_code = data[3] * 256 + data[4];
-		bcomp.mil = 1;
+        // Р”РµР°РєС‚РёРІРёСЂСѓРµРј С‡С‚РµРЅРёРµ РєРѕРґР°:
+        obd_act_set(FREEZE_DTC, 0);
+        // РЎРѕС…СЂР°РЅСЏРµРј РєРѕРґ:
+        bcomp.e_code = data[3] * 256 + data[4];
+        bcomp.mil = 1;
 #if defined( _DBGOUT )
-		error_decrypt(bcomp.e_code, error_code);
-		DBG("Trouble code detect: %s\r\n", error_code);
+        error_decrypt(bcomp.e_code, error_code);
+        DBG("Trouble code detect: %s\r\n", error_code);
 #endif
-		break;
-	}
+        break;
+    }
 #if ( PAJERO_SPECIFIC == 1 )
-	case PAJERO_ODO_INFO:
-		// Деактивируем чтение одометра:
-		obd_act_set(PAJERO_ODO_INFO, 0);
-		// Сохраняем прочитанное значение:
-		bcomp.odometer = (data[4] * 256 + data[5]) * 256 + data[6];
-		DBG("Odometer in ECU: %dkm", bcomp.odometer);
-		break;
+    case PAJERO_ODO_INFO:
+        // Р”РµР°РєС‚РёРІРёСЂСѓРµРј С‡С‚РµРЅРёРµ РѕРґРѕРјРµС‚СЂР°:
+        obd_act_set(PAJERO_ODO_INFO, 0);
+        // РЎРѕС…СЂР°РЅСЏРµРј РїСЂРѕС‡РёС‚Р°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ:
+        bcomp.odometer = (data[4] * 256 + data[5]) * 256 + data[6];
+        DBG("Odometer in ECU: %dkm", bcomp.odometer);
+        break;
 #endif
-	default:
-		break;
-	}
+    default:
+        break;
+    }
 }
 
 /*
-	bcomp_raw()
+    bcomp_raw()
 
-	Вызывается из OBD.C. Обработка сырых данных шины. 
-	Извлекает инфомрацию из пакетов данных, гуляющих на шине.
-	Данные обработки специфичны для Pajero Sport 2nd generation.
+    Р’С‹Р·С‹РІР°РµС‚СЃСЏ РёР· OBD.C. РћР±СЂР°Р±РѕС‚РєР° СЃС‹СЂС‹С… РґР°РЅРЅС‹С… С€РёРЅС‹. 
+    РР·РІР»РµРєР°РµС‚ РёРЅС„РѕРјСЂР°С†РёСЋ РёР· РїР°РєРµС‚РѕРІ РґР°РЅРЅС‹С…, РіСѓР»СЏСЋС‰РёС… РЅР° С€РёРЅРµ.
+    Р”Р°РЅРЅС‹Рµ РѕР±СЂР°Р±РѕС‚РєРё СЃРїРµС†РёС„РёС‡РЅС‹ РґР»СЏ Pajero Sport 2nd generation.
  */
 void bcomp_raw(int pid, uint8_t *data, uint8_t size) {
-	bcomp.connect = 1;
-	switch (pid) {
+    bcomp.connect = 1;
+    switch (pid) {
 #if ( PAJERO_SPECIFIC == 1 )
-	case 0x0215:
-		bcomp.speed = ((uint32_t)data[0] * 256 + data[1]) / 128;
-		break;
-	case 0x0218:
-		// AT-коробка в наличии!
-		bcomp.at_present = 1;
-		// Отображение передачи:
-		bcomp.at_drive = (uint8_t)data[2] & 0x0F;
-		break;
-	case 0x0236:
-		// Положение руля:
-		// правое       - 09 FE 10 00 10 00 00 3C
-		// центральное  - 10 02 10 00 D0 00 00 69
-		// левое        - 15 F9 10 00 E0 00 00 79
+    case 0x0215:
+        bcomp.speed = ((uint32_t)data[0] * 256 + data[1]) / 128;
+        break;
+    case 0x0218:
+        // AT-РєРѕСЂРѕР±РєР° РІ РЅР°Р»РёС‡РёРё!
+        bcomp.at_present = 1;
+        // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РїРµСЂРµРґР°С‡Рё:
+        bcomp.at_drive = (uint8_t)data[2] & 0x0F;
+        break;
+    case 0x0236:
+        // РџРѕР»РѕР¶РµРЅРёРµ СЂСѓР»СЏ:
+        // РїСЂР°РІРѕРµ       - 09 FE 10 00 10 00 00 3C
+        // С†РµРЅС‚СЂР°Р»СЊРЅРѕРµ  - 10 02 10 00 D0 00 00 69
+        // Р»РµРІРѕРµ        - 15 F9 10 00 E0 00 00 79
 
-		// Посылка с датчика положения руля, пока неизвестно где какие данные:
-		memcpy(bcomp.esc_data, data, 8);
-		bcomp.esc_id = pid;
-		break;
-	case 0x0308:
-        // Событие приходит каждые 20мс.
-        // Проверка флага каждые 40мс
-		bcomp.rpms = bcomp.rpm = (uint32_t)data[1] * 256 + data[2];
-		if (bcomp.rpm > 500) {
-			// Активируем опрос по CAN-шине:
-			obd_act(1);
-		} else 
-		if (bcomp.rpm == 0) {
-			// Останавливаем опрос по CAN-шине:
-			obd_act(0);
-		}
-		break;
-	case 0x0608:
-		bcomp.t_engine = (int32_t)data[0] - 40;
-		// ТЕСТОВЫЙ ВАРИАНТ ПОТРЕБЛЕНИЯ ТОПЛИВА
-		bcomp.raw_fuel = (int32_t)data[5]*256 + data[6];
+        // РџРѕСЃС‹Р»РєР° СЃ РґР°С‚С‡РёРєР° РїРѕР»РѕР¶РµРЅРёСЏ СЂСѓР»СЏ, РїРѕРєР° РЅРµРёР·РІРµСЃС‚РЅРѕ РіРґРµ РєР°РєРёРµ РґР°РЅРЅС‹Рµ:
+        memcpy(bcomp.esc_data, data, 8);
+        bcomp.esc_id = pid;
+        break;
+    case 0x0308:
+        // РЎРѕР±С‹С‚РёРµ РїСЂРёС…РѕРґРёС‚ РєР°Р¶РґС‹Рµ 20РјСЃ.
+        // РџСЂРѕРІРµСЂРєР° С„Р»Р°РіР° РєР°Р¶РґС‹Рµ 40РјСЃ
+        bcomp.rpms = bcomp.rpm = (uint32_t)data[1] * 256 + data[2];
+        if (bcomp.rpm > 500) {
+            // РђРєС‚РёРІРёСЂСѓРµРј РѕРїСЂРѕСЃ РїРѕ CAN-С€РёРЅРµ:
+            obd_act(1);
+        } else 
+        if (bcomp.rpm == 0) {
+            // РћСЃС‚Р°РЅР°РІР»РёРІР°РµРј РѕРїСЂРѕСЃ РїРѕ CAN-С€РёРЅРµ:
+            obd_act(0);
+        }
+        break;
+    case 0x0608:
+        bcomp.t_engine = (int32_t)data[0] - 40;
+        // РўР•РЎРўРћР’Р«Р™ Р’РђР РРђРќРў РџРћРўР Р•Р‘Р›Р•РќРРЇ РўРћРџР›РР’Рђ
+        bcomp.raw_fuel = (int32_t)data[5]*256 + data[6];
 #if defined( WIN32 )
-		diagram_add(&bcomp.dia_engine, (float)bcomp.t_engine);
+        diagram_add(&bcomp.dia_engine, (float)bcomp.t_engine);
 #endif
-		break;
+        break;
 #endif
 #if ( NISSAN_SPECIFIC == 1 )
 #endif
 #if 0
-	// OTHER VENDOR SPECIFIC CAN PAKCETS PROCESS
+    // OTHER VENDOR SPECIFIC CAN PAKCETS PROCESS
 #endif
-	default:
-		break;
-	}	
+    default:
+        break;
+    }    
 }
 
 /*
-	bcomp_calc()
+    bcomp_calc()
 
-	Функция рассчета данных. Вызывается каждую секунду.
-	Проводит интегрирование показаний и пересчет различных параметров маршрута.
+    Р¤СѓРЅРєС†РёСЏ СЂР°СЃСЃС‡РµС‚Р° РґР°РЅРЅС‹С…. Р’С‹Р·С‹РІР°РµС‚СЃСЏ РєР°Р¶РґСѓСЋ СЃРµРєСѓРЅРґСѓ.
+    РџСЂРѕРІРѕРґРёС‚ РёРЅС‚РµРіСЂРёСЂРѕРІР°РЅРёРµ РїРѕРєР°Р·Р°РЅРёР№ Рё РїРµСЂРµСЃС‡РµС‚ СЂР°Р·Р»РёС‡РЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ РјР°СЂС€СЂСѓС‚Р°.
  */
 void bcomp_calc(void) {
-	int i;
-	double d_dist = (double)bcomp.speed / 3600.0f * bconfig.speed_coeff * 1000.0f;
-	double d_fuel = (double)bcomp.raw_fuel / 3600.0f * bconfig.fuel_coeff / 1000.0f;
+    int i;
+    double d_dist = (double)bcomp.speed / 3600.0f * bconfig.speed_coeff * 1000.0f;
+    double d_fuel = (double)bcomp.raw_fuel / 3600.0f * bconfig.fuel_coeff / 1000.0f;
 
-	DBG("bcomp_calc()\r\n");
+    DBG("bcomp_calc()\r\n");
 
-	// Обновляем съеденное топливо:
-	bcomp.fuel += d_fuel;
-	bcomp.dist += d_dist;
+    // РћР±РЅРѕРІР»СЏРµРј СЃСЉРµРґРµРЅРЅРѕРµ С‚РѕРїР»РёРІРѕ:
+    bcomp.fuel += d_fuel;
+    bcomp.dist += d_dist;
 
-	// Обновление маршрутов:
-	if (bcomp.rpm) {
-		for (i=0; i<2; i++) {
-			bcomp.trip[i].dist += d_dist;
-			bcomp.trip[i].fuel += d_fuel;
-			bcomp.trip[i].time++;
-		}
-	}
+    // РћР±РЅРѕРІР»РµРЅРёРµ РјР°СЂС€СЂСѓС‚РѕРІ:
+    if (bcomp.rpm) {
+        for (i=0; i<2; i++) {
+            bcomp.trip[i].dist += d_dist;
+            bcomp.trip[i].fuel += d_fuel;
+            bcomp.trip[i].time++;
+        }
+    }
 
-	// Сервисное время (только если двигатель запущен):
-	if (bcomp.rpm) {
-		// Счетчик секунд:
-		bcomp.time++;
-		// Счетчики сервисные:
-		bcomp.moto_time++;
-		bcomp.moto_time_service++;
-		// Дистанции:
-		bcomp.moto_dist += d_dist;
-		bcomp.moto_dist_service += d_dist;
-	}
+    // РЎРµСЂРІРёСЃРЅРѕРµ РІСЂРµРјСЏ (С‚РѕР»СЊРєРѕ РµСЃР»Рё РґРІРёРіР°С‚РµР»СЊ Р·Р°РїСѓС‰РµРЅ):
+    if (bcomp.rpm) {
+        // РЎС‡РµС‚С‡РёРє СЃРµРєСѓРЅРґ:
+        bcomp.time++;
+        // РЎС‡РµС‚С‡РёРєРё СЃРµСЂРІРёСЃРЅС‹Рµ:
+        bcomp.moto_time++;
+        bcomp.moto_time_service++;
+        // Р”РёСЃС‚Р°РЅС†РёРё:
+        bcomp.moto_dist += d_dist;
+        bcomp.moto_dist_service += d_dist;
+    }
 
-	if ((bcomp.time % 30) == 0) {
-		// Таблица для рассчета потребления топлива:
-		bcomp.log[(bcomp.time/30)%20].fuel = bcomp.fuel;
-		bcomp.log[(bcomp.time/30)%20].dist = bcomp.dist;
-	}
-	
-	if ((bcomp.time % 60) == 0) {
-		// Каждую минуту заносим:
-		diagram_add(&bcomp.dia_engine,  (float)bcomp.t_engine);
-		diagram_add(&bcomp.dia_trans,   (float)bcomp.t_akpp);
-		//diagram_add(&bcomp.dia_rail,    (float)bcomp.p_fuel);
-		diagram_add(&bcomp.dia_intake,  (float)bcomp.p_intake);
-		diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
-	}
+    if ((bcomp.time % 30) == 0) {
+        // РўР°Р±Р»РёС†Р° РґР»СЏ СЂР°СЃСЃС‡РµС‚Р° РїРѕС‚СЂРµР±Р»РµРЅРёСЏ С‚РѕРїР»РёРІР°:
+        bcomp.log[(bcomp.time/30)%20].fuel = bcomp.fuel;
+        bcomp.log[(bcomp.time/30)%20].dist = bcomp.dist;
+    }
+    
+    if ((bcomp.time % 60) == 0) {
+        // РљР°Р¶РґСѓСЋ РјРёРЅСѓС‚Сѓ Р·Р°РЅРѕСЃРёРј:
+        diagram_add(&bcomp.dia_engine,  (float)bcomp.t_engine);
+        diagram_add(&bcomp.dia_trans,   (float)bcomp.t_akpp);
+        //diagram_add(&bcomp.dia_rail,    (float)bcomp.p_fuel);
+        diagram_add(&bcomp.dia_intake,  (float)bcomp.p_intake);
+        diagram_add(&bcomp.dia_voltage, (float)bcomp.v_ecu);
+    }
 
-	// Обнуляем параметры:
-	bcomp.rpm = 0;
+    // РћР±РЅСѓР»СЏРµРј РїР°СЂР°РјРµС‚СЂС‹:
+    bcomp.rpm = 0;
     
 #if defined( WIN32 )
-    // Для PC-сборки пролучаем актуальное время:
+    // Р”Р»СЏ PC-СЃР±РѕСЂРєРё РїСЂРѕР»СѓС‡Р°РµРј Р°РєС‚СѓР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ:
     if (1) {
         SYSTEMTIME st;
         GetSystemTime(&st);
@@ -400,209 +405,209 @@ void bcomp_calc(void) {
     }
 #endif
 
-	if (bcomp.utime) {
-		if (bcomp.g_correct) {
-			// nop
-		} else {
-			bcomp.utime++;
-		}
-	}
+    if (bcomp.utime) {
+        if (bcomp.g_correct) {
+            // nop
+        } else {
+            bcomp.utime++;
+        }
+    }
 
-	event_set(bcomp_calc, 1000);
+    event_set(bcomp_calc, 1000);
 }
 
 /*
-	bcomp_analog()
-	
-	Чтение аналоговых значний (АЦП-входы).
+    bcomp_analog()
+    
+    Р§С‚РµРЅРёРµ Р°РЅР°Р»РѕРіРѕРІС‹С… Р·РЅР°С‡РЅРёР№ (РђР¦Рџ-РІС…РѕРґС‹).
  */
 #define ABS(a) ((a)>0?(a):-(a))
 #define MAX_FUEL_DIFF 3.0f
 void bcomp_analog(void) {
-	static int fuel_protect_cnt = 0;
-	float new_fuel_level;
-	DBG("bcomp_analog();\r\n");
-	// Внешний датчик температуры:
-	bcomp.t_ext = analog_temp(&bconfig.termistor);
-	// Данные о напряжении:
-	bcomp.v_analog = analog_volt(); 
-	// Данные с ДУТ:
-	new_fuel_level = analog_fuel();
-	if (ABS(bcomp.fuel_level - new_fuel_level) > MAX_FUEL_DIFF) {
-		fuel_protect_cnt++;
-		if (fuel_protect_cnt > 6) {
-			// Если фиксируется больше 18 секунд, тогда сбрасываем путь.
-			// Защищает от случайного сброса, если вдруг пройдет какая-то помеха
-			// на аналоговой линии.
-			DBG("Fueling detect! Reset Trip B, previous fuel count: %d!\r\n", (int)bcomp.trip[1].fuel);
+    static int fuel_protect_cnt = 0;
+    float new_fuel_level;
+    DBG("bcomp_analog();\r\n");
+    // Р’РЅРµС€РЅРёР№ РґР°С‚С‡РёРє С‚РµРјРїРµСЂР°С‚СѓСЂС‹:
+    bcomp.t_ext = analog_temp(&bconfig.termistor);
+    // Р”Р°РЅРЅС‹Рµ Рѕ РЅР°РїСЂСЏР¶РµРЅРёРё:
+    bcomp.v_analog = analog_volt(); 
+    // Р”Р°РЅРЅС‹Рµ СЃ Р”РЈРў:
+    new_fuel_level = analog_fuel();
+    if (ABS(bcomp.fuel_level - new_fuel_level) > MAX_FUEL_DIFF) {
+        fuel_protect_cnt++;
+        if (fuel_protect_cnt > 6) {
+            // Р•СЃР»Рё С„РёРєСЃРёСЂСѓРµС‚СЃСЏ Р±РѕР»СЊС€Рµ 18 СЃРµРєСѓРЅРґ, С‚РѕРіРґР° СЃР±СЂР°СЃС‹РІР°РµРј РїСѓС‚СЊ.
+            // Р—Р°С‰РёС‰Р°РµС‚ РѕС‚ СЃР»СѓС‡Р°Р№РЅРѕРіРѕ СЃР±СЂРѕСЃР°, РµСЃР»Рё РІРґСЂСѓРі РїСЂРѕР№РґРµС‚ РєР°РєР°СЏ-С‚Рѕ РїРѕРјРµС…Р°
+            // РЅР° Р°РЅР°Р»РѕРіРѕРІРѕР№ Р»РёРЅРёРё.
+            DBG("Fueling detect! Reset Trip B, previous fuel count: %d!\r\n", (int)bcomp.trip[1].fuel);
             
-			// Сбрасываем путь "Б":
-			bcomp.trip[1].dist = 0.0f;
-			bcomp.trip[1].time = 0;
-			bcomp.trip[1].fuel = 0;
-			// Требуется сохранить изменения в EEPROM, ставим флаг сохранения:
-			save_flag |= 0x01;
-		}
-	} else {
-		fuel_protect_cnt = 0;
-	}
-	bcomp.fuel_level = new_fuel_level;
-	event_set(bcomp_analog, 3000);
+            // РЎР±СЂР°СЃС‹РІР°РµРј РїСѓС‚СЊ "Р‘":
+            bcomp.trip[1].dist = 0.0f;
+            bcomp.trip[1].time = 0;
+            bcomp.trip[1].fuel = 0;
+            // РўСЂРµР±СѓРµС‚СЃСЏ СЃРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ РІ EEPROM, СЃС‚Р°РІРёРј С„Р»Р°Рі СЃРѕС…СЂР°РЅРµРЅРёСЏ:
+            save_flag |= 0x01;
+        }
+    } else {
+        fuel_protect_cnt = 0;
+    }
+    bcomp.fuel_level = new_fuel_level;
+    event_set(bcomp_analog, 3000);
 }
 
 /*
-	bcomp_save()
+    bcomp_save()
 
-	Асинхронное событие сохранения данных: 
+    РђСЃРёРЅС…СЂРѕРЅРЅРѕРµ СЃРѕР±С‹С‚РёРµ СЃРѕС…СЂР°РЅРµРЅРёСЏ РґР°РЅРЅС‹С…: 
  */
 void bcomp_save(void) {
-	save_flag |= 0x01;
-	event_set(bcomp_save, 30000);
+    save_flag |= 0x01;
+    event_set(bcomp_save, 30000);
 }
 
 /*
-	bcomp_elog()
+    bcomp_elog()
 
-	Асинхронное событие сохранения лога: 
+    РђСЃРёРЅС…СЂРѕРЅРЅРѕРµ СЃРѕР±С‹С‚РёРµ СЃРѕС…СЂР°РЅРµРЅРёСЏ Р»РѕРіР°: 
  */
 void bcomp_elog(void) {
-	save_flag |= 0x08;
-	event_set(bcomp_elog, 1000);
+    save_flag |= 0x08;
+    event_set(bcomp_elog, 1000);
 }
 
 // -----------------------------------------------------------------------------
 // save_XXX
-// Функции сохранения различных параметров
+// Р¤СѓРЅРєС†РёРё СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂР°Р·Р»РёС‡РЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 // -----------------------------------------------------------------------------
 
 void save_params(void) {
-	DBG("save_params()\r\n");
-	// Сервисные пробеги и моточасы:
-	config_save(CPAR_MOTO_GLOB, (uint8_t*)&bcomp.moto_time, CPAR_MOTO_GLOB_SIZE);
-	config_save(CPAR_MOTO_SERV, (uint8_t*)&bcomp.moto_time_service, CPAR_MOTO_SERV_SIZE);
-	config_save(CPAR_DIST_GLOB, (uint8_t*)&bcomp.moto_dist, CPAR_DIST_GLOB_SIZE);
-	config_save(CPAR_DIST_SERV, (uint8_t*)&bcomp.moto_dist_service, CPAR_DIST_SERV_SIZE);
-	// Инициализация параметров маршрута А:
-	config_save(CPAR_TRIPA_DIST, (uint8_t*)&bcomp.trip[0].dist, CPAR_TRIPA_DIST_SIZE);
-	config_save(CPAR_TRIPA_TIME, (uint8_t*)&bcomp.trip[0].time, CPAR_TRIPA_TIME_SIZE);
-	config_save(CPAR_TRIPA_FUEL, (uint8_t*)&bcomp.trip[0].fuel, CPAR_TRIPA_FUEL_SIZE);
-	// Инициализация параметров маршрута Б:
-	config_save(CPAR_TRIPB_DIST, (uint8_t*)&bcomp.trip[1].dist, CPAR_TRIPB_DIST_SIZE);
-	config_save(CPAR_TRIPB_TIME, (uint8_t*)&bcomp.trip[1].time, CPAR_TRIPB_TIME_SIZE);
-	config_save(CPAR_TRIPB_FUEL, (uint8_t*)&bcomp.trip[1].fuel, CPAR_TRIPB_FUEL_SIZE);
-	// Прочее:
-	config_save(CPAR_FUEL_LEVEL, (uint8_t*)&bcomp.fuel_level, CPAR_FUEL_LEVEL_SIZE);
+    DBG("save_params()\r\n");
+    // РЎРµСЂРІРёСЃРЅС‹Рµ РїСЂРѕР±РµРіРё Рё РјРѕС‚РѕС‡Р°СЃС‹:
+    config_save(CPAR_MOTO_GLOB, (uint8_t*)&bcomp.moto_time, CPAR_MOTO_GLOB_SIZE);
+    config_save(CPAR_MOTO_SERV, (uint8_t*)&bcomp.moto_time_service, CPAR_MOTO_SERV_SIZE);
+    config_save(CPAR_DIST_GLOB, (uint8_t*)&bcomp.moto_dist, CPAR_DIST_GLOB_SIZE);
+    config_save(CPAR_DIST_SERV, (uint8_t*)&bcomp.moto_dist_service, CPAR_DIST_SERV_SIZE);
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РјР°СЂС€СЂСѓС‚Р° Рђ:
+    config_save(CPAR_TRIPA_DIST, (uint8_t*)&bcomp.trip[0].dist, CPAR_TRIPA_DIST_SIZE);
+    config_save(CPAR_TRIPA_TIME, (uint8_t*)&bcomp.trip[0].time, CPAR_TRIPA_TIME_SIZE);
+    config_save(CPAR_TRIPA_FUEL, (uint8_t*)&bcomp.trip[0].fuel, CPAR_TRIPA_FUEL_SIZE);
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РјР°СЂС€СЂСѓС‚Р° Р‘:
+    config_save(CPAR_TRIPB_DIST, (uint8_t*)&bcomp.trip[1].dist, CPAR_TRIPB_DIST_SIZE);
+    config_save(CPAR_TRIPB_TIME, (uint8_t*)&bcomp.trip[1].time, CPAR_TRIPB_TIME_SIZE);
+    config_save(CPAR_TRIPB_FUEL, (uint8_t*)&bcomp.trip[1].fuel, CPAR_TRIPB_FUEL_SIZE);
+    // РџСЂРѕС‡РµРµ:
+    config_save(CPAR_FUEL_LEVEL, (uint8_t*)&bcomp.fuel_level, CPAR_FUEL_LEVEL_SIZE);
 }
 
 void save_settings(void) {
-	DBG("save_settings()\r\n");
-	// Сохраняем настройки:
-	config_save(CPAR_SETUP_V_MAX, (uint8_t*)&bcomp.setup.v_max, CPAR_SETUP_V_MAX_SIZE);
-	config_save(CPAR_SETUP_V_MIN, (uint8_t*)&bcomp.setup.v_min, CPAR_SETUP_V_MIN_SIZE);
-	config_save(CPAR_SETUP_T_AT, (uint8_t*)&bcomp.setup.t_at, CPAR_SETUP_T_AT_SIZE);
-	config_save(CPAR_SETUP_T_ENG, (uint8_t*)&bcomp.setup.t_eng, CPAR_SETUP_T_ENG_SIZE);
-	config_save(CPAR_SETUP_F_FUEL, (uint8_t*)&bcomp.setup.f_fuel, CPAR_SETUP_F_FUEL_SIZE);
-	//config_save(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE);
-	//config_save(CPAR_SETUP_TIME, (uint8_t*)&bcomp.setup.time, CPAR_SETUP_TIME_SIZE);
-	config_save(CPAR_SETUP_W_DELAY, (uint8_t*)&bcomp.setup.w_delay, CPAR_SETUP_W_DELAY_SIZE);
-	//config_save(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE);
-	//config_save(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE);
-	config_save(CPAR_SETUP_T_EXT, (uint8_t*)&bcomp.setup.t_ext, CPAR_SETUP_T_EXT_SIZE);
-	config_save(CPAR_SETUP_F_GPS, (uint8_t*)&bcomp.setup.f_gps, CPAR_SETUP_F_GPS_SIZE);
-	config_save(CPAR_SETUP_I_GPS, (uint8_t*)&bcomp.setup.i_gps, CPAR_SETUP_I_GPS_SIZE);
-	config_save(CPAR_SETUP_F_ESP, (uint8_t*)&bcomp.setup.f_esp, CPAR_SETUP_F_ESP_SIZE);
-	config_save(CPAR_SETUP_FUEL_CAL, (uint8_t*)&bcomp.setup.fuel_cal, CPAR_SETUP_FUEL_CAL_SIZE);
-	config_save(CPAR_SETUP_F_LOG, (uint8_t*)&bcomp.setup.f_log, CPAR_SETUP_F_LOG_SIZE);
-	config_save(CPAR_SETUP_F_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_SETUP_F_CONTRAST_SIZE);
-	config_save(CPAR_SETUP_F_SOUND, (uint8_t*)&bcomp.setup.sound, CPAR_SETUP_F_SOUND_SIZE);
+    DBG("save_settings()\r\n");
+    // РЎРѕС…СЂР°РЅСЏРµРј РЅР°СЃС‚СЂРѕР№РєРё:
+    config_save(CPAR_SETUP_V_MAX, (uint8_t*)&bcomp.setup.v_max, CPAR_SETUP_V_MAX_SIZE);
+    config_save(CPAR_SETUP_V_MIN, (uint8_t*)&bcomp.setup.v_min, CPAR_SETUP_V_MIN_SIZE);
+    config_save(CPAR_SETUP_T_AT, (uint8_t*)&bcomp.setup.t_at, CPAR_SETUP_T_AT_SIZE);
+    config_save(CPAR_SETUP_T_ENG, (uint8_t*)&bcomp.setup.t_eng, CPAR_SETUP_T_ENG_SIZE);
+    config_save(CPAR_SETUP_F_FUEL, (uint8_t*)&bcomp.setup.f_fuel, CPAR_SETUP_F_FUEL_SIZE);
+    //config_save(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE);
+    //config_save(CPAR_SETUP_TIME, (uint8_t*)&bcomp.setup.time, CPAR_SETUP_TIME_SIZE);
+    config_save(CPAR_SETUP_W_DELAY, (uint8_t*)&bcomp.setup.w_delay, CPAR_SETUP_W_DELAY_SIZE);
+    //config_save(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE);
+    //config_save(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE);
+    config_save(CPAR_SETUP_T_EXT, (uint8_t*)&bcomp.setup.t_ext, CPAR_SETUP_T_EXT_SIZE);
+    config_save(CPAR_SETUP_F_GPS, (uint8_t*)&bcomp.setup.f_gps, CPAR_SETUP_F_GPS_SIZE);
+    config_save(CPAR_SETUP_I_GPS, (uint8_t*)&bcomp.setup.i_gps, CPAR_SETUP_I_GPS_SIZE);
+    config_save(CPAR_SETUP_F_ESP, (uint8_t*)&bcomp.setup.f_esp, CPAR_SETUP_F_ESP_SIZE);
+    config_save(CPAR_SETUP_FUEL_CAL, (uint8_t*)&bcomp.setup.fuel_cal, CPAR_SETUP_FUEL_CAL_SIZE);
+    config_save(CPAR_SETUP_F_LOG, (uint8_t*)&bcomp.setup.f_log, CPAR_SETUP_F_LOG_SIZE);
+    config_save(CPAR_SETUP_F_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_SETUP_F_CONTRAST_SIZE);
+    config_save(CPAR_SETUP_F_SOUND, (uint8_t*)&bcomp.setup.sound, CPAR_SETUP_F_SOUND_SIZE);
 }
 
 #if !defined( WIN32 )
 void ProtectDelay(void) {
-	int n;
-	for (n = 0; n < 100000; n++) { __NOP(); } 
+    int n;
+    for (n = 0; n < 100000; n++) { __NOP(); } 
 }
 #endif
 
 #if defined( WIN32 )
-// Win-версия запускает основную логику в дополнительном потоке:
+// Win-РІРµСЂСЃРёСЏ Р·Р°РїСѓСЃРєР°РµС‚ РѕСЃРЅРѕРІРЅСѓСЋ Р»РѕРіРёРєСѓ РІ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРј РїРѕС‚РѕРєРµ:
 DWORD WINAPI ProcMain(LPVOID par)
 #else
 int main(void)
 #endif
 {
-	int ret;
-	int ms;
-	char str[20];
+    int ret;
+    int ms;
+    char str[20];
 
-	// На всякий случай деинициализируем CAN и 
-	// переводим в состояние ожидания (в функции):
-	//obd_deinit();
+    // РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№ РґРµРёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј CAN Рё 
+    // РїРµСЂРµРІРѕРґРёРј РІ СЃРѕСЃС‚РѕСЏРЅРёРµ РѕР¶РёРґР°РЅРёСЏ (РІ С„СѓРЅРєС†РёРё):
+    //obd_deinit();
 
-	// Инициализация периферийных модулей и библиотек:
-	leds_init();
-	led_red(1);
-	uart0_init(bconfig.uart_speed);
-	event_init();
-	button_init();
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРёС„РµСЂРёР№РЅС‹С… РјРѕРґСѓР»РµР№ Рё Р±РёР±Р»РёРѕС‚РµРє:
+    leds_init();
+    led_red(1);
+    uart0_init(bconfig.uart_speed);
+    event_init();
+    button_init();
 #if !defined( WIN32 )
-	beep_init();
+    beep_init();
 #endif
 #if defined( WIN32 )
-	ee_init();
+    ee_init();
 #else
-	i2c_init();
+    i2c_init();
 #endif
-	adc_init();
+    adc_init();
 #if ( GRAPH_SUPPORT == 1)
-	warning_init();
+    warning_init();
 #endif
 #if ( NMEA_SUPPORT == 1 )
-	nmea_init();
+    nmea_init();
 #endif
-	DBG("init ok!\r\n");
+    DBG("init ok!\r\n");
 
-	// -----------------------------------------------------------------------------
-	// Инициализация переменных:
-	// -----------------------------------------------------------------------------
-	bcomp.time = 0;
-	bcomp.t_engine = 0xFFFF;
-	bcomp.rpm = 0;
+    // -----------------------------------------------------------------------------
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРµРјРµРЅРЅС‹С…:
+    // -----------------------------------------------------------------------------
+    bcomp.time = 0;
+    bcomp.t_engine = 0xFFFF;
+    bcomp.rpm = 0;
     bcomp.can_act = 1;
-	bcomp.speed = 0;
+    bcomp.speed = 0;
 #if ( NISSAN_SPECIFIC == 1 )
-	bcomp.at_present = 1;
+    bcomp.at_present = 1;
 #else
-	bcomp.at_present = 0;
+    bcomp.at_present = 0;
 #endif
-	bcomp.at_drive = 0xFF;
-	bcomp.connect = 0;
-	bcomp.v_ecu = NAN;
-	bcomp.t_akpp = 0xFFFF;
-	bcomp.t_ext = 0xFFFF;
-	bcomp.dist = 0.0f;
-	bcomp.fuel = 0.0f;
-	memset(bcomp.vin, 0, sizeof(bcomp.vin));
-	bcomp.odometer = -1;
-	bcomp.angle = 0;
-	bcomp.esc_id = 0;
-	bcomp.utime = 0;
-	bcomp.nmea_cnt = 0;
-	bcomp.g_correct = 0;
+    bcomp.at_drive = 0xFF;
+    bcomp.connect = 0;
+    bcomp.v_ecu = NAN;
+    bcomp.t_akpp = 0xFFFF;
+    bcomp.t_ext = 0xFFFF;
+    bcomp.dist = 0.0f;
+    bcomp.fuel = 0.0f;
+    memset(bcomp.vin, 0, sizeof(bcomp.vin));
+    bcomp.odometer = -1;
+    bcomp.angle = 0;
+    bcomp.esc_id = 0;
+    bcomp.utime = 0;
+    bcomp.nmea_cnt = 0;
+    bcomp.g_correct = 0;
 
 #if defined( WIN32 )
-	// -----------------------------------------------------------------------------
-	// Инициализация для симулятора интерфейса:
-	// -----------------------------------------------------------------------------
-	bcomp.at_present = 1;
-	bcomp.at_drive = 0x02;
+    // -----------------------------------------------------------------------------
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РґР»СЏ СЃРёРјСѓР»СЏС‚РѕСЂР° РёРЅС‚РµСЂС„РµР№СЃР°:
+    // -----------------------------------------------------------------------------
+    bcomp.at_present = 1;
+    bcomp.at_drive = 0x02;
 #endif
 
 #if defined( WIN32 )
-	// Тестовая обработка GPS-данных:
-	//nmea_parce("$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A");    // year < 2000
-	//nmea_parce("$GPRMC,113650.0,A,5548.607,N,03739.387,E,000.01,25 5.6,210403,08.7,E*69"); // bad crc
-	//nmea_parce("$GPRMC,194530.000,A,3051.8007,N,10035.9989,W,1.49,111.67,310714,,,A*74");  // old
+    // РўРµСЃС‚РѕРІР°СЏ РѕР±СЂР°Р±РѕС‚РєР° GPS-РґР°РЅРЅС‹С…:
+    //nmea_parce("$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A");    // year < 2000
+    //nmea_parce("$GPRMC,113650.0,A,5548.607,N,03739.387,E,000.01,25 5.6,210403,08.7,E*69"); // bad crc
+    //nmea_parce("$GPRMC,194530.000,A,3051.8007,N,10035.9989,W,1.49,111.67,310714,,,A*74");  // old
     nmea_parce("$GPRMC,202512.000,A,5554.0584,N,03744.0148,E,0.01,132.04,260319,,,A*63");    // actual
 
     if (1) {
@@ -619,763 +624,763 @@ int main(void)
     }
 #endif
 
-	// -----------------------------------------------------------------------------
-	// Загрузка сохраненных значений и настроек:
-	// -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // Р—Р°РіСЂСѓР·РєР° СЃРѕС…СЂР°РЅРµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№ Рё РЅР°СЃС‚СЂРѕРµРє:
+    // -----------------------------------------------------------------------------
 
-	// Актуальный экран для отображения:
-	if (config_read(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE)) {
-		bcomp.page = 0;
-	}
-	// Сервисные пробеги и моточасы:
-	if (config_read(CPAR_MOTO_GLOB, (uint8_t*)&bcomp.moto_time, CPAR_MOTO_GLOB_SIZE)) {
-		bcomp.moto_time = 0;
-	}
-	if (config_read(CPAR_MOTO_SERV, (uint8_t*)&bcomp.moto_time_service, CPAR_MOTO_SERV_SIZE)) {
-		bcomp.moto_time_service = 0;
-	}
-	if (config_read(CPAR_DATE_SERV, (uint8_t*)bcomp.moto_date_service, CPAR_DATE_SERV_SIZE)) {
-		memset(bcomp.moto_date_service, 0, sizeof(bcomp.moto_date_service));
-	}
-	// Глобальные пробеги и моточасы:
-	if (config_read(CPAR_DIST_GLOB, (uint8_t*)&bcomp.moto_dist, CPAR_DIST_GLOB_SIZE)) {
-		bcomp.moto_dist = 0.0f;
-	}
-	if (config_read(CPAR_DIST_SERV, (uint8_t*)&bcomp.moto_dist_service, CPAR_DIST_SERV_SIZE)) {
-		bcomp.moto_dist_service = 0.0f;
-	}
-	// Инициализация параметров маршрута А:
-	if (config_read(CPAR_TRIPA_DIST, (uint8_t*)&bcomp.trip[0].dist, CPAR_TRIPA_DIST_SIZE)) {
-		bcomp.trip[0].dist = 0.0f;
-	}
-	if (config_read(CPAR_TRIPA_TIME, (uint8_t*)&bcomp.trip[0].time, CPAR_TRIPA_TIME_SIZE)) {
-		bcomp.trip[0].time = 0;
-	}
-	if (config_read(CPAR_TRIPA_FUEL, (uint8_t*)&bcomp.trip[0].fuel, CPAR_TRIPA_FUEL_SIZE)) {
-		bcomp.trip[0].fuel = 0.0f;
-	}
-	// Инициализация параметров маршрута Б:
-	if (config_read(CPAR_TRIPB_DIST, (uint8_t*)&bcomp.trip[1].dist, CPAR_TRIPB_DIST_SIZE)) {
-		bcomp.trip[1].dist = 0.0f;
-	}
-	if (config_read(CPAR_TRIPB_TIME, (uint8_t*)&bcomp.trip[1].time, CPAR_TRIPB_TIME_SIZE)) {
-		bcomp.trip[1].time = 0;
-	}
-	if (config_read(CPAR_TRIPB_FUEL, (uint8_t*)&bcomp.trip[1].fuel, CPAR_TRIPB_FUEL_SIZE)) {
-		bcomp.trip[1].fuel = 0.0f;
-	}
-	// Переменная одометра:
-	//if (config_read(CPAR_SETUP_ODO, (uint8_t*)&bcomp.odometer, CPAR_SETUP_ODO_SIZE)) {
-	//	bcomp.odometer = -1;
-	//}
-	// Инициализация настроечных переменных:
-	if (config_read(CPAR_SETUP_V_MAX, (uint8_t*)&bcomp.setup.v_max, CPAR_SETUP_V_MAX_SIZE)) {
-		bcomp.setup.v_max = bconfig.v_max;
-	}
-	if (config_read(CPAR_SETUP_V_MIN, (uint8_t*)&bcomp.setup.v_min, CPAR_SETUP_V_MIN_SIZE)) {
-		bcomp.setup.v_min = bconfig.v_min;
-	}
-	// Температура предупреждения о перегреве автоматической коробки:
-	if (config_read(CPAR_SETUP_T_AT, (uint8_t*)&bcomp.setup.t_at, CPAR_SETUP_T_AT_SIZE)) {
-		bcomp.setup.t_at = bconfig.t_akpp_warning;
-	}
-	// Температура предупреждения о перегреве двигателя:
-	if (config_read(CPAR_SETUP_T_ENG, (uint8_t*)&bcomp.setup.t_eng, CPAR_SETUP_T_ENG_SIZE)) {
-		bcomp.setup.t_eng = bconfig.t_engine_warning;
-	}
-	// Флаг подведенного сигнала уровня топлива в баке:
-	if (config_read(CPAR_SETUP_F_FUEL, (uint8_t*)&bcomp.setup.f_fuel, CPAR_SETUP_F_FUEL_SIZE)) {
-		bcomp.setup.f_fuel = 0;
-	}
-	// Уровень топлива предупреждения на пустой бак:
-	//if (config_read(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE)) {
-	//	bcomp.setup.l_fuel = 10.0f;
-	//}
-	// Смещение часового пояса:
-	//if (config_read(CPAR_SETUP_TIME, (uint8_t*)&bcomp.setup.time, CPAR_SETUP_TIME_SIZE)) {
-	//	bcomp.setup.time = 3600*3;
-	//}
-	// Задержка повтора предупреждений:
-	if (config_read(CPAR_SETUP_W_DELAY, (uint8_t*)&bcomp.setup.w_delay, CPAR_SETUP_W_DELAY_SIZE)) {
-		bcomp.setup.w_delay = 30;
-	}
-	// Флаг наличия внешнего датчика:
-	//if (config_read(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE)) {
-	//	bcomp.setup.f_ext = 1;
-	//}
-	// Флаг вывода предупреждения о гололёде:
-	//if (config_read(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE)) {
-	//	bcomp.setup.f_ext_w = 0;
-	//}
-	// Температура срабатывания предупреждения о гололёде:
-	if (config_read(CPAR_SETUP_T_EXT, (uint8_t*)&bcomp.setup.t_ext, CPAR_SETUP_T_EXT_SIZE)) {
-		bcomp.setup.t_ext = 1;
-	}
-	// Флаг наличия GPS-приемника:
-	if (config_read(CPAR_SETUP_F_GPS, (uint8_t*)&bcomp.setup.f_gps, CPAR_SETUP_F_GPS_SIZE)) {
-		bcomp.setup.f_gps = 0;
-	}
-	// Скорость работы UART-интерфейса:
-	if (config_read(CPAR_SETUP_I_GPS, (uint8_t*)&bcomp.setup.i_gps, CPAR_SETUP_I_GPS_SIZE)) {
-		bcomp.setup.i_gps = bconfig.uart_speed;
-	} else {
-		DBG("UART speed = %d\r\n", bcomp.setup.i_gps);
-		// Если скорости отличается от настроечной, перенастраиваем UART:
-		if (bcomp.setup.i_gps != bconfig.uart_speed) {
-			uart0_init(bcomp.setup.i_gps);
-		}
-	}
-	// Флаг наличия системы стабилизации, для неё имеется CAN-датчик положения рулевого колеса:
-	if (config_read(CPAR_SETUP_F_ESP, (uint8_t*)&bcomp.setup.f_esp, CPAR_SETUP_F_ESP_SIZE)) {
-		bcomp.setup.f_esp = 0;
-	}
+    // РђРєС‚СѓР°Р»СЊРЅС‹Р№ СЌРєСЂР°РЅ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ:
+    if (config_read(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE)) {
+        bcomp.page = 0;
+    }
+    // РЎРµСЂРІРёСЃРЅС‹Рµ РїСЂРѕР±РµРіРё Рё РјРѕС‚РѕС‡Р°СЃС‹:
+    if (config_read(CPAR_MOTO_GLOB, (uint8_t*)&bcomp.moto_time, CPAR_MOTO_GLOB_SIZE)) {
+        bcomp.moto_time = 0;
+    }
+    if (config_read(CPAR_MOTO_SERV, (uint8_t*)&bcomp.moto_time_service, CPAR_MOTO_SERV_SIZE)) {
+        bcomp.moto_time_service = 0;
+    }
+    if (config_read(CPAR_DATE_SERV, (uint8_t*)bcomp.moto_date_service, CPAR_DATE_SERV_SIZE)) {
+        memset(bcomp.moto_date_service, 0, sizeof(bcomp.moto_date_service));
+    }
+    // Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РїСЂРѕР±РµРіРё Рё РјРѕС‚РѕС‡Р°СЃС‹:
+    if (config_read(CPAR_DIST_GLOB, (uint8_t*)&bcomp.moto_dist, CPAR_DIST_GLOB_SIZE)) {
+        bcomp.moto_dist = 0.0f;
+    }
+    if (config_read(CPAR_DIST_SERV, (uint8_t*)&bcomp.moto_dist_service, CPAR_DIST_SERV_SIZE)) {
+        bcomp.moto_dist_service = 0.0f;
+    }
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РјР°СЂС€СЂСѓС‚Р° Рђ:
+    if (config_read(CPAR_TRIPA_DIST, (uint8_t*)&bcomp.trip[0].dist, CPAR_TRIPA_DIST_SIZE)) {
+        bcomp.trip[0].dist = 0.0f;
+    }
+    if (config_read(CPAR_TRIPA_TIME, (uint8_t*)&bcomp.trip[0].time, CPAR_TRIPA_TIME_SIZE)) {
+        bcomp.trip[0].time = 0;
+    }
+    if (config_read(CPAR_TRIPA_FUEL, (uint8_t*)&bcomp.trip[0].fuel, CPAR_TRIPA_FUEL_SIZE)) {
+        bcomp.trip[0].fuel = 0.0f;
+    }
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РјР°СЂС€СЂСѓС‚Р° Р‘:
+    if (config_read(CPAR_TRIPB_DIST, (uint8_t*)&bcomp.trip[1].dist, CPAR_TRIPB_DIST_SIZE)) {
+        bcomp.trip[1].dist = 0.0f;
+    }
+    if (config_read(CPAR_TRIPB_TIME, (uint8_t*)&bcomp.trip[1].time, CPAR_TRIPB_TIME_SIZE)) {
+        bcomp.trip[1].time = 0;
+    }
+    if (config_read(CPAR_TRIPB_FUEL, (uint8_t*)&bcomp.trip[1].fuel, CPAR_TRIPB_FUEL_SIZE)) {
+        bcomp.trip[1].fuel = 0.0f;
+    }
+    // РџРµСЂРµРјРµРЅРЅР°СЏ РѕРґРѕРјРµС‚СЂР°:
+    //if (config_read(CPAR_SETUP_ODO, (uint8_t*)&bcomp.odometer, CPAR_SETUP_ODO_SIZE)) {
+    //    bcomp.odometer = -1;
+    //}
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РЅР°СЃС‚СЂРѕРµС‡РЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…:
+    if (config_read(CPAR_SETUP_V_MAX, (uint8_t*)&bcomp.setup.v_max, CPAR_SETUP_V_MAX_SIZE)) {
+        bcomp.setup.v_max = bconfig.v_max;
+    }
+    if (config_read(CPAR_SETUP_V_MIN, (uint8_t*)&bcomp.setup.v_min, CPAR_SETUP_V_MIN_SIZE)) {
+        bcomp.setup.v_min = bconfig.v_min;
+    }
+    // РўРµРјРїРµСЂР°С‚СѓСЂР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ Рѕ РїРµСЂРµРіСЂРµРІРµ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕР№ РєРѕСЂРѕР±РєРё:
+    if (config_read(CPAR_SETUP_T_AT, (uint8_t*)&bcomp.setup.t_at, CPAR_SETUP_T_AT_SIZE)) {
+        bcomp.setup.t_at = bconfig.t_akpp_warning;
+    }
+    // РўРµРјРїРµСЂР°С‚СѓСЂР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ Рѕ РїРµСЂРµРіСЂРµРІРµ РґРІРёРіР°С‚РµР»СЏ:
+    if (config_read(CPAR_SETUP_T_ENG, (uint8_t*)&bcomp.setup.t_eng, CPAR_SETUP_T_ENG_SIZE)) {
+        bcomp.setup.t_eng = bconfig.t_engine_warning;
+    }
+    // Р¤Р»Р°Рі РїРѕРґРІРµРґРµРЅРЅРѕРіРѕ СЃРёРіРЅР°Р»Р° СѓСЂРѕРІРЅСЏ С‚РѕРїР»РёРІР° РІ Р±Р°РєРµ:
+    if (config_read(CPAR_SETUP_F_FUEL, (uint8_t*)&bcomp.setup.f_fuel, CPAR_SETUP_F_FUEL_SIZE)) {
+        bcomp.setup.f_fuel = 0;
+    }
+    // РЈСЂРѕРІРµРЅСЊ С‚РѕРїР»РёРІР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ РЅР° РїСѓСЃС‚РѕР№ Р±Р°Рє:
+    //if (config_read(CPAR_SETUP_L_FUEL, (uint8_t*)&bcomp.setup.l_fuel, CPAR_SETUP_L_FUEL_SIZE)) {
+    //    bcomp.setup.l_fuel = 10.0f;
+    //}
+    // РЎРјРµС‰РµРЅРёРµ С‡Р°СЃРѕРІРѕРіРѕ РїРѕСЏСЃР°:
+    //if (config_read(CPAR_SETUP_TIME, (uint8_t*)&bcomp.setup.time, CPAR_SETUP_TIME_SIZE)) {
+    //    bcomp.setup.time = 3600*3;
+    //}
+    // Р—Р°РґРµСЂР¶РєР° РїРѕРІС‚РѕСЂР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№:
+    if (config_read(CPAR_SETUP_W_DELAY, (uint8_t*)&bcomp.setup.w_delay, CPAR_SETUP_W_DELAY_SIZE)) {
+        bcomp.setup.w_delay = 30;
+    }
+    // Р¤Р»Р°Рі РЅР°Р»РёС‡РёСЏ РІРЅРµС€РЅРµРіРѕ РґР°С‚С‡РёРєР°:
+    //if (config_read(CPAR_SETUP_F_EXT, (uint8_t*)&bcomp.setup.f_ext, CPAR_SETUP_F_EXT_SIZE)) {
+    //    bcomp.setup.f_ext = 1;
+    //}
+    // Р¤Р»Р°Рі РІС‹РІРѕРґР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ Рѕ РіРѕР»РѕР»С‘РґРµ:
+    //if (config_read(CPAR_SETUP_F_EXT_W, (uint8_t*)&bcomp.setup.f_ext_w, CPAR_SETUP_F_EXT_W_SIZE)) {
+    //    bcomp.setup.f_ext_w = 0;
+    //}
+    // РўРµРјРїРµСЂР°С‚СѓСЂР° СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ Рѕ РіРѕР»РѕР»С‘РґРµ:
+    if (config_read(CPAR_SETUP_T_EXT, (uint8_t*)&bcomp.setup.t_ext, CPAR_SETUP_T_EXT_SIZE)) {
+        bcomp.setup.t_ext = 1;
+    }
+    // Р¤Р»Р°Рі РЅР°Р»РёС‡РёСЏ GPS-РїСЂРёРµРјРЅРёРєР°:
+    if (config_read(CPAR_SETUP_F_GPS, (uint8_t*)&bcomp.setup.f_gps, CPAR_SETUP_F_GPS_SIZE)) {
+        bcomp.setup.f_gps = 0;
+    }
+    // РЎРєРѕСЂРѕСЃС‚СЊ СЂР°Р±РѕС‚С‹ UART-РёРЅС‚РµСЂС„РµР№СЃР°:
+    if (config_read(CPAR_SETUP_I_GPS, (uint8_t*)&bcomp.setup.i_gps, CPAR_SETUP_I_GPS_SIZE)) {
+        bcomp.setup.i_gps = bconfig.uart_speed;
+    } else {
+        DBG("UART speed = %d\r\n", bcomp.setup.i_gps);
+        // Р•СЃР»Рё СЃРєРѕСЂРѕСЃС‚Рё РѕС‚Р»РёС‡Р°РµС‚СЃСЏ РѕС‚ РЅР°СЃС‚СЂРѕРµС‡РЅРѕР№, РїРµСЂРµРЅР°СЃС‚СЂР°РёРІР°РµРј UART:
+        if (bcomp.setup.i_gps != bconfig.uart_speed) {
+            uart0_init(bcomp.setup.i_gps);
+        }
+    }
+    // Р¤Р»Р°Рі РЅР°Р»РёС‡РёСЏ СЃРёСЃС‚РµРјС‹ СЃС‚Р°Р±РёР»РёР·Р°С†РёРё, РґР»СЏ РЅРµС‘ РёРјРµРµС‚СЃСЏ CAN-РґР°С‚С‡РёРє РїРѕР»РѕР¶РµРЅРёСЏ СЂСѓР»РµРІРѕРіРѕ РєРѕР»РµСЃР°:
+    if (config_read(CPAR_SETUP_F_ESP, (uint8_t*)&bcomp.setup.f_esp, CPAR_SETUP_F_ESP_SIZE)) {
+        bcomp.setup.f_esp = 0;
+    }
 #if ( ELOG_SUPPORT == 1 )
-	// Флаг отправки лог-данных в UART-порт. Можно подключать устройство логгирования UART-данных.
-	// Данные отправляются на той же скорости, что работает GPS-модуль.
-	if (config_read(CPAR_SETUP_F_LOG, (uint8_t*)&bcomp.setup.f_log, CPAR_SETUP_F_LOG_SIZE)) {
-		bcomp.setup.f_log = bconfig.elog_flag;
-	}
+    // Р¤Р»Р°Рі РѕС‚РїСЂР°РІРєРё Р»РѕРі-РґР°РЅРЅС‹С… РІ UART-РїРѕСЂС‚. РњРѕР¶РЅРѕ РїРѕРґРєР»СЋС‡Р°С‚СЊ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ Р»РѕРіРіРёСЂРѕРІР°РЅРёСЏ UART-РґР°РЅРЅС‹С….
+    // Р”Р°РЅРЅС‹Рµ РѕС‚РїСЂР°РІР»СЏСЋС‚СЃСЏ РЅР° С‚РѕР№ Р¶Рµ СЃРєРѕСЂРѕСЃС‚Рё, С‡С‚Рѕ СЂР°Р±РѕС‚Р°РµС‚ GPS-РјРѕРґСѓР»СЊ.
+    if (config_read(CPAR_SETUP_F_LOG, (uint8_t*)&bcomp.setup.f_log, CPAR_SETUP_F_LOG_SIZE)) {
+        bcomp.setup.f_log = bconfig.elog_flag;
+    }
 #endif
-	// Калибровочный коэффициент топлива:
-	// Редактировать его требуется по формуле: F_новый_коэффициент = L_заправки / L_израсходованного * F_старый_коэффициент.
-	if (config_read(CPAR_SETUP_FUEL_CAL, (uint8_t*)&bcomp.setup.fuel_cal, CPAR_SETUP_FUEL_CAL_SIZE)) {
-		bcomp.setup.fuel_cal = bconfig.fuel_coeff;
-	}
-	// Значение яркости экрана:
-	if (config_read(CPAR_SETUP_F_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_SETUP_F_CONTRAST_SIZE)) {
-		bcomp.setup.contrast = bconfig.contrast;
-	}
-	// Флаг, проигрывать ли звуки:
-	if (config_read(CPAR_SETUP_F_SOUND, (uint8_t*)&bcomp.setup.sound, CPAR_SETUP_F_SOUND_SIZE)) {
-		bcomp.setup.sound = 0;
-	}
-	// Флаг сервисного режима, сохраняется между сеансами работы, активируется на время сервисного обслуживания:
-	if (config_read(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE)) {
-		bcomp.service = 0;
-	}
-	// Текущий уровень топлива:
-	if (config_read(CPAR_FUEL_LEVEL, (uint8_t*)&bcomp.fuel_level, CPAR_FUEL_LEVEL_SIZE)) {
-		bcomp.fuel_level = 0.0f;
-	}
-	
-	// -----------------------------------------------------------------------------
-	// Инициализация диаграмм:
-	// -----------------------------------------------------------------------------
-	
-	diagram_create(&bcomp.dia_engine, 100, 50, 1); // от 50 до 100 градусов.
-	diagram_create(&bcomp.dia_trans, 115, 50, 1);  // от 50 до 115 градусов.
-	diagram_create(&bcomp.dia_rail, 60000, 25000, 1);   // от 25 до 60 МПа (от 250 до 600Атм).
-	diagram_create(&bcomp.dia_intake, 200, 80, 1); // от 0.8 до 2 Атм.
-	diagram_create(&bcomp.dia_voltage, 15.0f, 11.0f, 1); // от 11V до 15V Атм.
-	
-	// -----------------------------------------------------------------------------
-	// Инициализируем асинхронные события:
-	// -----------------------------------------------------------------------------
+    // РљР°Р»РёР±СЂРѕРІРѕС‡РЅС‹Р№ РєРѕСЌС„С„РёС†РёРµРЅС‚ С‚РѕРїР»РёРІР°:
+    // Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РµРіРѕ С‚СЂРµР±СѓРµС‚СЃСЏ РїРѕ С„РѕСЂРјСѓР»Рµ: F_РЅРѕРІС‹Р№_РєРѕСЌС„С„РёС†РёРµРЅС‚ = L_Р·Р°РїСЂР°РІРєРё / L_РёР·СЂР°СЃС…РѕРґРѕРІР°РЅРЅРѕРіРѕ * F_СЃС‚Р°СЂС‹Р№_РєРѕСЌС„С„РёС†РёРµРЅС‚.
+    if (config_read(CPAR_SETUP_FUEL_CAL, (uint8_t*)&bcomp.setup.fuel_cal, CPAR_SETUP_FUEL_CAL_SIZE)) {
+        bcomp.setup.fuel_cal = bconfig.fuel_coeff;
+    }
+    // Р—РЅР°С‡РµРЅРёРµ СЏСЂРєРѕСЃС‚Рё СЌРєСЂР°РЅР°:
+    if (config_read(CPAR_SETUP_F_CONTRAST, (uint8_t*)&bcomp.setup.contrast, CPAR_SETUP_F_CONTRAST_SIZE)) {
+        bcomp.setup.contrast = bconfig.contrast;
+    }
+    // Р¤Р»Р°Рі, РїСЂРѕРёРіСЂС‹РІР°С‚СЊ Р»Рё Р·РІСѓРєРё:
+    if (config_read(CPAR_SETUP_F_SOUND, (uint8_t*)&bcomp.setup.sound, CPAR_SETUP_F_SOUND_SIZE)) {
+        bcomp.setup.sound = 0;
+    }
+    // Р¤Р»Р°Рі СЃРµСЂРІРёСЃРЅРѕРіРѕ СЂРµР¶РёРјР°, СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ РјРµР¶РґСѓ СЃРµР°РЅСЃР°РјРё СЂР°Р±РѕС‚С‹, Р°РєС‚РёРІРёСЂСѓРµС‚СЃСЏ РЅР° РІСЂРµРјСЏ СЃРµСЂРІРёСЃРЅРѕРіРѕ РѕР±СЃР»СѓР¶РёРІР°РЅРёСЏ:
+    if (config_read(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE)) {
+        bcomp.service = 0;
+    }
+    // РўРµРєСѓС‰РёР№ СѓСЂРѕРІРµРЅСЊ С‚РѕРїР»РёРІР°:
+    if (config_read(CPAR_FUEL_LEVEL, (uint8_t*)&bcomp.fuel_level, CPAR_FUEL_LEVEL_SIZE)) {
+        bcomp.fuel_level = 0.0f;
+    }
+    
+    // -----------------------------------------------------------------------------
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РґРёР°РіСЂР°РјРј:
+    // -----------------------------------------------------------------------------
+    
+    diagram_create(&bcomp.dia_engine, 100, 50, 1); // РѕС‚ 50 РґРѕ 100 РіСЂР°РґСѓСЃРѕРІ.
+    diagram_create(&bcomp.dia_trans, 115, 50, 1);  // РѕС‚ 50 РґРѕ 115 РіСЂР°РґСѓСЃРѕРІ.
+    diagram_create(&bcomp.dia_rail, 60000, 25000, 1);   // РѕС‚ 25 РґРѕ 60 РњРџР° (РѕС‚ 250 РґРѕ 600РђС‚Рј).
+    diagram_create(&bcomp.dia_intake, 200, 80, 1); // РѕС‚ 0.8 РґРѕ 2 РђС‚Рј.
+    diagram_create(&bcomp.dia_voltage, 15.0f, 11.0f, 1); // РѕС‚ 11V РґРѕ 15V РђС‚Рј.
+    
+    // -----------------------------------------------------------------------------
+    // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј Р°СЃРёРЅС…СЂРѕРЅРЅС‹Рµ СЃРѕР±С‹С‚РёСЏ:
+    // -----------------------------------------------------------------------------
 
-	// Процедура 
-	event_set(bcomp_calc, 1000); delay_ms(10);
-	// Получение аналоговых данных:
-	event_set(bcomp_analog, 500); delay_ms(10);
+    // РџСЂРѕС†РµРґСѓСЂР° 
+    event_set(bcomp_calc, 1000); delay_ms(10);
+    // РџРѕР»СѓС‡РµРЅРёРµ Р°РЅР°Р»РѕРіРѕРІС‹С… РґР°РЅРЅС‹С…:
+    event_set(bcomp_analog, 500); delay_ms(10);
 #if ( ELOG_SUPPORT == 1 )
-	// Если установлен флаг логгирования, инициализируем соотв. событие:
-	if (bcomp.setup.f_log) {
-		event_set(bcomp_elog, 10000); delay_ms(10);
-	}
+    // Р•СЃР»Рё СѓСЃС‚Р°РЅРѕРІР»РµРЅ С„Р»Р°Рі Р»РѕРіРіРёСЂРѕРІР°РЅРёСЏ, РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЃРѕРѕС‚РІ. СЃРѕР±С‹С‚РёРµ:
+    if (bcomp.setup.f_log) {
+        event_set(bcomp_elog, 10000); delay_ms(10);
+    }
 #endif
 #if ( WARNING_SUPPORT == 1 )
-	// Асинхронный обработчик с проверками на предупреждения:
-	event_set(bcomp_warning, 10000); delay_ms(10);
+    // РђСЃРёРЅС…СЂРѕРЅРЅС‹Р№ РѕР±СЂР°Р±РѕС‚С‡РёРє СЃ РїСЂРѕРІРµСЂРєР°РјРё РЅР° РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ:
+    event_set(bcomp_warning, 10000); delay_ms(10);
 #endif
-	// Сохраняем данные в EEPROM, только если задана её конфигурация:
-	event_set(bcomp_save, 30000); delay_ms(10);
+    // РЎРѕС…СЂР°РЅСЏРµРј РґР°РЅРЅС‹Рµ РІ EEPROM, С‚РѕР»СЊРєРѕ РµСЃР»Рё Р·Р°РґР°РЅР° РµС‘ РєРѕРЅС„РёРіСѓСЂР°С†РёСЏ:
+    event_set(bcomp_save, 30000); delay_ms(10);
 
-	// -----------------------------------------------------------------------------
-	// Инициализируем экран:
-	// -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј СЌРєСЂР°РЅ:
+    // -----------------------------------------------------------------------------
 
 #if ( GRAPH_SUPPORT == 1 )
-	oled_init(bcomp.setup.contrast, 0);
-	graph_clear();
+    oled_init(bcomp.setup.contrast, 0);
+    graph_clear();
 #endif
 
-	// -----------------------------------------------------------------------------
-	// Запускаем OBD-протокол:
-	// -----------------------------------------------------------------------------
-	obd_init();
+    // -----------------------------------------------------------------------------
+    // Р—Р°РїСѓСЃРєР°РµРј OBD-РїСЂРѕС‚РѕРєРѕР»:
+    // -----------------------------------------------------------------------------
+    obd_init();
 
-	// -----------------------------------------------------------------------------
-	// Стартовый экран (заставка/мелодия):
-	// -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // РЎС‚Р°СЂС‚РѕРІС‹Р№ СЌРєСЂР°РЅ (Р·Р°СЃС‚Р°РІРєР°/РјРµР»РѕРґРёСЏ):
+    // -----------------------------------------------------------------------------
 
 #if ( GRAPH_SUPPORT == 1 )
-	if (bconfig.start_delay) {
+    if (bconfig.start_delay) {
 #if ( PAJERO_SPECIFIC == 1 )
-		// Новая версия заставки, только иконка:
-		graph_pic(&ico64_mitsu,64-32,0);
+        // РќРѕРІР°СЏ РІРµСЂСЃРёСЏ Р·Р°СЃС‚Р°РІРєРё, С‚РѕР»СЊРєРѕ РёРєРѕРЅРєР°:
+        graph_pic(&ico64_mitsu,64-32,0);
 #elif ( NISSAN_SPECIFIC == 1 )
-		// Новая версия заставки, только иконка:
-		graph_pic(&ico64_nissan,64-36,8);
+        // РќРѕРІР°СЏ РІРµСЂСЃРёСЏ Р·Р°СЃС‚Р°РІРєРё, С‚РѕР»СЊРєРѕ РёРєРѕРЅРєР°:
+        graph_pic(&ico64_nissan,64-36,8);
 #else
-		// Просто картинка заставки:
-		graph_pic(&ico48_mcu,64-24,8);
+        // РџСЂРѕСЃС‚Рѕ РєР°СЂС‚РёРЅРєР° Р·Р°СЃС‚Р°РІРєРё:
+        graph_pic(&ico48_mcu,64-24,8);
 #endif
-		graph_update();
-	}
+        graph_update();
+    }
 #endif
-	if (bconfig.start_sound) {
+    if (bconfig.start_sound) {
 #if !defined( WIN32 )
-		beep_play(melody_start);
+        beep_play(melody_start);
 #endif
-	}
-	if (bconfig.start_delay) {
-		// Ожидание N секунд, по нажатию - прерываем.
-		ms = get_ms_timer();
-		while ((get_ms_timer() - ms) < bconfig.start_delay*1000) {
-			__WFI();
-			ret = button_read();
-			if (ret) {
-				break;
-			}
-		}
-	} else {
-		// Задержка перед основной логикой:
-		delay_ms(1000);
-	}
+    }
+    if (bconfig.start_delay) {
+        // РћР¶РёРґР°РЅРёРµ N СЃРµРєСѓРЅРґ, РїРѕ РЅР°Р¶Р°С‚РёСЋ - РїСЂРµСЂС‹РІР°РµРј.
+        ms = get_ms_timer();
+        while ((get_ms_timer() - ms) < bconfig.start_delay*1000) {
+            __WFI();
+            ret = button_read();
+            if (ret) {
+                break;
+            }
+        }
+    } else {
+        // Р—Р°РґРµСЂР¶РєР° РїРµСЂРµРґ РѕСЃРЅРѕРІРЅРѕР№ Р»РѕРіРёРєРѕР№:
+        delay_ms(1000);
+    }
 
-	// Инициализация закончена, выключаем красный светодиод:
-	led_red(0);
-		
-	// -----------------------------------------------------------------------------
-	// Основной цикл работы интерфейса:
-	// -----------------------------------------------------------------------------
-	ret = 0;
-	while (1) {
-		int buttons;
+    // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р·Р°РєРѕРЅС‡РµРЅР°, РІС‹РєР»СЋС‡Р°РµРј РєСЂР°СЃРЅС‹Р№ СЃРІРµС‚РѕРґРёРѕРґ:
+    led_red(0);
+        
+    // -----------------------------------------------------------------------------
+    // РћСЃРЅРѕРІРЅРѕР№ С†РёРєР» СЂР°Р±РѕС‚С‹ РёРЅС‚РµСЂС„РµР№СЃР°:
+    // -----------------------------------------------------------------------------
+    ret = 0;
+    while (1) {
+        int buttons;
 #if ( GRAPH_SUPPORT == 1 )
-		graph_clear();
+        graph_clear();
 #endif
-		// Состояние кнопок:
-		ms = get_ms_timer();
-		while ((get_ms_timer() - ms) < 400) {
-			__WFI();
-			buttons = button_read();
-			if (buttons) {
-				break;
-			}
-		}
-		// Вывод страницы:
-		DBG("bcomp.page = %d\r\n", bcomp.page);
-		// Обработка кнопок:
-		if (buttons & BUTT_SW1) {
-			DBG("buttons(): BUTT_SW1\r\n");
-			bcomp.page &= ~GUI_FLAG_GRAPH;
+        // РЎРѕСЃС‚РѕСЏРЅРёРµ РєРЅРѕРїРѕРє:
+        ms = get_ms_timer();
+        while ((get_ms_timer() - ms) < 400) {
+            __WFI();
+            buttons = button_read();
+            if (buttons) {
+                break;
+            }
+        }
+        // Р’С‹РІРѕРґ СЃС‚СЂР°РЅРёС†С‹:
+        DBG("bcomp.page = %d\r\n", bcomp.page);
+        // РћР±СЂР°Р±РѕС‚РєР° РєРЅРѕРїРѕРє:
+        if (buttons & BUTT_SW1) {
+            DBG("buttons(): BUTT_SW1\r\n");
+            bcomp.page &= ~GUI_FLAG_GRAPH;
 #if !defined( WIN32 )
-			if (bcomp.setup.sound) {
-				// Нажатие на кнопку:
-				beep_play(melody_wrep);
-			}
+            if (bcomp.setup.sound) {
+                // РќР°Р¶Р°С‚РёРµ РЅР° РєРЅРѕРїРєСѓ:
+                beep_play(melody_wrep);
+            }
 #endif
-			if (bcomp.page & GUI_FLAG_MENU) {
-				// nop
-			} else
+            if (bcomp.page & GUI_FLAG_MENU) {
+                // nop
+            } else
 #if ( WARNING_SUPPORT == 1 )
-			if (bcomp.page & GUI_FLAG_WARNING) {
-				// nop
-			} else 
+            if (bcomp.page & GUI_FLAG_WARNING) {
+                // nop
+            } else 
 #endif
-			{
-				if (bcomp.page == 8) {
-					if (bcomp.service & 0x80) {
-						bcomp.service ^= 0x01;
-						config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
-						goto end_sw1_proc;
-					}
-				}
-				bcomp.page++;
-				config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
-			}
-		}
+            {
+                if (bcomp.page == 8) {
+                    if (bcomp.service & 0x80) {
+                        bcomp.service ^= 0x01;
+                        config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
+                        goto end_sw1_proc;
+                    }
+                }
+                bcomp.page++;
+                config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
+            }
+        }
 end_sw1_proc:
-		if (buttons & BUTT_SW1_LONG) {
-			DBG("buttons(): BUTT_SW1_LONG\r\n");
+        if (buttons & BUTT_SW1_LONG) {
+            DBG("buttons(): BUTT_SW1_LONG\r\n");
 #if !defined( WIN32 )
-			if (bcomp.setup.sound) {
-				// Нажатие на кнопку:
-				beep_play(melody_wrep2);
-			}
+            if (bcomp.setup.sound) {
+                // РќР°Р¶Р°С‚РёРµ РЅР° РєРЅРѕРїРєСѓ:
+                beep_play(melody_wrep2);
+            }
 #endif
-			if (bcomp.page & GUI_FLAG_MENU) {
-				// nop
-			} else 
+            if (bcomp.page & GUI_FLAG_MENU) {
+                // nop
+            } else 
 #if ( WARNING_SUPPORT == 1 )
-			if (bcomp.page & GUI_FLAG_WARNING) {
-				// nop
-			} else 
+            if (bcomp.page & GUI_FLAG_WARNING) {
+                // nop
+            } else 
 #endif
-			if (bcomp.page == 1) {
-				buttons = 0;
-				bcomp.page |= GUI_FLAG_MENU;
-			} else 
-			if (bcomp.page == 2) {
-				bcomp.page ^= GUI_FLAG_GRAPH;
-			} else 
-			if (bcomp.page == 3) {
-				bcomp.page ^= GUI_FLAG_GRAPH;
-			} else 
-			if (bcomp.page == 4) {
-				bcomp.page ^= GUI_FLAG_GRAPH;
-			} else 
-			if (bcomp.page == 6) {
-				bcomp.trip[0].dist = 0;
-				bcomp.trip[0].time = 0;
-				bcomp.trip[0].fuel = 0;
-				// Сброс параметров маршрута А:
-				config_save(CPAR_TRIPA_DIST, (uint8_t*)&bcomp.trip[0].dist, CPAR_TRIPA_DIST_SIZE);
-				config_save(CPAR_TRIPA_TIME, (uint8_t*)&bcomp.trip[0].time, CPAR_TRIPA_TIME_SIZE);
-				config_save(CPAR_TRIPA_FUEL, (uint8_t*)&bcomp.trip[0].fuel, CPAR_TRIPA_FUEL_SIZE);
-			} else 
-			if (bcomp.page == 7) {
-				bcomp.trip[1].dist = 0;
-				bcomp.trip[1].time = 0;
-				bcomp.trip[1].fuel = 0;
-				// Сброс параметров маршрута Б:
-				config_save(CPAR_TRIPB_DIST, (uint8_t*)&bcomp.trip[1].dist, CPAR_TRIPB_DIST_SIZE);
-				config_save(CPAR_TRIPB_TIME, (uint8_t*)&bcomp.trip[1].time, CPAR_TRIPB_TIME_SIZE);
-				config_save(CPAR_TRIPB_FUEL, (uint8_t*)&bcomp.trip[1].fuel, CPAR_TRIPB_FUEL_SIZE);
-			} else 
-			if (bcomp.page == 8) {
-				if (bcomp.service == 0) {
-					bcomp.service = 0x80;
-				} else {
-					if (bcomp.service & 0x01) {
-						// Инициализация сервисного счетчика.
-						// Моточасы:
-						bcomp.moto_time_service = 0;
-						config_save(CPAR_MOTO_SERV, (uint8_t*)&bcomp.moto_time_service, CPAR_MOTO_SERV_SIZE);
-						// Дистанция:
-						bcomp.moto_dist_service = 0.0f;
-						config_save(CPAR_DIST_SERV, (uint8_t*)&bcomp.moto_dist_service, CPAR_DIST_SERV_SIZE);
-						// Дата проведения ТО:
-						memcpy(bcomp.moto_date_service, bcomp.gps_val_date,sizeof(bcomp.moto_date_service));
-						bcomp.moto_date_service[sizeof(bcomp.moto_date_service)-1] = 0;
-						config_save(CPAR_DATE_SERV, (uint8_t*)bcomp.moto_date_service, CPAR_DATE_SERV_SIZE);
-					}
-					bcomp.service = 0;
-				}
-				config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
-			} else
-			if (bcomp.page == 11) {
-				bcomp.page ^= GUI_FLAG_GRAPH;
-			} else 
-			if (bcomp.page == 12) {
-				bcomp.page ^= GUI_FLAG_GRAPH;
-			} else
+            if (bcomp.page == 1) {
+                buttons = 0;
+                bcomp.page |= GUI_FLAG_MENU;
+            } else 
+            if (bcomp.page == 2) {
+                bcomp.page ^= GUI_FLAG_GRAPH;
+            } else 
+            if (bcomp.page == 3) {
+                bcomp.page ^= GUI_FLAG_GRAPH;
+            } else 
+            if (bcomp.page == 4) {
+                bcomp.page ^= GUI_FLAG_GRAPH;
+            } else 
+            if (bcomp.page == 6) {
+                bcomp.trip[0].dist = 0;
+                bcomp.trip[0].time = 0;
+                bcomp.trip[0].fuel = 0;
+                // РЎР±СЂРѕСЃ РїР°СЂР°РјРµС‚СЂРѕРІ РјР°СЂС€СЂСѓС‚Р° Рђ:
+                config_save(CPAR_TRIPA_DIST, (uint8_t*)&bcomp.trip[0].dist, CPAR_TRIPA_DIST_SIZE);
+                config_save(CPAR_TRIPA_TIME, (uint8_t*)&bcomp.trip[0].time, CPAR_TRIPA_TIME_SIZE);
+                config_save(CPAR_TRIPA_FUEL, (uint8_t*)&bcomp.trip[0].fuel, CPAR_TRIPA_FUEL_SIZE);
+            } else 
+            if (bcomp.page == 7) {
+                bcomp.trip[1].dist = 0;
+                bcomp.trip[1].time = 0;
+                bcomp.trip[1].fuel = 0;
+                // РЎР±СЂРѕСЃ РїР°СЂР°РјРµС‚СЂРѕРІ РјР°СЂС€СЂСѓС‚Р° Р‘:
+                config_save(CPAR_TRIPB_DIST, (uint8_t*)&bcomp.trip[1].dist, CPAR_TRIPB_DIST_SIZE);
+                config_save(CPAR_TRIPB_TIME, (uint8_t*)&bcomp.trip[1].time, CPAR_TRIPB_TIME_SIZE);
+                config_save(CPAR_TRIPB_FUEL, (uint8_t*)&bcomp.trip[1].fuel, CPAR_TRIPB_FUEL_SIZE);
+            } else 
+            if (bcomp.page == 8) {
+                if (bcomp.service == 0) {
+                    bcomp.service = 0x80;
+                } else {
+                    if (bcomp.service & 0x01) {
+                        // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРµСЂРІРёСЃРЅРѕРіРѕ СЃС‡РµС‚С‡РёРєР°.
+                        // РњРѕС‚РѕС‡Р°СЃС‹:
+                        bcomp.moto_time_service = 0;
+                        config_save(CPAR_MOTO_SERV, (uint8_t*)&bcomp.moto_time_service, CPAR_MOTO_SERV_SIZE);
+                        // Р”РёСЃС‚Р°РЅС†РёСЏ:
+                        bcomp.moto_dist_service = 0.0f;
+                        config_save(CPAR_DIST_SERV, (uint8_t*)&bcomp.moto_dist_service, CPAR_DIST_SERV_SIZE);
+                        // Р”Р°С‚Р° РїСЂРѕРІРµРґРµРЅРёСЏ РўРћ:
+                        memcpy(bcomp.moto_date_service, bcomp.gps_val_date,sizeof(bcomp.moto_date_service));
+                        bcomp.moto_date_service[sizeof(bcomp.moto_date_service)-1] = 0;
+                        config_save(CPAR_DATE_SERV, (uint8_t*)bcomp.moto_date_service, CPAR_DATE_SERV_SIZE);
+                    }
+                    bcomp.service = 0;
+                }
+                config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
+            } else
+            if (bcomp.page == 11) {
+                bcomp.page ^= GUI_FLAG_GRAPH;
+            } else 
+            if (bcomp.page == 12) {
+                bcomp.page ^= GUI_FLAG_GRAPH;
+            } else
             {
                 // nop
             }
-		}
+        }
 //end_sw1_long_proc:
-		if (buttons & BUTT_SW2) {
-			DBG("buttons(): BUTT_SW2\r\n");
-			bcomp.page &= ~GUI_FLAG_GRAPH;
+        if (buttons & BUTT_SW2) {
+            DBG("buttons(): BUTT_SW2\r\n");
+            bcomp.page &= ~GUI_FLAG_GRAPH;
 #if !defined( WIN32 )
-			if (bcomp.setup.sound) {
-				// Нажатие на кнопку:
-				beep_play(melody_wrep);
-			}
+            if (bcomp.setup.sound) {
+                // РќР°Р¶Р°С‚РёРµ РЅР° РєРЅРѕРїРєСѓ:
+                beep_play(melody_wrep);
+            }
 #endif
-			if (bcomp.page & GUI_FLAG_MENU) {
-				// nop
-			} else
+            if (bcomp.page & GUI_FLAG_MENU) {
+                // nop
+            } else
 #if ( WARNING_SUPPORT == 1 )
-			if (bcomp.page & GUI_FLAG_WARNING) {
-				// nop
-			} else 
+            if (bcomp.page & GUI_FLAG_WARNING) {
+                // nop
+            } else 
 #endif
-				if (bcomp.page == 8) {
-				if (bcomp.service & 0x80) {
-					bcomp.service ^= 0x01;
-					config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
-					goto end_sw2_proc;
-				}
-			}
-			bcomp.page--;
-			//DBG("config_save(): new page %d\r\n", bcomp.page);
-			config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
-		}
+                if (bcomp.page == 8) {
+                if (bcomp.service & 0x80) {
+                    bcomp.service ^= 0x01;
+                    config_save(CPAR_SERVICE, (uint8_t*)&bcomp.service, CPAR_SERVICE_SIZE);
+                    goto end_sw2_proc;
+                }
+            }
+            bcomp.page--;
+            //DBG("config_save(): new page %d\r\n", bcomp.page);
+            config_save(CPAR_PAGE, (uint8_t*)&bcomp.page, CPAR_PAGE_SIZE);
+        }
 end_sw2_proc:
-		if (buttons & BUTT_SW2_LONG) {
-			DBG("buttons(): BUTT_SW2_LONG\r\n");
-		}
+        if (buttons & BUTT_SW2_LONG) {
+            DBG("buttons(): BUTT_SW2_LONG\r\n");
+        }
 repeate:
 #if ( WARNING_SUPPORT == 1 )
-		// Проверка, есть ли варнинги: внутри устанавливается нужный флаг для работы.
-		warning_check();
-		// Вывод справки по страницам:
-		//DBG("page = %d (buttons = %02x)\r\n", bcomp.page, buttons);
-		// Проверка флагов, потом основной SWITCH по командам.
-		if (bcomp.page & GUI_FLAG_WARNING) {
-			ret = warning_show(&buttons);
-			if (ret) {
-				goto repeate;
-			}
-		} 
+        // РџСЂРѕРІРµСЂРєР°, РµСЃС‚СЊ Р»Рё РІР°СЂРЅРёРЅРіРё: РІРЅСѓС‚СЂРё СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РЅСѓР¶РЅС‹Р№ С„Р»Р°Рі РґР»СЏ СЂР°Р±РѕС‚С‹.
+        warning_check();
+        // Р’С‹РІРѕРґ СЃРїСЂР°РІРєРё РїРѕ СЃС‚СЂР°РЅРёС†Р°Рј:
+        //DBG("page = %d (buttons = %02x)\r\n", bcomp.page, buttons);
+        // РџСЂРѕРІРµСЂРєР° С„Р»Р°РіРѕРІ, РїРѕС‚РѕРј РѕСЃРЅРѕРІРЅРѕР№ SWITCH РїРѕ РєРѕРјР°РЅРґР°Рј.
+        if (bcomp.page & GUI_FLAG_WARNING) {
+            ret = warning_show(&buttons);
+            if (ret) {
+                goto repeate;
+            }
+        } 
 #endif
 #if ( GRAPH_SUPPORT == 1 ) && ( WARNING_SUPPORT == 1 )
-		else
+        else
 #endif
 #if ( GRAPH_SUPPORT == 1 )
-		if (bcomp.page & GUI_FLAG_MENU) {
-			int contrast;
-			contrast = bcomp.setup.contrast;
-			ret = menu_work(&buttons);
-			// Проверяем, не изменился ли контраст:
-			if (contrast != bcomp.setup.contrast) {
-				// Изменился, перенастраиваем:
-				oled_contrast(bcomp.setup.contrast);
-			}
-			switch (ret) {
-			case 0x00:
-				bcomp.page &= ~GUI_FLAG_MENU;
-				goto repeate;
-			case 0xF0:
-				if (buttons & (BUTT_SW1|BUTT_SW1_LONG)) {
-					menu_back();
-				}
-				graph_puts16(64,  0, 1, INFO_DEVICE);
-				graph_puts16(64, 16, 1, INFO_VERSION);
-				graph_puts16(64, 32, 1, INFO_AUTHOR);
-				graph_puts16(64, 48, 1, INFO_YEAR);
-				break;
-			case 0xF1:
-				DBG("Screen 0xF1, buttons: %02x\r\n", buttons);
-				graph_puts16(64, 10, 1, "Сохранение");
-				if (buttons & BUTT_SW1) {
-					save_flag ^= 0x80;
-				}
-				if (buttons & BUTT_SW1_LONG) {
-					if (save_flag & 0x80) {
-						save_flag |= 0x02;
-					} else {
-						save_flag = 0;
-					}
-					menu_back();
-				}
-				if (save_flag & 0x80) {
-					graph_puts16(64, 26, 1, "OK");
-				} else {
-					graph_puts16(64, 26, 1, "Отмена");
-				}
-				break;
-			case 0xF2:
-				if (buttons & (BUTT_SW1|BUTT_SW1_LONG)) {
-					menu_back();
-				}
-				graph_puts16(64, 10, 1, "VIN");
-				memcpy(str, bcomp.vin, 10); str[10] = 0;
-				graph_puts16(64, 26, 1, str);
-				memcpy(str, &bcomp.vin[10], 10); str[10] = 0;
-				graph_puts16(64, 42, 1, str);
-				break;
-			case 0xF3:
-				if (bcomp.odometer == -1) {
-					obd_act_set(PAJERO_ODO_INFO, 1);
-				}
-				graph_puts16(64, 10, 1, "Пробег ECU");
-				_sprintf(str, "%dкм", bcomp.odometer);
-				graph_puts16(64, 26, 1, str);
+        if (bcomp.page & GUI_FLAG_MENU) {
+            int contrast;
+            contrast = bcomp.setup.contrast;
+            ret = menu_work(&buttons);
+            // РџСЂРѕРІРµСЂСЏРµРј, РЅРµ РёР·РјРµРЅРёР»СЃСЏ Р»Рё РєРѕРЅС‚СЂР°СЃС‚:
+            if (contrast != bcomp.setup.contrast) {
+                // РР·РјРµРЅРёР»СЃСЏ, РїРµСЂРµРЅР°СЃС‚СЂР°РёРІР°РµРј:
+                oled_contrast(bcomp.setup.contrast);
+            }
+            switch (ret) {
+            case 0x00:
+                bcomp.page &= ~GUI_FLAG_MENU;
+                goto repeate;
+            case 0xF0:
+                if (buttons & (BUTT_SW1|BUTT_SW1_LONG)) {
+                    menu_back();
+                }
+                graph_puts16(64,  0, 1, INFO_DEVICE);
+                graph_puts16(64, 16, 1, INFO_VERSION);
+                graph_puts16(64, 32, 1, INFO_AUTHOR);
+                graph_puts16(64, 48, 1, INFO_YEAR);
+                break;
+            case 0xF1:
+                DBG("Screen 0xF1, buttons: %02x\r\n", buttons);
+                graph_puts16(64, 10, 1, "Save");
+                if (buttons & BUTT_SW1) {
+                    save_flag ^= 0x80;
+                }
+                if (buttons & BUTT_SW1_LONG) {
+                    if (save_flag & 0x80) {
+                        save_flag |= 0x02;
+                    } else {
+                        save_flag = 0;
+                    }
+                    menu_back();
+                }
+                if (save_flag & 0x80) {
+                    graph_puts16(64, 26, 1, "OK");
+                } else {
+                    graph_puts16(64, 26, 1, "Cancel");
+                }
+                break;
+            case 0xF2:
+                if (buttons & (BUTT_SW1|BUTT_SW1_LONG)) {
+                    menu_back();
+                }
+                graph_puts16(64, 10, 1, "VIN");
+                memcpy(str, bcomp.vin, 10); str[10] = 0;
+                graph_puts16(64, 26, 1, str);
+                memcpy(str, &bcomp.vin[10], 10); str[10] = 0;
+                graph_puts16(64, 42, 1, str);
+                break;
+            case 0xF3:
+                if (bcomp.odometer == -1) {
+                    obd_act_set(PAJERO_ODO_INFO, 1);
+                }
+                graph_puts16(64, 10, 1, "Distance ECU");
+                _sprintf(str, "%dkm", bcomp.odometer);
+                graph_puts16(64, 26, 1, str);
 #if 0
-				// NOTE:
-				// Сохранение пробега ECU для синхронизаций показаний отключено.
-				// Не решено окончательно, каким образом точно будет работать данная функция.
-				if (buttons & BUTT_SW1) {
-					save_flag ^= 0x80;
-				}
-				if (buttons & BUTT_SW1_LONG) {
-					if (save_flag & 0x80) {
-						save_flag |= 0x04;
-					} else {
-						save_flag = 0;
-					}
-					menu_back();
-				}
-				if (save_flag & 0x80) {
-					graph_puts16(64, 42, 1, "Синхрон.?");
-				} else {
-					graph_puts16(64, 42, 1, "Отмена");
-				}
+                // NOTE:
+                // РЎРѕС…СЂР°РЅРµРЅРёРµ РїСЂРѕР±РµРіР° ECU РґР»СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёР№ РїРѕРєР°Р·Р°РЅРёР№ РѕС‚РєР»СЋС‡РµРЅРѕ.
+                // РќРµ СЂРµС€РµРЅРѕ РѕРєРѕРЅС‡Р°С‚РµР»СЊРЅРѕ, РєР°РєРёРј РѕР±СЂР°Р·РѕРј С‚РѕС‡РЅРѕ Р±СѓРґРµС‚ СЂР°Р±РѕС‚Р°С‚СЊ РґР°РЅРЅР°СЏ С„СѓРЅРєС†РёСЏ.
+                if (buttons & BUTT_SW1) {
+                    save_flag ^= 0x80;
+                }
+                if (buttons & BUTT_SW1_LONG) {
+                    if (save_flag & 0x80) {
+                        save_flag |= 0x04;
+                    } else {
+                        save_flag = 0;
+                    }
+                    menu_back();
+                }
+                if (save_flag & 0x80) {
+                    graph_puts16(64, 42, 1, "Sync.?");
+                } else {
+                    graph_puts16(64, 42, 1, "Cancel");
+                }
 #endif
-				break;
-			default:
-				break;
-			}
-		} else {
-			switch (BCOMP_PAGE()) {
-			// SCREENS:
-			//  1 - ODOMETER
-			//  2 - ENGINE
-			//  3 - TRANSMISSION (if present)
-			//  4 - BATTERY
-			//  5 - FUEL ECONOMY
-			//  6 - TRIP A
-			//  7 - TRIP B
-			//  8 - SERVICE
-			//  9 - WHEELS (if present)
-			// 10 - GPS (if present)
-			// 11 - RAIL PRESSURE
-			// 12 - INTAKE PRESSURE
+                break;
+            default:
+                break;
+            }
+        } else {
+            switch (BCOMP_PAGE()) {
+            // SCREENS:
+            //  1 - ODOMETER
+            //  2 - ENGINE
+            //  3 - TRANSMISSION (if present)
+            //  4 - BATTERY
+            //  5 - FUEL ECONOMY
+            //  6 - TRIP A
+            //  7 - TRIP B
+            //  8 - SERVICE
+            //  9 - WHEELS (if present)
+            // 10 - GPS (if present)
+            // 11 - RAIL PRESSURE
+            // 12 - INTAKE PRESSURE
             // 13 - TEST CAN ERROR COUNTERS
 #if 0
-            // Временно убрал эту страницу информации.
+            // Р’СЂРµРјРµРЅРЅРѕ СѓР±СЂР°Р» СЌС‚Сѓ СЃС‚СЂР°РЅРёС†Сѓ РёРЅС„РѕСЂРјР°С†РёРё.
             case 1:
-				// -----------------------------------------------------------------
-				// ODOMETER
-				// -----------------------------------------------------------------
-				//if (bcomp.setup.f_ext) {
-				//	if (bcomp.t_ext == 0xFFFF) {
-				//		_sprintf(str, "--°C", bcomp.t_ext);
-				//	} else {
-				//		_sprintf(str, "%d°C", bcomp.t_ext);
-				//		graph_puts16(64+32, 0, 1, str);
-				//	}
-				//}
+                // -----------------------------------------------------------------
+                // ODOMETER
+                // -----------------------------------------------------------------
+                //if (bcomp.setup.f_ext) {
+                //    if (bcomp.t_ext == 0xFFFF) {
+                //        _sprintf(str, "--В°C", bcomp.t_ext);
+                //    } else {
+                //        _sprintf(str, "%dВ°C", bcomp.t_ext);
+                //        graph_puts16(64+32, 0, 1, str);
+                //    }
+                //}
 #if ( NMEA_SUPPORT == 1 )
-				if (bcomp.g_correct) {
-					_sprintf(str,"%d km/h", (uint32_t)bcomp.gps_speed);
-					graph_puts16(64, 0, 1, str);
-				}
+                if (bcomp.g_correct) {
+                    _sprintf(str,"%dkm/h", (uint32_t)bcomp.gps_speed);
+                    graph_puts16(64, 0, 1, str);
+                }
 #endif // NMEA_SUPPORT
 #if ( PAJERO_SPECIFIC == 1 )
-				if (bcomp.at_present) {
-					show_drive(64, 14);
-				} else
+                if (bcomp.at_present) {
+                    show_drive(64, 14);
+                } else
 #endif
-				{
-					int speed;
+                {
+                    int speed;
 #if ( NMEA_SUPPORT == 1 )
-					if (bcomp.g_correct) {
-						speed = (int)bcomp.gps_speed;
-					} else 
+                    if (bcomp.g_correct) {
+                        speed = (int)bcomp.gps_speed;
+                    } else 
 #endif
-					{
-						speed = bcomp.speed;
-					}
-					_sprintf(str, "%dкм/ч", speed);
-					graph_puts16(64, 32, 1, str);
-				}
-				_sprintf(str, "%dкм", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
-				graph_puts16(64, 48, 1, str);
-				break;
+                    {
+                        speed = bcomp.speed;
+                    }
+                    _sprintf(str, "%dkm/h", speed);
+                    graph_puts16(64, 32, 1, str);
+                }
+                _sprintf(str, "%dkm", (int)bcomp.moto_dist/1000 + bconfig.moto_dist_offset);
+                graph_puts16(64, 48, 1, str);
+                break;
 #endif
-			case 2:
-				// -----------------------------------------------------------------
-				// ENGINE
-				// -----------------------------------------------------------------
-				graph_puts16(64, 0, 1, "ENGINE");
-				if (bcomp.t_engine == 0xFFFF) {
-					_sprintf(str, "--°C");
-				} else {
-					_sprintf(str, "%d°C", bcomp.t_engine);
-				}
-				if (bcomp.page & GUI_FLAG_GRAPH) {
-					graph_puts16(64, 16, 1, str);
-					diagram_draw(&bcomp.dia_engine);
-				} else {
-					graph_puts32c(64, 24, str);
-				}
-				break;
-			case 3:
-				// -----------------------------------------------------------------
-				// TRANSMISSION
-				// -----------------------------------------------------------------
-				if (bcomp.at_present == 0) {
+            case 2:
+                // -----------------------------------------------------------------
+                // ENGINE
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "ENGINE");
+                if (bcomp.t_engine == 0xFFFF) {
+                    _sprintf(str, "--В°C");
+                } else {
+                    _sprintf(str, "%dВ°C", bcomp.t_engine);
+                }
+                if (bcomp.page & GUI_FLAG_GRAPH) {
+                    graph_puts16(64, 16, 1, str);
+                    diagram_draw(&bcomp.dia_engine);
+                } else {
+                    graph_puts32c(64, 24, str);
+                }
+                break;
+            case 3:
+                // -----------------------------------------------------------------
+                // TRANSMISSION
+                // -----------------------------------------------------------------
+                if (bcomp.at_present == 0) {
                     goto default_mark;
-				}
+                }
 #if ( PAJERO_SPECIFIC == 1 ) || ( NISSAN_SPECIFIC == 1 )
-				graph_puts16(64, 0, 1, "TRANS");
-				if (bcomp.t_akpp == 0xFFFF) {
-					_sprintf(str, "--°C");
-				} else {
-					_sprintf(str, "%d°C", bcomp.t_akpp);
-				}
-				if (bcomp.page & GUI_FLAG_GRAPH) {
-					graph_puts16(64, 16, 1, str);
-					diagram_draw(&bcomp.dia_trans);
-				} else {
+                graph_puts16(64, 0, 1, "TRANS");
+                if (bcomp.t_akpp == 0xFFFF) {
+                    _sprintf(str, "--В°C");
+                } else {
+                    _sprintf(str, "%dВ°C", bcomp.t_akpp);
+                }
+                if (bcomp.page & GUI_FLAG_GRAPH) {
+                    graph_puts16(64, 16, 1, str);
+                    diagram_draw(&bcomp.dia_trans);
+                } else {
 #if ( PAJERO_SPECIFIC == 1 )
-					show_drive(64, 14);
+                    show_drive(64, 14);
 #endif
-					graph_puts32c(64, 38, str);
-				}
+                    graph_puts32c(64, 38, str);
+                }
 #endif
-				break;
-			case 4:
-				// -----------------------------------------------------------------
-				// BATERY
-				// -----------------------------------------------------------------
-				graph_puts16(64, 0, 1, "BATTERY");
-				if (isnan(bcomp.v_ecu)) {
-					_sprintf(str, "--.-V");
-				} else {
-					_sprintf(str, "%d.%dV", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
-				}
-				if (bcomp.page & GUI_FLAG_GRAPH) {
-					graph_puts16(64, 16, 1, str);
-					diagram_draw(&bcomp.dia_voltage);
-				} else {
-					graph_puts32c(64, 24, str);
-				}
-				break;
-			case 5:
-				// -----------------------------------------------------------------
-				// FUEL ECONOMY
-				// -----------------------------------------------------------------
-				graph_puts16(64, 0, 1, "FUEL");
-				// NOTE: Данный код показывает расход менее чем через 10 минут, это побочное 
-				// действие, из-за нулевого значения в ячейке "+1". Однако, это вполне правильный 
-				// вариант, постепенно расход подойдет к среднему за 10 минут.
-				if ((bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist) > 1000.0f) {
-					// Если за 10 минут проехали больше 1км:
-					float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
-					float d_dist = (bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist)/1000.0f;
-					float fuel_km = d_fuel / d_dist * 100.0f;
-					if (fuel_km < 50.0f) {
-						_sprintf(str, "%2d.%d", (int)fuel_km, (int)(fuel_km*10)%10);
-					} else {			  
-						_sprintf(str, "--.-");
-					}
-				} else {			  
-					_sprintf(str, "--.-");
-				}
-				graph_puts32c(64, 14, str);
-				graph_ico16(96, 24, ico16_100kms_data, 22); // l/100km
-				if (1) { // Часовой расход топлива
-					float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
-					float fuel_h;
-					if (bcomp.time < 60) {
-						_sprintf(str, "--.-");
-					} else
-					if (bcomp.time < 600) {
-						fuel_h = d_fuel*(3600/((bcomp.time/30)*30));
-						_sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
-					} else {
-						fuel_h = d_fuel*(3600/600);
-						_sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
-					}
-				}
-				graph_puts32c(64, 38, str);
-				graph_ico16(96, 48, ico16_lhour_data, 22); // l/100km
-				break;
-			case 6:
-				// -----------------------------------------------------------------
-				// TRIP A
-				// -----------------------------------------------------------------
-				graph_puts16(64, 0, 1, "TRIP A");
-				goto trip;
-			case 7:
-				// -----------------------------------------------------------------
-				// TRIP B
-				// -----------------------------------------------------------------
-				graph_puts16(64, 0, 1, "TRIP B");
+                break;
+            case 4:
+                // -----------------------------------------------------------------
+                // BATERY
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "BATTERY");
+                if (isnan(bcomp.v_ecu)) {
+                    _sprintf(str, "--.-V");
+                } else {
+                    _sprintf(str, "%d.%dV", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
+                }
+                if (bcomp.page & GUI_FLAG_GRAPH) {
+                    graph_puts16(64, 16, 1, str);
+                    diagram_draw(&bcomp.dia_voltage);
+                } else {
+                    graph_puts32c(64, 24, str);
+                }
+                break;
+            case 5:
+                // -----------------------------------------------------------------
+                // FUEL ECONOMY
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "FUEL");
+                // NOTE: Р”Р°РЅРЅС‹Р№ РєРѕРґ РїРѕРєР°Р·С‹РІР°РµС‚ СЂР°СЃС…РѕРґ РјРµРЅРµРµ С‡РµРј С‡РµСЂРµР· 10 РјРёРЅСѓС‚, СЌС‚Рѕ РїРѕР±РѕС‡РЅРѕРµ 
+                // РґРµР№СЃС‚РІРёРµ, РёР·-Р·Р° РЅСѓР»РµРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РІ СЏС‡РµР№РєРµ "+1". РћРґРЅР°РєРѕ, СЌС‚Рѕ РІРїРѕР»РЅРµ РїСЂР°РІРёР»СЊРЅС‹Р№ 
+                // РІР°СЂРёР°РЅС‚, РїРѕСЃС‚РµРїРµРЅРЅРѕ СЂР°СЃС…РѕРґ РїРѕРґРѕР№РґРµС‚ Рє СЃСЂРµРґРЅРµРјСѓ Р·Р° 10 РјРёРЅСѓС‚.
+                if ((bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist) > 1000.0f) {
+                    // Р•СЃР»Рё Р·Р° 10 РјРёРЅСѓС‚ РїСЂРѕРµС…Р°Р»Рё Р±РѕР»СЊС€Рµ 1РєРј:
+                    float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
+                    float d_dist = (bcomp.log[(bcomp.time/30)%20].dist - bcomp.log[(bcomp.time/30+1)%20].dist)/1000.0f;
+                    float fuel_km = d_fuel / d_dist * 100.0f;
+                    if (fuel_km < 50.0f) {
+                        _sprintf(str, "%2d.%d", (int)fuel_km, (int)(fuel_km*10)%10);
+                    } else {              
+                        _sprintf(str, "--.-");
+                    }
+                } else {              
+                    _sprintf(str, "--.-");
+                }
+                graph_puts32c(64, 14, str);
+                graph_ico16(96, 24, ico16_100kms_data, 22); // l/100km
+                if (1) { // Р§Р°СЃРѕРІРѕР№ СЂР°СЃС…РѕРґ С‚РѕРїР»РёРІР°
+                    float d_fuel = (bcomp.log[(bcomp.time/30)%20].fuel - bcomp.log[(bcomp.time/30+1)%20].fuel);
+                    float fuel_h;
+                    if (bcomp.time < 60) {
+                        _sprintf(str, "--.-");
+                    } else
+                    if (bcomp.time < 600) {
+                        fuel_h = d_fuel*(3600/((bcomp.time/30)*30));
+                        _sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
+                    } else {
+                        fuel_h = d_fuel*(3600/600);
+                        _sprintf(str, "%2d.%d", (int)fuel_h, (int)(fuel_h*10)%10);
+                    }
+                }
+                graph_puts32c(64, 38, str);
+                graph_ico16(96, 48, ico16_lhour_data, 22); // l/100km
+                break;
+            case 6:
+                // -----------------------------------------------------------------
+                // TRIP A
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "TRIP A");
+                goto trip;
+            case 7:
+                // -----------------------------------------------------------------
+                // TRIP B
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "TRIP B");
 trip:
                 {
                     int page = BCOMP_PAGE()-6;
-                    _sprintf(str, "%dкм", (int)bcomp.trip[page].dist/1000);
+                    _sprintf(str, "%dkm", (int)bcomp.trip[page].dist/1000);
                     graph_puts16(64, 16, 1, str);
-                    _sprintf(str, "%dч%02dм", (int)bcomp.trip[page].time/3600, (int)(bcomp.trip[page].time/60)%60);
+                    _sprintf(str, "%dh%02dm", (int)bcomp.trip[page].time/3600, (int)(bcomp.trip[page].time/60)%60);
                     graph_puts16(64, 32, 1, str);
-                    _sprintf(str, "%dл", (int)bcomp.trip[page].fuel);
+                    _sprintf(str, "%dl", (int)bcomp.trip[page].fuel);
                     graph_puts16(64, 48, 1, str);
                 }
                 break;
-			case 8:
-				// -----------------------------------------------------------------
-				// SERVICE
-				// -----------------------------------------------------------------
-				graph_puts16(64,  0, 1, "SERVICE");
-				if (bcomp.service & 0x80) {
-					graph_puts16(64, 16, 1, "Режим");
-					graph_puts16(64, 32, 1, "активен");
-					if (bcomp.service & 0x01) {
-						graph_puts16(64, 48, 1, "Сбросить");
-					} else {
-						graph_puts16(64, 48, 1, "Выход");
-					}
-				} else {
-					_sprintf(str, "%s", bcomp.moto_date_service);
-					graph_puts16(64, 16, 1, str);
-					_sprintf(str, "%dh", bcomp.moto_time_service/3600);
-					graph_puts16(64, 32, 1, str);
-					_sprintf(str, "%dkm", (int)bcomp.moto_dist_service/1000);
-					graph_puts16(64, 48, 1, str);
-				}
-				break;
+            case 8:
+                // -----------------------------------------------------------------
+                // SERVICE
+                // -----------------------------------------------------------------
+                graph_puts16(64,  0, 1, "SERVICE");
+                if (bcomp.service & 0x80) {
+                    graph_puts16(64, 16, 1, "Mode");
+                    graph_puts16(64, 32, 1, "active");
+                    if (bcomp.service & 0x01) {
+                        graph_puts16(64, 48, 1, "Reset");
+                    } else {
+                        graph_puts16(64, 48, 1, "Exit");
+                    }
+                } else {
+                    _sprintf(str, "%s", bcomp.moto_date_service);
+                    graph_puts16(64, 16, 1, str);
+                    _sprintf(str, "%dh", bcomp.moto_time_service/3600);
+                    graph_puts16(64, 32, 1, str);
+                    _sprintf(str, "%dkm", (int)bcomp.moto_dist_service/1000);
+                    graph_puts16(64, 48, 1, str);
+                }
+                break;
 #if ( WHELLS_DRAW_SUPPORT == 1 )
-			case 9:
-				// -----------------------------------------------------------------
-				// WHEELS
-				// -----------------------------------------------------------------
-				if (bcomp.esc_id == 0 ||
-					bcomp.setup.f_esp == 0) {
+            case 9:
+                // -----------------------------------------------------------------
+                // WHEELS
+                // -----------------------------------------------------------------
+                if (bcomp.esc_id == 0 ||
+                    bcomp.setup.f_esp == 0) {
                     goto default_mark;
-				}
-				graph_puts16(64,0,1,"WHEELS");
-				graph_line(40+4,40,88-4,40);
-				draw_rect(40,40,bcomp.angle);
-				draw_rect(88,40,bcomp.angle);
-				break;
+                }
+                graph_puts16(64,0,1,"WHEELS");
+                graph_line(40+4,40,88-4,40);
+                draw_rect(40,40,bcomp.angle);
+                draw_rect(88,40,bcomp.angle);
+                break;
 #endif
 #if ( NMEA_SUPPORT == 1 )
-			case 10:
-				// GPS
+            case 10:
+                // GPS
                 DBG("bcomp.setup.f_gps = %d\r\n", bcomp.setup.f_gps);
-				if (bcomp.setup.f_gps == 0) {
+                if (bcomp.setup.f_gps == 0) {
                     goto default_mark;
-				}
-				graph_puts16(64,0,1,"GPS");
-				if (bcomp.g_correct) {
-					_sprintf(str,"%s",bcomp.gps_val_time);
-					graph_puts16(64,16,1,str);
-					_sprintf(str,"%s",bcomp.gps_val_lon); str[10] = 0; // cutting
-					graph_puts16(64,32,1,str);
-					_sprintf(str,"%s",bcomp.gps_val_lat); str[10] = 0; // cutting
-					graph_puts16(64,48,1,str);
-				} else {
-					graph_puts16(64,32,1,"NO DATA");
-				}
-				break;
+                }
+                graph_puts16(64,0,1,"GPS");
+                if (bcomp.g_correct) {
+                    _sprintf(str,"%s",bcomp.gps_val_time);
+                    graph_puts16(64,16,1,str);
+                    _sprintf(str,"%s",bcomp.gps_val_lon); str[10] = 0; // cutting
+                    graph_puts16(64,32,1,str);
+                    _sprintf(str,"%s",bcomp.gps_val_lat); str[10] = 0; // cutting
+                    graph_puts16(64,48,1,str);
+                } else {
+                    graph_puts16(64,32,1,"NO DATA");
+                }
+                break;
 #endif
-			case 11:
-				// -----------------------------------------------------------------
-				// RAIL PRESSURE
-				// -----------------------------------------------------------------
-				graph_puts16(64, 0, 1, "FUEL");
-				_sprintf(str,"%3d.%dMPa", (bcomp.p_fuel/1000), (bcomp.p_fuel/100)%10);
-				if (bcomp.page & GUI_FLAG_GRAPH) {
-					graph_puts16(64, 16, 1, str);
-					diagram_draw(&bcomp.dia_rail);
-				} else {
-					graph_puts32c(64, 24, str);
-				}
-				break;
-			case 12:
-				// -----------------------------------------------------------------
-				// INTAKE PRESSURE
-				// -----------------------------------------------------------------
-				graph_puts16(64, 0, 1, "INTAKE");
-				_sprintf(str,"%dkPa",bcomp.p_intake);
-				if (bcomp.page & GUI_FLAG_GRAPH) {
-					graph_puts16(64, 16, 1, str);
-					diagram_draw(&bcomp.dia_intake);
-				} else {
-					graph_puts32c(64, 24, str);
-				}
-				break;
+            case 11:
+                // -----------------------------------------------------------------
+                // RAIL PRESSURE
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "FUEL");
+                _sprintf(str,"%3d.%dMPa", (bcomp.p_fuel/1000), (bcomp.p_fuel/100)%10);
+                if (bcomp.page & GUI_FLAG_GRAPH) {
+                    graph_puts16(64, 16, 1, str);
+                    diagram_draw(&bcomp.dia_rail);
+                } else {
+                    graph_puts32c(64, 24, str);
+                }
+                break;
+            case 12:
+                // -----------------------------------------------------------------
+                // INTAKE PRESSURE
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "INTAKE");
+                _sprintf(str,"%dkPa",bcomp.p_intake);
+                if (bcomp.page & GUI_FLAG_GRAPH) {
+                    graph_puts16(64, 16, 1, str);
+                    diagram_draw(&bcomp.dia_intake);
+                } else {
+                    graph_puts32c(64, 24, str);
+                }
+                break;
 #if 0
             case 13:
                 {
                     //
-                    // Экран с выводом счетчиков ошибок:
+                    // Р­РєСЂР°РЅ СЃ РІС‹РІРѕРґРѕРј СЃС‡РµС‚С‡РёРєРѕРІ РѕС€РёР±РѕРє:
                     //
                     uint8_t err_trans;
                     uint8_t err_recv;
@@ -1386,82 +1391,87 @@ trip:
                     _sprintf(str,"t: %d", err_trans);
                     graph_puts16(0, 32, 0, str);
                 }
-				break;
+                break;
 #endif
-			case 14:
-				{
-					//   ENG
-					graph_ico16(16, 0, ico16_engine_data, 16);
-					if (bcomp.t_engine == 0xFFFF) {
-						_sprintf(str, "--°C");
-					} else {
-						_sprintf(str, "%d°C", bcomp.t_engine);
-					}
-					graph_puts16(64+16, 0, 1, str);
-					//   AT
-					//graph_pic(ico16_engine_data, 16, 0);
-					graph_ico16(16, 16, ico16_at_data, 16);
-					if (bcomp.t_akpp == 0xFFFF) {
-						_sprintf(str, "--°C");
-					} else {
-						_sprintf(str, "%d°C", bcomp.t_akpp);
-					}
-					graph_puts16(64+16, 16, 1, str);
-					//  DRIVE
-					// 12x16. 128-(12+12+12)/2 = 110
-					switch (bcomp.at_drive) {
-					case 0x00:
-						graph_puts16(110, 32, 1, "N");
-						break;
-					case 0x01:
-						graph_puts16(110, 32, 1, "D/1");
-						break;
-					case 0x02:
-						graph_puts16(110, 32, 1, "D/2");
-						break;
-					case 0x03:
-						graph_puts16(110, 32, 1, "D/3");
-						break;
-					case 0x04:
-						graph_puts16(110, 32, 1, "D/4");
-						break;
-					case 0x05:
-						graph_puts16(110, 32, 1, "D/5");
-						break;
-					case 0x0d:
-						graph_puts16(110, 32, 1, "P");
-						break;
-					case 0x0b:
-						graph_puts16(110, 32, 1, "R");
-						break;
-					default:
-						graph_puts16(110, 32, 1, "ERR");
-						break;
-					}
-					// BATTERY
-					graph_ico16(0, 32, ico16_battery_data, 16);
-					if (isnan(bcomp.v_ecu)) {
-						_sprintf(str, "--.-V");
-					} else {
-						_sprintf(str, "%d.%dV", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
-					}
-					// 128-36 = 92-16 = 76/2 = 38 + 16 = 
-					graph_puts16(54, 32, 1, str);
-					//  SPEED
-					if (bcomp.g_correct) {
-						_sprintf(str,"%d km/h", (uint32_t)bcomp.gps_speed);
-					} else {
-						_sprintf(str,"--- km/h", (uint32_t)bcomp.gps_speed);
-					}
-					graph_puts16(64+16, 48, 1, str);
-				}
-				break;
+            case 14:
+                // -----------------------------------------------------------------
+                // MAIN WINDOW
+                // -----------------------------------------------------------------
+                {
+                    //   ENG
+                    graph_ico16(16, 0, ico16_engine_data, 16);
+                    if (bcomp.t_engine == 0xFFFF) {
+                        _sprintf(str, "--В°C");
+                    } else {
+                        _sprintf(str, "%dВ°C", bcomp.t_engine);
+                    }
+                    graph_puts16(64+16, 0, 1, str);
+                    //   AT
+                    //graph_pic(ico16_engine_data, 16, 0);
+                    graph_ico16(16, 16, ico16_at_data, 16);
+                    if (bcomp.t_akpp == 0xFFFF) {
+                        _sprintf(str, "--В°C");
+                    } else {
+                        _sprintf(str, "%dВ°C", bcomp.t_akpp);
+                    }
+                    graph_puts16(64+16, 16, 1, str);
+                    //  DRIVE
+                    // 12x16. 128-(12+12+12)/2 = 110
+                    switch (bcomp.at_drive) {
+                    case 0x00:
+                        graph_puts16(110, 32, 1, "N");
+                        break;
+                    case 0x01:
+                        graph_puts16(110, 32, 1, "D/1");
+                        break;
+                    case 0x02:
+                        graph_puts16(110, 32, 1, "D/2");
+                        break;
+                    case 0x03:
+                        graph_puts16(110, 32, 1, "D/3");
+                        break;
+                    case 0x04:
+                        graph_puts16(110, 32, 1, "D/4");
+                        break;
+                    case 0x05:
+                        graph_puts16(110, 32, 1, "D/5");
+                        break;
+                    case 0x0d:
+                        graph_puts16(110, 32, 1, "P");
+                        break;
+                    case 0x0b:
+                        graph_puts16(110, 32, 1, "R");
+                        break;
+                    default:
+                        graph_puts16(110, 32, 1, "ERR");
+                        break;
+                    }
+                    // BATTERY
+                    graph_ico16(0, 32, ico16_battery_data, 16);
+                    if (isnan(bcomp.v_ecu)) {
+                        _sprintf(str, "--.-V");
+                    } else {
+                        _sprintf(str, "%d.%dV", (int)bcomp.v_ecu, (int)(bcomp.v_ecu*10)%10);
+                    }
+                    // 128-36 = 92-16 = 76/2 = 38 + 16 = 
+                    graph_puts16(54, 32, 1, str);
+                    //  SPEED
+                    if (bcomp.g_correct) {
+                        _sprintf(str,"%d km/h", (uint32_t)bcomp.gps_speed);
+                    } else {
+                        _sprintf(str,"--- km/h", (uint32_t)bcomp.gps_speed);
+                    }
+                    graph_puts16(64+16, 48, 1, str);
+                }
+                break;
 #if 1
             case 15:
+                // -----------------------------------------------------------------
+                // SUN CALC
+                // -----------------------------------------------------------------
                 {
                     double lat;
                     double lon;
-                    float phase;
                     // GPS convert
                     DBG("GPS: %s %s\r\n", bcomp.gps_val_lat, bcomp.gps_val_lon);
                     nmea_convert_coord_w(&bcomp.gps_val_lat[1], bcomp.gps_val_lat[0], &lat);
@@ -1475,9 +1485,11 @@ trip:
                         3, // TIME ZONE 
                         (float)lat, (float)lon,
                         &bcomp.sun_rise, &bcomp.sun_set, &bcomp.sun_day);
+#if defined( _DBGOUT )
                     // moon calc
-                    phase = moon_phase(JulDay(bcomp.gtime.date, bcomp.gtime.month, bcomp.gtime.year, bcomp.gtime.hour));
+                    float phase = moon_phase(JulDay(bcomp.gtime.date, bcomp.gtime.month, bcomp.gtime.year, bcomp.gtime.hour));
                     DBG("Moon phase: %f (day: %d)\r\n", phase, (int)(phase*29.5f)+1);
+#endif //_DBGOUT
                     graph_puts16(64, 0, 1, "SUN");
                     graph_puts16( 0, 16, 0, "RISE:");
                     _sprintf(str,"%2d:%02d", (int)bcomp.sun_rise, (int)(fracf(bcomp.sun_rise)*60.0f));
@@ -1491,10 +1503,35 @@ trip:
                 }
                 break;
 #endif
+            case 16:
+                // -----------------------------------------------------------------
+                // RPM
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "RPM");
+                if (bcomp.t_engine == 0xFFFF) {
+                    _sprintf(str, "--rpm");
+                } else {
+                    _sprintf(str, "%4d", bcomp.rpm);
+                }
+                graph_puts32c(64, 24, str);
+                break;
+            case 17:
+                // -----------------------------------------------------------------
+                // AT EXTENTION
+                // -----------------------------------------------------------------
+                graph_puts16(64, 0, 1, "AT EXT.");
+                _sprintf(str, "IO %d/%d", bcomp.akpp_input, bcomp.akpp_output);
+                graph_puts16(0, 16, 0, str);
+                _sprintf(str, "RL: %d.%02d", bcomp.akpp_relay/100, bcomp.akpp_relay%100);
+                graph_puts16(0, 32, 0, str);
+                _sprintf(str, "S:%d,D:%d", bcomp.akpp_speed, bcomp.akpp_demf);
+                graph_puts16(0, 48, 0, str);
+                break;
             default:
 default_mark:
+                #define MAX_PAGE 16
                 DBG("unknown page (%d)\r\n", bcomp.page);
-                if (bcomp.page > 0 && bcomp.page < 15) {
+                if (bcomp.page > 0 && bcomp.page < MAX_PAGE) {
                     if (buttons & BUTT_SW2) {
                         BCOMP_PAGE_PREV();
                     } else {
@@ -1502,7 +1539,7 @@ default_mark:
                     }
                 } else {
                     if (buttons & BUTT_SW2) {
-                        bcomp.page = 15;
+                        bcomp.page = MAX_PAGE;
                     } else {
                         bcomp.page = 1;
                     }
@@ -1512,7 +1549,7 @@ default_mark:
             }
         }
         // -----------------------------------------------------------------
-        // Обновление экрана:
+        // РћР±РЅРѕРІР»РµРЅРёРµ СЌРєСЂР°РЅР°:
         // -----------------------------------------------------------------
 #ifdef _DBGOUT
         ms = get_ms_timer(); 
@@ -1523,7 +1560,7 @@ default_mark:
         DBG("graph_update() work %dms\r\n", ms);
 #endif //_DBGOUT
 #endif
-        // Сохранение изменяемых параметров:
+        // РЎРѕС…СЂР°РЅРµРЅРёРµ РёР·РјРµРЅСЏРµРјС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ:
         if (save_flag & 0x01) {
             save_params();
             save_flag &= ~0x01;
@@ -1539,22 +1576,21 @@ default_mark:
         }
 #endif
     }
-    return 0;
 }
 
 #if defined( WIN32 )
-// Точка входа для отладочной WIN-версии:
+// РўРѕС‡РєР° РІС…РѕРґР° РґР»СЏ РѕС‚Р»Р°РґРѕС‡РЅРѕР№ WIN-РІРµСЂСЃРёРё:
 int main(int argc, char **argv) {
-	uint32_t addr;
-	
-	printf("-----------------------------------------------------------\r\n");
-	printf("BCOMP11 Win32 PC build\r\n");
-	printf("-----------------------------------------------------------\r\n");
-	printf("A (or mouse click) - next, S - previous\r\n");
-	printf("A long press - Enter, S long press - Cancel\r\n");
-	printf("-----------------------------------------------------------\r\n");
-	printf("\r\n");
+    uint32_t addr;
+    
+    printf("-----------------------------------------------------------\r\n");
+    printf("BCOMP11 Win32 PC build\r\n");
+    printf("-----------------------------------------------------------\r\n");
+    printf("A (or mouse click) - next, S - previous\r\n");
+    printf("A long press - Enter, S long press - Cancel\r\n");
+    printf("-----------------------------------------------------------\r\n");
+    printf("\r\n");
 
-	return lcd_init(ProcMain, "OLED", SIZE_X, SIZE_Y);
+    return lcd_init(ProcMain, "OLED", SIZE_X, SIZE_Y);
 }
 #endif

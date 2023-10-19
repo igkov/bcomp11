@@ -194,7 +194,7 @@ PIOINT0_IRQHandler
                 IMPORT  exeption_proc
                 LDR     R0, =exeption_proc
                 BX      R0
-				ENDIF
+                ENDIF
 
                 ENDP
 

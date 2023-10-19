@@ -24,8 +24,8 @@ extern void STACK$$Limit;
 static ecu_error_t errors_list[WARN_MAX_NUM];
 
 /*
-	Проверка выхода параметров за допустимые значения.
-	Выставление ошибок.
+	РџСЂРѕРІРµСЂРєР° РІС‹С…РѕРґР° РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р° РґРѕРїСѓСЃС‚РёРјС‹Рµ Р·РЅР°С‡РµРЅРёСЏ.
+	Р’С‹СЃС‚Р°РІР»РµРЅРёРµ РѕС€РёР±РѕРє.
  */
 void bcomp_warning(void) {
 	DBG("bcomp_warning()\r\n");
@@ -39,13 +39,13 @@ void bcomp_warning(void) {
 			}
 		} else {
 			errors_list[WARNING_ID_CONNECT].time++;
-			// Больше 3х раз нет флага соединения:
+			// Р‘РѕР»СЊС€Рµ 3С… СЂР°Р· РЅРµС‚ С„Р»Р°РіР° СЃРѕРµРґРёРЅРµРЅРёСЏ:
 			if (errors_list[WARNING_ID_CONNECT].time > 3) {
 				errors_list[WARNING_ID_CONNECT].flags |= WARN_FLAG_ACT;
 				errors_list[WARNING_ID_CONNECT].time = 0;
 			}
 		}
-		// Возвращаемся, другие ошибки пока мониторить бессмысленно.
+		// Р’РѕР·РІСЂР°С‰Р°РµРјСЃСЏ, РґСЂСѓРіРёРµ РѕС€РёР±РєРё РїРѕРєР° РјРѕРЅРёС‚РѕСЂРёС‚СЊ Р±РµСЃСЃРјС‹СЃР»РµРЅРЅРѕ.
 		goto bcomp_warning_end;
 	} else {
 		errors_list[WARNING_ID_CONNECT].flags = 0;
@@ -107,7 +107,7 @@ void bcomp_warning(void) {
 			}
 		} else
 		if (bcomp.t_akpp < bcomp.setup.t_at-3) {
-			// Температура в норме, сбрасываем предупреждение:
+			// РўРµРјРїРµСЂР°С‚СѓСЂР° РІ РЅРѕСЂРјРµ, СЃР±СЂР°СЃС‹РІР°РµРј РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ:
 			errors_list[WARNING_ID_T_AT].flags = 0;
 			errors_list[WARNING_ID_T_AT].time = 0;
 		}
@@ -130,7 +130,7 @@ void bcomp_warning(void) {
 			}
 		} else {
 			errors_list[WARNING_ID_BATTERY].time++;
-			// Больше 3х раз подряд просадка напряжения!
+			// Р‘РѕР»СЊС€Рµ 3С… СЂР°Р· РїРѕРґСЂСЏРґ РїСЂРѕСЃР°РґРєР° РЅР°РїСЂСЏР¶РµРЅРёСЏ!
 			if (errors_list[WARNING_ID_BATTERY].time > 3) {
 				errors_list[WARNING_ID_BATTERY].flags |= WARN_FLAG_ACT;
 				errors_list[WARNING_ID_BATTERY].time = 0;
@@ -151,7 +151,7 @@ void bcomp_warning(void) {
 		} else
 		if (bcomp.t_ext < bcomp.setup.t_ext) {
 			if (errors_list[WARNING_ID_T_EXT].flags & WARN_FLAG_ACT) {
-				// Самостоятельно гасет через 10 секунд:
+				// РЎР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ РіР°СЃРµС‚ С‡РµСЂРµР· 10 СЃРµРєСѓРЅРґ:
 				errors_list[WARNING_ID_T_EXT].time += 5;
 				if (errors_list[WARNING_ID_T_EXT].time >= 10) {
 					errors_list[WARNING_ID_T_EXT].flags |= WARN_FLAG_HIDE;
@@ -182,7 +182,7 @@ void bcomp_warning(void) {
 				}
 			} else {
 				errors_list[WARNING_ID_GPS].time++;
-				// Ошибка по GPS только через 5 минут:
+				// РћС€РёР±РєР° РїРѕ GPS С‚РѕР»СЊРєРѕ С‡РµСЂРµР· 5 РјРёРЅСѓС‚:
 				if (errors_list[WARNING_ID_GPS].time > 60) {
 					errors_list[WARNING_ID_GPS].flags |= WARN_FLAG_ACT;
 					errors_list[WARNING_ID_GPS].time = 0;
@@ -216,9 +216,9 @@ void bcomp_warning(void) {
 				}
 			} else {
 				errors_list[WARNING_ID_FUEL].time++;
-				// Ошибка по FUEL появляется с задержкой в 1 минуту,
-				// фильтрует мгновенные уменьшения уровня ниже минимума 
-				// во время движения:
+				// РћС€РёР±РєР° РїРѕ FUEL РїРѕСЏРІР»СЏРµС‚СЃСЏ СЃ Р·Р°РґРµСЂР¶РєРѕР№ РІ 1 РјРёРЅСѓС‚Сѓ,
+				// С„РёР»СЊС‚СЂСѓРµС‚ РјРіРЅРѕРІРµРЅРЅС‹Рµ СѓРјРµРЅСЊС€РµРЅРёСЏ СѓСЂРѕРІРЅСЏ РЅРёР¶Рµ РјРёРЅРёРјСѓРјР° 
+				// РІРѕ РІСЂРµРјСЏ РґРІРёР¶РµРЅРёСЏ:
 				if (errors_list[WARNING_ID_FUEL].time > 12) {
 					errors_list[WARNING_ID_FUEL].flags |= WARN_FLAG_ACT;
 					errors_list[WARNING_ID_FUEL].time = 0;
@@ -231,14 +231,14 @@ void bcomp_warning(void) {
 	}
 #endif
 bcomp_warning_end:
-	// Раз в 5 секунд:
+	// Р Р°Р· РІ 5 СЃРµРєСѓРЅРґ:
 	event_set(bcomp_warning, 5000);
 }
 
 #if ( GRAPH_SUPPORT == 1 )
 // -----------------------------------------------------------------------------
 // show_XXX
-// Функции отображения информации.
+// Р¤СѓРЅРєС†РёРё РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё.
 // -----------------------------------------------------------------------------
 int warning_show(int *act) {
 	uint8_t id = 0;
@@ -251,17 +251,17 @@ int warning_show(int *act) {
 		}
 	}
 	if (*act & BUTT_SW1) {
-		// Скрытие ошибки, флаг ошибки не сбрасывается,
-		// после прохода заданного времени, ошибка возникает вновь!
+		// РЎРєСЂС‹С‚РёРµ РѕС€РёР±РєРё, С„Р»Р°Рі РѕС€РёР±РєРё РЅРµ СЃР±СЂР°СЃС‹РІР°РµС‚СЃСЏ,
+		// РїРѕСЃР»Рµ РїСЂРѕС…РѕРґР° Р·Р°РґР°РЅРЅРѕРіРѕ РІСЂРµРјРµРЅРё, РѕС€РёР±РєР° РІРѕР·РЅРёРєР°РµС‚ РІРЅРѕРІСЊ!
 		errors_list[id].flags |= WARN_FLAG_HIDE;
 		return 2;
 	} else 
 	if (*act & BUTT_SW1_LONG) {
-		// Погасим саму ошибку.
+		// РџРѕРіР°СЃРёРј СЃР°РјСѓ РѕС€РёР±РєСѓ.
 		errors_list[id].flags = 0;
 		if (id == 0) {
 			// TODO:
-			// Для CHECK ENGINE здесь можно поставить логику сброса ошибки.
+			// Р”Р»СЏ CHECK ENGINE Р·РґРµСЃСЊ РјРѕР¶РЅРѕ РїРѕСЃС‚Р°РІРёС‚СЊ Р»РѕРіРёРєСѓ СЃР±СЂРѕСЃР° РѕС€РёР±РєРё.
 		}
 		return 2;
 	}
@@ -286,12 +286,12 @@ int warning_show(int *act) {
 		break;
 	case WARNING_ID_T_ENGINE:
 		graph_pic(&ico48_temp,64-24,0);
-		_sprintf(str, "%d°C", bcomp.t_engine);
+		_sprintf(str, "%dВ°C", bcomp.t_engine);
 		graph_puts16(64,48,1,str);
 		break;
 	case WARNING_ID_T_AT:
 		graph_pic(&ico48_trans,64-24,0);
-		_sprintf(str, "%d°C", bcomp.t_akpp);
+		_sprintf(str, "%dВ°C", bcomp.t_akpp);
 		graph_puts16(64,48,1,str);
 		break;
 	case WARNING_ID_BATTERY:
@@ -301,7 +301,7 @@ int warning_show(int *act) {
 		break;
 	case WARNING_ID_T_EXT:
 		graph_pic(&ico48_silkroad,64-24,0);
-		_sprintf(str, "%d°C", (int)bcomp.t_ext);
+		_sprintf(str, "%dВ°C", (int)bcomp.t_ext);
 		graph_puts16(64,48,1,str);
 		break;
 	case WARNING_ID_GPS:
@@ -346,13 +346,13 @@ void warning_check(void) {
 					}
 				}
 #endif
-				// Выставляем ошибку:
+				// Р’С‹СЃС‚Р°РІР»СЏРµРј РѕС€РёР±РєСѓ:
 				bcomp.page |= GUI_FLAG_WARNING;
 				return;
 			}
 		}
 	}
-	// Нет предупреждений!
+	// РќРµС‚ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёР№!
 	bcomp.page &= ~GUI_FLAG_WARNING;
 }
 

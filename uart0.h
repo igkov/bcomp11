@@ -5,7 +5,7 @@
 
 #include "bcomp.h"
 
-/* Используем прерывания для приема данных? */
+/* РСЃРїРѕР»СЊР·СѓРµРј РїСЂРµСЂС‹РІР°РЅРёСЏ РґР»СЏ РїСЂРёРµРјР° РґР°РЅРЅС‹С…? */
 #if ( VIRTUINO_SUPPORT == 1 ) 
 #define __UART_IRQ   1
 extern void virtuino_proc(uint8_t data);
@@ -19,8 +19,8 @@ extern void nmea_proc(uint8_t ch);
 #endif
 
 void    uart0_init(uint32_t baudrate);
-void    uart0_putchar(uint8_t ch);
+void    uart0_putchar(char ch);
 uint8_t uart0_getchar(void);
-void    uart0_puts(const uint8_t *str);
+void    uart0_puts(const char *str);
 
 #endif

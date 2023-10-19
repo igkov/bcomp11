@@ -6,7 +6,7 @@
 
 #if ( PAJERO_SPECIFIC == 1 ) && ( GRAPH_SUPPORT == 1 ) && ( WHELLS_DRAW_SUPPORT == 1 )
 
-// Вращение точки, для отрисовки колес:
+// Р’СЂР°С‰РµРЅРёРµ С‚РѕС‡РєРё, РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё РєРѕР»РµСЃ:
 static void point_rot(int *x, int *y, int angle) {
 	int xNew, yNew;
 	float A = (float)angle / (180 / 3.14);
@@ -16,8 +16,8 @@ static void point_rot(int *x, int *y, int angle) {
 	*y = yNew;
 }
 
-// Отрисовка прямоугольника с поворотом,
-// используется для отрисовки колес:
+// РћС‚СЂРёСЃРѕРІРєР° РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР° СЃ РїРѕРІРѕСЂРѕС‚РѕРј,
+// РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РѕС‚СЂРёСЃРѕРІРєРё РєРѕР»РµСЃ:
 void draw_rect(int x, int y, int angle) {
 	int point_0_x = -RECT_X_SIZE;
 	int point_0_y = -RECT_Y_SIZE;
